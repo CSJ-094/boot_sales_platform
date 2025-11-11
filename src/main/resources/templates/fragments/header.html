@@ -1,0 +1,63 @@
+<header class="main-header" th:fragment="Header">
+  <div class="header-top">
+    <div class="logo">
+      <a th:href="@{/}">MY MODERN SHOP</a>
+    </div>
+
+    <div class="user-auth">
+      <th:block th:if="${session.memberId != null}">
+        <span class="auth-welcome">환영합니다, [[${session.memberName}]]님!</span>
+        <a th:href="@{/mypage}" class="auth-btn">마이페이지</a>
+        <a th:href="@{/cart}" class="auth-btn cart-btn">장바구니</a>
+        <a th:href="@{/logout}" class="auth-btn">로그아웃</a>
+      </th:block>
+
+      <th:block th:if="${session.memberId == null}">
+        <a th:href="@{/login}" class="auth-btn">로그인/회원가입</a>
+      </th:block>
+    </div>
+  </div>
+
+  <nav class="category-nav">
+    <ul class="category-list">
+      <li class="category-item">
+        <a th:href="@{/category/mans}">MANS</a>
+        <ul class="sub-category">
+          <li><a th:href="@{/category/mans/top}">상의</a></li>
+          <li><a th:href="@{/category/mans/bottom}">하의</a></li>
+          <li><a th:href="@{/category/mans/outer}">아우터</a></li>
+          <li><a th:href="@{/category/mans/acc}">모자/액세서리</a></li>
+        </ul>
+      </li>
+      <li class="category-item">
+        <a th:href="@{/category/women}">WOMEN</a>
+        <ul class="sub-category">
+          <li><a th:href="@{/category/women/top}">블라우스/티셔츠</a></li>
+          <li><a th:href="@{/category/women/dress}">원피스</a></li>
+          <li><a th:href="@{/category/women/skirt}">스커트</a></li>
+          <li><a th:href="@{/category/women/bag}">가방/잡화</a></li>
+        </ul>
+      </li>
+
+      <li class="category-item">
+        <a th:href="@{/category/unisex}">UNISEX</a>
+        <ul class="sub-category">
+          <li><a th:href="@{/category/unisex/top}">상의</a></li>
+          <li><a th:href="@{/category/unisex/bottom}">하의</a></li>
+          <li><a th:href="@{/category/unisex/outer}">아우터</a></li>
+          <li><a th:href="@{/category/unisex/shoes}">신발</a></li>
+        </ul>
+      </li>
+
+      <li class="category-item">
+        <a th:href="@{/category/sports}">SPORTS</a>
+        <ul class="sub-category">
+          <li><a th:href="@{/category/sports/top}">상의</a></li>
+          <li><a th:href="@{/category/sports/bottom}">하의</a></li>
+          <li><a th:href="@{/category/sports/outer}">아우터</a></li>
+          <li><a th:href="@{/category/sports/shoes}">신발</a></li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+</header>

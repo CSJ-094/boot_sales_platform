@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.dao.WishlistDAO">
+
+    <select id="getWishlistByMemberId" resultType="com.boot.dto.ProdDTO">
+        SELECT
+            P.PROD_ID as prodId,
+            P.PROD_SELLER as prodSeller,
+            P.PROD_NAME as prodName,
+            P.PROD_PRICE as prodPrice,
+            P.PROD_STOCK as prodStock,
+            P.PROD_DESC as prodDesc,
+            P.PROD_CODE as prodCode,
+            P.PROD_REG as prodReg,
+            P.PROD_UPD as prodUpd
+        FROM PRODUCT_DB P
+        JOIN WISHLIST_DB W ON P.PROD_ID = W.PROD_ID
+        WHERE W.MEMBER_ID = #{memberId}
+        ORDER BY W.WISH_DATE DESC
+    </select>
+
+    <insert id="addWishlist">
+        INSERT INTO WISHLIST_DB (WISH_ID, MEMBER_ID, PROD_ID, WISH_DATE)
+        VALUES (WISHLIST_SEQ.NEXTVAL, #{memberId}, #{prodId}, SYSDATE)
+    </insert>
+
+    <delete id="removeWishlist">
+        DELETE FROM WISHLIST_DB
+        WHERE MEMBER_ID = #{memberId} AND PROD_ID = #{prodId}
+    </delete>
+
+</mapper>
