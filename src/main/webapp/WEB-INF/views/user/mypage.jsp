@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>마이페이지</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
-    
+    <link rel="stylesheet" href="<c:url value='/css/header.css' />">
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <script>
     function daumZipCode() {
@@ -55,8 +55,8 @@
         }
 
         body {
-            font-family: 'Noto Sans KR', 'Montserrat', sans-serif; [cite_start]/* ⭐️ mainpage.jsp 폰트 적용 [cite: 178] */
-            background-color: #f9f9f9; [cite_start]/* ⭐️ mainpage.jsp 배경색 적용 [cite: 178] */
+            font-family: 'Noto Sans KR', 'Montserrat', sans-serif;/* ⭐️ mainpage.jsp 폰트 적용 [cite: 178] */
+            background-color: #f9f9f9;/* ⭐️ mainpage.jsp 배경색 적용 [cite: 178] */
             color: #333;
             min-height: 100vh;
         }
@@ -75,64 +75,6 @@
         }
 
         /* ==================== 1. 헤더 스타일 (mainpage.jsp 기준) ==================== */
-        .main-header {
-        	width: 1440px;
-			margin: 0 auto;
-            background-color: #2c2c2c; [cite_start]/* ⭐️ mainpage.jsp 헤더 배경색 적용 [cite: 181] */
-            border-bottom: none;
-            padding: 15px 0;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .header-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            padding: 0 20px;
-        }
-        
-        .header-top {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .logo a {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 20px;
-            font-weight: 800;
-            color: #ffffff;
-            letter-spacing: 1px;
-        }
-
-        /* 카테고리 스타일 */
-        .categories {
-            width: 100%;
-            border-top: 1px solid #555;
-            padding: 8px 0;
-            margin-bottom: 0;
-        }
-
-        .categories ul {
-            display: flex;
-            gap: 30px;
-        }
-
-        .categories a {
-            font-size: 14px;
-            font-weight: 500;
-            padding: 5px 0;
-            color: #ccc;
-        }
-
-        .categories a:hover {
-            color: #b08d57;
-            border-bottom: 2px solid #b08d57;
-        }
 
         /* ==================== 2. 바디 (마이페이지 메인 영역) 스타일 ==================== */
         .mypage-body {
@@ -427,24 +369,7 @@
 </head>
 <body>
 
-    <header class="main-header">
-        <div class="header-content">
-            <div class="header-top">
-                <div class="logo">
-                    <a href='<c:url value="/mainpage"/>' title="메인 페이지로 이동">MY MODERN SHOP</a>
-                </div>
-            </div>
-
-            <nav class="categories">
-                <ul>
-                    <li><a href="/category/mans">MANS</a></li>
-                    <li><a href="/category/women">WOMEN</a></li>
-                    <li><a href="/category/unisex">UNISEX</a></li>
-                    <li><a href="/category/sports">SPORTS</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
+<jsp:include page="/WEB-INF/views/fragments/header.jsp" />
 
     <main class="mypage-body">
         

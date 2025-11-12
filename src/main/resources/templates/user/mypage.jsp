@@ -79,7 +79,7 @@
         	width: 1440px;
 			margin: 0 auto;
             background-color: #2c2c2c; [cite_start]/* ⭐️ mainpage.jsp 헤더 배경색 적용 [cite: 181] */
-            border-bottom: none;
+            border-bottom:none;
             padding: 15px 0;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }

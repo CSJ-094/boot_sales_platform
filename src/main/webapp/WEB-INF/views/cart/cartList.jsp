@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>나의 장바구니</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
-    
+    <link rel="stylesheet" href="<c:url value='/css/header.css' />">
     <style>
         /* ==================== 0. 기본 스타일 & 초기화 (mainpage.jsp 기준) ==================== */
         * {
@@ -23,6 +23,7 @@
             color: #333;
             line-height: 1.6;
             min-height: 100vh;
+
         }
 
         a {
@@ -39,60 +40,7 @@
         }
 
         /* ==================== 1. 헤더 스타일 (mypage.jsp에서 복사) ==================== */
-        .main-header {
-            background-color: #2c2c2c;
-            padding: 15px 0;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        }
 
-        .header-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            padding: 0 20px;
-        }
-        
-        .header-top {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .logo a {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 20px;
-            font-weight: 800;
-            color: #ffffff;
-            letter-spacing: 1px;
-        }
-
-        .categories {
-            width: 100%;
-            border-top: 1px solid #555;
-            padding: 8px 0;
-            margin-bottom: 0;
-        }
-
-        .categories ul {
-            display: flex;
-            gap: 30px;
-        }
-
-        .categories a {
-            font-size: 14px;
-            font-weight: 500;
-            padding: 5px 0;
-            color: #ccc;
-        }
-
-        .categories a:hover {
-            color: #b08d57;
-            border-bottom: 2px solid #b08d57;
-        }
         /* ==================== End of Header Styles ==================== */
 
 
@@ -261,25 +209,8 @@
     </style>
 </head>
 <body>
-    
-    <header class="main-header">
-        <div class="header-content">
-            <div class="header-top">
-                <div class="logo">
-                    <a href='<c:url value="/"/>' title="메인 페이지로 이동">MY MODERN SHOP</a>
-                </div>
-            </div>
 
-            <nav class="categories">
-                <ul>
-                    <li><a href="/category/mans">MANS</a></li>
-                    <li><a href="/category/women">WOMEN</a></li>
-                    <li><a href="/category/kids">KIDS</a></li>
-                    <li><a href="/category/shoes">SHOES</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
+<jsp:include page="/WEB-INF/views/fragments/header.jsp" />
     <div class="container">
         <h1>나의 장바구니</h1>
 
