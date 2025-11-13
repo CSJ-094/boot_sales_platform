@@ -137,9 +137,7 @@ public class SellerController {
 	
 	//상품 상세 (/seller/products/{prodId})
 	@GetMapping("/products/{prodId}")
-		// ⭐️ prodId를 Long 타입으로 받도록 통일
 		public String productDetail(@PathVariable("prodId") Long prodId, Model model) { 
-			// ⭐️ DAO 직접 호출 대신 Service 계층 사용
 			ProdDTO product = productService.getProductById(prodId.intValue());
 			model.addAttribute("product", product);
 			model.addAttribute("activeMenu", "product");
