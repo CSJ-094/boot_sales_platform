@@ -218,8 +218,7 @@ ul {
 									</div>
 									<div class="product-info">
 										<p>${product.prodName}</p>
-										<span><fmt:formatNumber value="${product.prodPrice}"
-												type="number" />원</span>
+										<span><fmt:formatNumber value="${product.prodPrice}" type="number" maxFractionDigits="0"/>원</span>
 									</div>
 								</div>
 							</a>
@@ -246,8 +245,7 @@ ul {
 									</div>
 									<div class="product-info">
 										<p>${product.prodName}</p>
-										<span><fmt:formatNumber value="${product.prodPrice}"
-												type="number" />원</span>
+										<span><fmt:formatNumber value="${product.prodPrice}" type="number" maxFractionDigits="0"/>원</span>
 									</div>
 								</div>
 							</a>

@@ -43,9 +43,19 @@ public class CartController {
 
         // 2. 장바구니 목록 조회 (로그인 상태)
         List<CartDTO> cartList = cartService.getCartListByMemberId(memberId);
+
+        // 3. 총 장바구니 금액 계산
+        int totalCartPrice = 0;
+        if (cartList != null) {
+            for (CartDTO cartItem : cartList) {
+                totalCartPrice += cartItem.getProdPrice() * cartItem.getCartQty();
+            }
+        }
+
         model.addAttribute("cartList", cartList);
         model.addAttribute("memberId", memberId);
-        
+        model.addAttribute("totalCartPrice", totalCartPrice); // ⭐️ 총 금액을 모델에 추가
+
         // (D) View 이름 수정: 'cart' 폴더 안의 'cartList.jsp'를 의도했다면
         return "cart/cartList"; 
     }

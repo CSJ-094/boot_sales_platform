@@ -45,7 +45,7 @@ public class OrderController {
         if (cartItems == null || cartItems.isEmpty()) {
             // 장바구니에 상품이 없으면 주문서로 이동할 수 없음
             model.addAttribute("error", "장바구니에 상품이 없습니다.");
-            return "redirect:/cart?memberId=" + memberId; 
+            return "redirect:/cart/list"; 
         }
 
         model.addAttribute("cartItems", cartItems);
