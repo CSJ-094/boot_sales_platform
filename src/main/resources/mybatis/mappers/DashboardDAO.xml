@@ -5,69 +5,67 @@
 
 <mapper namespace="com.boot.dao.DashboardDAO">
 
-    <!-- 요약 -->
+     <!-- 요약 조회 -->
     <select id="selectSummary"
             resultType="com.boot.dto.SellerDashboardDTO">
         <![CDATA[
         SELECT
             /* 오늘 주문 건수 */
-            (SELECT COUNT(DISTINCT o.ORD_ID)
-               FROM ORDER_DB o
-              WHERE o.ORD_STATUS = 'PAID'
-                AND o.ORD_DATE >= TRUNC(SYSDATE)
-                AND o.ORD_DATE < TRUNC(SYSDATE) + 1
+            (
+                SELECT COUNT(*)
+                  FROM ORDER_DB o
+                 WHERE o.ORD_DATE >= TRUNC(SYSDATE)
+                   AND o.ORD_DATE <  TRUNC(SYSDATE) + 1
             ) AS todayOrderCount,
 
-            /* 오늘 매출 */
-            (SELECT NVL(SUM(d.PRICE * d.QUANTITY), 0)
-               FROM ORDER_DB o
-               JOIN ORDER_DETAILS d ON d.ORDERID = o.ORD_ID
-              WHERE o.ORD_STATUS = 'PAID'
-                AND o.ORD_DATE >= TRUNC(SYSDATE)
-                AND o.ORD_DATE < TRUNC(SYSDATE) + 1
+            /* 오늘 매출액 */
+            (
+                SELECT NVL(SUM(o.ORD_AMOUNT), 0)
+                  FROM ORDER_DB o
+                 WHERE o.ORD_DATE >= TRUNC(SYSDATE)
+                   AND o.ORD_DATE <  TRUNC(SYSDATE) + 1
             ) AS todaySalesAmount,
 
-            /* 오늘 가입자 */
-            (SELECT COUNT(*)
-               FROM USER_DB
-              WHERE MEMBER_REGDATE >= TRUNC(SYSDATE)
-                AND MEMBER_REGDATE < TRUNC(SYSDATE) + 1
+            /* 오늘 신규 가입자 */
+            (
+                SELECT COUNT(*)
+                  FROM USER_DB u
+                 WHERE u.MEMBER_REGDATE >= TRUNC(SYSDATE)
+                   AND u.MEMBER_REGDATE <  TRUNC(SYSDATE) + 1
             ) AS todayNewMembers,
 
-            /* 오늘 방문자 */
-            (SELECT COUNT(DISTINCT NVL(MEMBER_ID, IP))
-               FROM VISIT_LOG_DB
-              WHERE VISIT_DATE >= TRUNC(SYSDATE)
-                AND VISIT_DATE < TRUNC(SYSDATE) + 1
+            /* 오늘 방문자 수 */
+            (
+                SELECT COUNT(DISTINCT NVL(v.MEMBER_ID, v.IP))
+                  FROM VISIT_LOG_DB v
+                 WHERE v.VISIT_DATE >= TRUNC(SYSDATE)
+                   AND v.VISIT_DATE <  TRUNC(SYSDATE) + 1
             ) AS todayVisitors,
 
-            /* 미처리 문의 */
-            (SELECT COUNT(*)
-               FROM QNA_DB q
-              WHERE q.QNA_PARENT_ID IS NULL
-                AND NOT EXISTS (
-                        SELECT 1
-                          FROM QNA_DB a
-                         WHERE a.QNA_PARENT_ID = q.QNA_ID
-                )
+            /* 미처리 문의 수 */
+            (
+                SELECT COUNT(*)
+                  FROM QNA_DB q
+                 WHERE q.QNA_PARENT_ID IS NULL
+                   AND q.QNA_STATUS = '답변대기'
             ) AS pendingQnaCount,
 
-            /* 어제 주문 */
-            (SELECT COUNT(DISTINCT o.ORD_ID)
-               FROM ORDER_DB o
-              WHERE o.ORD_STATUS = 'PAID'
-                AND o.ORD_DATE >= TRUNC(SYSDATE) - 1
-                AND o.ORD_DATE < TRUNC(SYSDATE)
+            /* 어제 주문 건수 */
+            (
+                SELECT COUNT(*)
+                  FROM ORDER_DB o
+                 WHERE o.ORD_DATE >= TRUNC(SYSDATE) - 1
+                   AND o.ORD_DATE <  TRUNC(SYSDATE)
             ) AS yesterdayOrderCount,
 
-            /* 어제 매출 */
-            (SELECT NVL(SUM(d.PRICE * d.QUANTITY), 0)
-               FROM ORDER_DB o
-               JOIN ORDER_DETAILS d ON d.ORDERID = o.ORD_ID
-              WHERE o.ORD_STATUS = 'PAID'
-                AND o.ORD_DATE >= TRUNC(SYSDATE) - 1
-                AND o.ORD_DATE < TRUNC(SYSDATE)
+            /* 어제 매출액 */
+            (
+                SELECT NVL(SUM(o.ORD_AMOUNT), 0)
+                  FROM ORDER_DB o
+                 WHERE o.ORD_DATE >= TRUNC(SYSDATE) - 1
+                   AND o.ORD_DATE <  TRUNC(SYSDATE)
             ) AS yesterdaySalesAmount
+
         FROM DUAL
         ]]>
     </select>

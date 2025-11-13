@@ -18,7 +18,10 @@ public class DashboardService {
 	
 	// 요약 정보 가져오기
     public SellerDashboardDTO getSummary() {
-        return dashboardDAO.selectSummary();
+    	SellerDashboardDTO dto = dashboardDAO.selectSummary();
+        System.out.println("=== DASH SUMMARY TEST ===");
+        System.out.println(dto);
+        return dto;
     }
 
     // 일간 매출 통계

@@ -10,13 +10,11 @@
   <link rel="stylesheet" href="<c:url value='/css/header.css' />">
 </head>
 <body>
-
-<jsp:include page="/WEB-INF/views/fragments/header.jsp" />
-<main class="mypage-body">
-    <jsp:include page="/WEB-INF/views/fragments/sidebar.jsp">
-        <jsp:param name="menu" value="notices"/>
-    </jsp:include>
-
+	<jsp:include page="/WEB-INF/views/fragments/header.jsp" />
+	<main class="mypage-body">
+	    <jsp:include page="/WEB-INF/views/fragments/sidebar.jsp">
+	        <jsp:param name="menu" value="notices"/>
+	    </jsp:include>
 
   <section class="mypage-content-area">
     <h2>공지사항 목록</h2>

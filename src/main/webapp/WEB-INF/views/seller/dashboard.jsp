@@ -1,16 +1,16 @@
-<%@ page contentType="text/html; charset=UTF-8" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c"   uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"  %>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
 	<meta charset="UTF-8">
     <title>판매자 대시보드</title>
-	<link rel="stylesheet" href="<c:url value='/css/dashboard.css' />" />
-	<link rel="stylesheet" href="<c:url value='/css/header.css' />" />
-</head>
+	<link rel="stylesheet" href=<c:url value='/css/sellerstyle.css' />/>
+	<link rel="stylesheet" href=<c:url value='/css/dashboard.css' />/>
+	<link rel="stylesheet" href="<c:url value='/css/header.css' />">
+	</head>
 <body>
-	<jsp:include page="/WEB-INF/views/fragments/header.jsp" />
 	<jsp:include page="/WEB-INF/views/fragments/header.jsp" />
 	<main class="mypage-body">
 	    <jsp:include page="/WEB-INF/views/fragments/sidebar.jsp">
@@ -20,6 +20,7 @@
 <div class="dash-wrap">
     <div class="dash-title">판매자 대시보드</div>
 
+	
     <!-- 핵심 지표 카드 -->
     <div class="dash-cards">
 
@@ -82,6 +83,7 @@
 
     </div>
 </div>
+</main>
 <jsp:include page="/WEB-INF/views/fragments/footer.jsp" />
 </body>
 </html>
