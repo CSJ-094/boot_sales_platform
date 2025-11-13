@@ -15,4 +15,5 @@ public interface LoginDAO {
     public ArrayList<LoginDTO> findId(LoginDTO loginDTO);
     public ArrayList<LoginDTO> findPw(LoginDTO loginDTO);
     public void updatePw(LoginDTO loginDTO);
+    public void sendTempPw(LoginDTO loginDTO);
 }

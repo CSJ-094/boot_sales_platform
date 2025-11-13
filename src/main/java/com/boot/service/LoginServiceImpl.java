@@ -27,22 +27,20 @@ public class LoginServiceImpl implements LoginService {
 	@Autowired
 	private LoginDAO loginDAO;
 	@Autowired
-	private PasswordEncoder passwordEncoder;
-	// 이메일 인증 기능 사용을 위해 추가
+	private PasswordEncoder passwordEncoder; // 이메일 인증 기능 사용을 위해 추가
 	@Autowired
 	private JavaMailSenderImpl mailSender; 
 	private int authNumber; // 인증번호 저장 변수
 
-	// ===================================================================
-	// 1. 회원 기본 기능 (DTO 기반)
-	// ===================================================================
 
+	//로그인 기능
 	@Override
 	public LoginDTO loginYn(LoginDTO loginDTO) {
 		log.info("@# loginYn({})", loginDTO.getMemberId());
 		return loginDAO.loginYn(loginDTO);
 	}
 
+	//회원가입 기능
 	@Override
 	public void write(LoginDTO loginDTO) {
 		log.info("@# write({})", loginDTO.getMemberId());
@@ -52,36 +50,54 @@ public class LoginServiceImpl implements LoginService {
 		loginDAO.write(loginDTO);
 	}
 
+	//아이디 중복 확인 기능
 	@Override
 	public ArrayList<LoginDTO> idCheck(LoginDTO loginDTO) {
 		log.info("@# idCheck({})", loginDTO.getMemberId());
 		return loginDAO.idCheck(loginDTO);
 	}
 
+	//이메일 중복 확인 기능
 	@Override
 	public ArrayList<LoginDTO> emailCheck(LoginDTO loginDTO) {
 		log.info("@# emailCheck({})", loginDTO.getMemberEmail());
 		return loginDAO.emailCheck(loginDTO);
 	}
-	
-	// ===================================================================
-	// 2. 아이디/비밀번호 찾기 기능 (DTO 기반)
-	// ===================================================================
 
+//	↑ 회원가입 및 로그인 관련 ================================================ ↓ 찾기 기능 관련
+
+	//아이디 찾기 기능
 	@Override
 	public ArrayList<LoginDTO> findId(LoginDTO loginDTO) {
 		// 로그 인자가 3개 이상일 때 문자열 연결(+)을 사용합니다.
 		log.info("@# findId - Name: " + loginDTO.getMemberName() + ", Email: " + loginDTO.getMemberEmail());
 		return loginDAO.findId(loginDTO);
 	}
-	
+
+	//패스워드 찾기 기능
 	@Override
 	public ArrayList<LoginDTO> findPw(LoginDTO loginDTO) {
 		// 로그 인자가 3개 이상일 때 문자열 연결(+)을 사용합니다. (이전 FindController에서 오류가 발생했던 원인)
 		log.info("@# findPw - ID: " + loginDTO.getMemberId() + ", Name: " + loginDTO.getMemberName() + ", Email: " + loginDTO.getMemberEmail());
 		return loginDAO.findPw(loginDTO);
 	}
-	
+
+	//임시 패스워드 보내기 기능
+	@Override
+	public void sendTempPw(LoginDTO loginDTO) {
+		//임시 패스워드에 6자리의 999999까지의 랜덤 값 설정
+		String tempPw = String.format("%06d", new Random().nextInt(999999));
+		String encodedTempPw = passwordEncoder.encode(tempPw); //암호화
+		loginDTO.setMemberPw(encodedTempPw);
+		loginDAO.updatePw(loginDTO);
+
+		String subject = "임시 비밀번호 안내";
+		String content = "회원님의 임시 비밀번호는 " + tempPw + " 입니다. 로그인 후 반드시 비밀번호를 변경해주세요.";
+		mailSend("pop5805pop@gmail.com", loginDTO.getMemberEmail(), subject, content);
+
+		log.info("@# 임시 비밀번호 발송 완료: ID={}, Email={}", loginDTO.getMemberId(), loginDTO.getMemberEmail());
+	}
+
 	// ===================================================================
 	// 3. 이메일 인증 기능 
 	// ===================================================================

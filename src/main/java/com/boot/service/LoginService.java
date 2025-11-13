@@ -11,6 +11,7 @@ public interface LoginService {
     public ArrayList<LoginDTO> emailCheck(LoginDTO loginDTO);
     public ArrayList<LoginDTO> findId(LoginDTO loginDTO);
     public ArrayList<LoginDTO> findPw(LoginDTO loginDTO);
+    public void sendTempPw(LoginDTO loginDTO);
     public void makeRandomNumber();
 	public String joinEmail(String email);
 	public void mailSend(String setFrom, String toMail, String title, String content);
