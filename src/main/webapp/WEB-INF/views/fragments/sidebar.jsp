@@ -29,6 +29,20 @@
             </li>
 
             <li>
+                <a href="<c:url value='/seller/qna' />"
+                   class="sidebar-link${param.menu eq 'qna' ? ' active' : ''}">
+                    문의 관리
+                </a>
+            </li>
+
+            <li>
+                <a href="<c:url value='/seller/reviews' />"
+                   class="sidebar-link${param.menu eq 'reviews' ? ' active' : ''}">
+                    리뷰 관리
+                </a>
+            </li>
+
+            <li>
                 <a href="<c:url value='/seller/notices' />"
                    class="sidebar-link${param.menu eq 'notices' ? ' active' : ''}">
                     공지사항
