@@ -1,6 +1,7 @@
 package com.boot.service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import com.boot.dao.CartDAO;
@@ -10,6 +11,7 @@ import com.boot.dto.CartDTO;
 import com.boot.dto.OrdDTO;
 import com.boot.dto.OrderDetailDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +36,18 @@ public class OrderService {
      */
     public List<OrdDTO> getOrdersByMemberId(String memberId) {
         return ordDAO.getOrdersByMemberId(memberId);
+    }
+
+    /**
+     * 회원 ID로 주문 내역과 각 주문의 상세 항목 목록을 함께 조회합니다.
+     */
+    public List<OrdDTO> getOrdersWithDetailsByMemberId(String memberId) {
+        List<OrdDTO> orders = ordDAO.getOrdersByMemberId(memberId);
+        for (OrdDTO order : orders) {
+            List<OrderDetailDTO> details = orderDetailDAO.findByOrderId(order.getOrdId());
+            order.setOrderDetails(details); // OrdDTO에 setOrderDetails 메서드 필요
+        }
+        return orders;
     }
 
     /**
@@ -92,5 +106,27 @@ public class OrderService {
         log.info("Cart cleared for member: {}", memberId);
 
         return newOrder;
+    }
+
+    /**
+     * 특정 사용자가 특정 상품을 구매했는지 확인합니다.
+     * @param memberId 회원 ID
+     * @param productId 상품 ID
+     * @return 구매 이력이 있으면 true, 없으면 false
+     */
+    public boolean hasUserPurchasedProduct(String memberId, Long productId) {
+        // 특정 사용자가 특정 상품을 포함하는 '구매확정' 상태의 주문을 했는지 확인
+        int count = orderDetailDAO.countConfirmedPurchase(memberId, productId);
+        return count > 0;
+    }
+
+    /**
+     * 주문 상태를 '구매확정'으로 변경합니다.
+     * @param orderId 주문 ID
+     * @param memberId 회원 ID (본인 확인용)
+     */
+    @Transactional
+    public void confirmOrder(String orderId, String memberId) {
+        ordDAO.updateStatus(orderId, "구매확정");
     }
 }

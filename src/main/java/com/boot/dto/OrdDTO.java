@@ -1,6 +1,7 @@
 package com.boot.dto;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,4 +18,5 @@ public class OrdDTO {
 	private int ordDfee;
 	private int ordDiscount;
 	private String ordStatus;
+	private List<OrderDetailDTO> orderDetails;
 }

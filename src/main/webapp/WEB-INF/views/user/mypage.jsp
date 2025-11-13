@@ -523,26 +523,51 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>주문번호</th>
-                                <th>주문일자</th>
-                                <th>총 구매금액</th>
-                                <th>할인 금액</th>
-                                <th>배송비</th>
-                                <th>주문 상태</th>
-                                <th style="width: 100px;">상세 보기</th>
+                                <th>주문정보</th>
+                                <th>주문상품</th>
+                                <th style="width: 120px;">주문 상태</th>
+                                <th style="width: 120px;">관리</th>
                             </tr>
                         </thead>
                         <tbody>
                             <c:forEach var="order" items="${orderList}">
                                 <tr>
-                                    <td>${order.ordId}</td>
-                                    <td><fmt:formatDate value="${order.ordDate}" pattern="yyyy-MM-dd"/></td>
-                                    <td><fmt:formatNumber value="${order.ordAmount}" pattern="#,###" />원</td>
-                                    <td><fmt:formatNumber value="${order.ordDiscount}" pattern="#,###" />원</td>
-									<td><fmt:formatNumber value="${order.ordDfee}" pattern="#,###" />원</td>
+                                    <td>
+                                        <strong>주문번호:</strong> ${order.ordId}<br>
+                                        <strong>주문일:</strong> <fmt:formatDate value="${order.ordDate}" pattern="yyyy-MM-dd" /><br>
+                                        <strong>결제금액:</strong> <fmt:formatNumber value="${order.ordAmount}" pattern="#,###" />원
+                                    </td>
+                                    <td>
+                                        <ul style="list-style: none; padding: 0;">
+                                            <c:forEach var="detail" items="${order.orderDetails}">
+                                                <li style="margin-bottom: 5px;">
+                                                    <a href="<c:url value='/products/detail?prodId=${detail.productId}'/>">${detail.prodName}</a> - ${detail.quantity}개
+                                                    
+                                                    <%-- '구매확정' 상태일 때만 상품별로 '리뷰쓰기' 버튼 표시 --%>
+                                                    <c:if test="${order.ordStatus == '구매확정'}">
+                                                        <a href="<c:url value='/reviews/write?productId=${detail.productId}&orderId=${order.ordId}'/>" class="action-btn" style="margin-left: 10px; background-color: #b08d57;">리뷰쓰기</a>
+                                                    </c:if>
+                                                </li>
+                                            </c:forEach>
+                                        </ul>
+                                    </td>
                                     <td>${order.ordStatus}</td>
                                     <td>
-                                        <a href="/order/detail?ordId=${order.ordId}" class="action-btn">상세</a>
+                                        <%-- 상태에 따라 다른 버튼 표시 --%>
+                                        <c:choose>
+                                            <c:when test="${order.ordStatus == '배송완료'}">
+                                                <form action="<c:url value='/order/confirm'/>" method="post" style="display:inline;">
+                                                    <input type="hidden" name="orderId" value="${order.ordId}">
+                                                    <button type="submit" class="action-btn" style="background-color: #28a745;">구매 확정</button>
+                                                </form>
+                                            </c:when>
+                                            <c:when test="${order.ordStatus == '구매확정'}">
+                                                완료
+                                            </c:when>
+                                            <c:otherwise>
+                                                -
+                                            </c:otherwise>
+                                        </c:choose>
                                     </td>
                                 </tr>
                             </c:forEach>

@@ -11,4 +11,28 @@
         VALUES (ORDER_DETAIL_SEQ.NEXTVAL, #{orderId}, #{productId}, #{quantity}, #{price})
     </insert>
 
+    <!-- 주문 ID로 주문 상세 목록 조회 -->
+    <select id="findByOrderId" resultType="com.boot.dto.OrderDetailDTO">
+        SELECT
+            od.ORDERDETAILID as orderDetailId,
+            od.ORDERID as orderId,
+            od.PRODUCTID as productId,
+            od.QUANTITY as quantity,
+            od.PRICE as price,
+            p.PROD_NAME as prodName  <!-- 상품명도 함께 조회 -->
+        FROM ORDER_DETAILS od
+        JOIN PRODUCT_DB p ON od.PRODUCTID = p.PROD_ID
+        WHERE od.ORDERID = #{orderId}
+    </select>
+
+    <!-- 특정 사용자가 특정 상품을 '구매확정' 했는지 확인 (리뷰 작성 자격) -->
+    <select id="countConfirmedPurchase" resultType="int">
+        SELECT COUNT(*)
+        FROM ORDER_DETAILS od
+        JOIN ORDER_DB o ON od.ORDERID = o.ORD_ID
+        WHERE o.ORD_MEMID = #{memberId}
+          AND od.PRODUCTID = #{productId}
+          AND o.ORD_STATUS = '구매확정'
+    </select>
+
 </mapper>
