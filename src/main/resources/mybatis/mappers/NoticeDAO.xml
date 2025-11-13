@@ -11,7 +11,7 @@
         <result property="NOT_NAME" column="NOT_NAME"/>
         <result property="NOT_TIME" column="NOT_TIME"/>
     </resultMap>
-<!---->
+<!--/-->
     <!-- 2. Select: 목록 조회 (list) -->
     <select id="list" resultMap="noticeResultMap">
         SELECT 
