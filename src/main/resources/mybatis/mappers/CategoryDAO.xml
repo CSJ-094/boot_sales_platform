@@ -27,4 +27,16 @@
   		ORDER SIBLINGS BY c.CAT_SORT, c.CAT_NAME
 	</select>
 
+	<!-- 주어진 카테고리 ID 목록의 모든 상위 카테고리 ID를 재귀적으로 조회 -->
+	<select id="selectAllParentIds" resultType="long">
+		SELECT DISTINCT CAT_PARENT
+		FROM CATEGORY_DB
+		WHERE CAT_PARENT IS NOT NULL
+		START WITH CAT_ID IN
+		<foreach item="catId" collection="list" open="(" separator="," close=")">
+			#{catId}
+		</foreach>
+		CONNECT BY PRIOR CAT_PARENT = CAT_ID
+	</select>
+
 </mapper>

@@ -7,4 +7,5 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface ImageDAO {
     int insertImage(ImageDTO dto);
+	void deleteByProdId(Long prodId);
 }

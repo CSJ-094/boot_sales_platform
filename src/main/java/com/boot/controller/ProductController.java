@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpSession;
 @Controller
-@RequestMapping("/product/product")
+@RequestMapping("/products")
 public class ProductController {
 
     @Autowired

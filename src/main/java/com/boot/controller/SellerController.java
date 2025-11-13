@@ -133,8 +133,8 @@ public class SellerController {
 	@GetMapping("/products/{prodId}")
 		// ⭐️ prodId를 Long 타입으로 받도록 통일
 		public String productDetail(@PathVariable("prodId") Long prodId, Model model) { 
-			// ⭐️ ProdDTO -> ProdDTO로 변경
-			ProdDTO product = prodDAO.getProduct(prodId); 
+			// ⭐️ DAO 직접 호출 대신 Service 계층 사용
+			ProdDTO product = productService.getProductById(prodId.intValue());
 			model.addAttribute("product", product);
 			model.addAttribute("activeMenu", "product");
 			return "seller/productDetail";
@@ -175,11 +175,12 @@ public class SellerController {
 	public String update(@PathVariable("id") Long id,
 					@ModelAttribute ProdDTO form, // ⭐️ ProdDTO -> ProdDTO로 변경
 					@RequestParam(value = "catIds", required = false) List<Long> catIds,
-					@RequestParam(value = "mainCatId", required = false) Long mainCatId,
+					@RequestParam(value = "mainCatId", required = false) Long mainCatId, // 이미지 파일 추가
+					@RequestParam(value = "uploadFile", required = false) MultipartFile file,
 					RedirectAttributes ra) {
 
 		form.setProdId(id);
-		productService.updateProductWithCategories(form, catIds, mainCatId); // ✅ 트랜잭션 경계
+		productService.updateProductWithCategories(form, catIds, mainCatId, file); // ✅ 트랜잭션 경계
 		ra.addFlashAttribute("msg", "수정되었습니다.");
 		return "redirect:/seller/products/" + id; // 상세로 이동
 	}

@@ -3,8 +3,10 @@ package com.boot.service;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import com.boot.dao.ImageDAO;
 import com.boot.dao.ProdDAO;
@@ -12,6 +14,7 @@ import com.boot.dao.ProductCategoryDAO;
 import com.boot.dto.ImageDTO;
 import com.boot.dto.ProdDTO;
 import com.boot.dto.ProductCategoryDTO;
+import com.boot.dao.CategoryDAO; // CategoryDAO import 추가
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +35,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProdDAO prodDAO;
     private final ProductCategoryDAO productCategoryDAO;
     private final ImageDAO imageDAO; // @RequiredArgsConstructor를 통해 주입됨
+    private final CategoryDAO categoryDAO; // 상위 카테고리 조회를 위해 추가
 
     @Override
     public List<ProdDTO> selectProductsByCategory(int catId) {
@@ -50,7 +54,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProdDTO getProductById(Integer prodId) {
         log.info("Fetching product detail for prodId: {}", prodId);
-        return prodDAO.getProductById(prodId);
+        // ⭐️ DAO 호출 메서드명을 getProduct으로 통일
+        return prodDAO.getProduct(prodId.longValue());
     }
 
     // 2. [Admin 기능] 상품 등록
@@ -112,12 +117,20 @@ public class ProductServiceImpl implements ProductService {
             mainCatId = catIds.get(0);
         }
         
+        // ⭐️ 상위 카테고리 ID를 포함한 전체 카테고리 ID 목록 생성
+        // 1. Set을 사용해 중복을 방지하며 catIds를 추가
+        HashSet<Long> fullCatIds = new HashSet<>(catIds);
+        // 2. catIds에 해당하는 모든 상위 카테고리 ID를 조회하여 추가 (CategoryDAO에 구현 필요)
+        if (!catIds.isEmpty()) {
+            fullCatIds.addAll(categoryDAO.selectAllParentIds(catIds));
+        }
+        
         List<ProductCategoryDTO> list = new ArrayList<ProductCategoryDTO>();
-        for (Long cid : catIds) {
+        for (Long cid : fullCatIds) { // ⭐️ 수정: catIds 대신 fullCatIds 사용
             ProductCategoryDTO m = new ProductCategoryDTO();
             m.setProdId(prodId); // 새로 생성된 prodId 사용
             m.setCatId(cid);
-            m.setIsMain(cid.equals(mainCatId) ? "Y" : "N");
+            m.setIsMain(cid.equals(mainCatId) ? "Y" : "N"); // 대표 카테고리 설정은 유지
             list.add(m);
         }
         productCategoryDAO.bulkInsert(list);
@@ -125,10 +138,46 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public void updateProductWithCategories(ProdDTO form, List<Long> catIds, Long mainCatId) {
+    public void updateProductWithCategories(ProdDTO form, List<Long> catIds, Long mainCatId, MultipartFile file) {
         // 상품 정보 업데이트
         prodDAO.updateProduct(form);
         
+        // ⭐️ 이미지 파일 처리 및 DB 업데이트
+        if (file != null && !file.isEmpty()) {
+            try {
+                // 1. 기존 이미지 정보 삭제 (DB 및 실제 파일)
+                // 실제 파일 삭제 로직은 필요에 따라 추가 구현 (예: 스케줄러로 정리)
+                imageDAO.deleteByProdId(form.getProdId());
+
+                // 2. 새 파일 정보 설정 및 저장
+                String originalFileName = file.getOriginalFilename();
+                String fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
+                String savedFileName = UUID.randomUUID().toString() + fileExtension;
+                String savedFilePath = "/upload/images/" + savedFileName;
+
+                File uploadDirectory = new File(UPLOAD_DIR);
+                if (!uploadDirectory.exists()) {
+                    uploadDirectory.mkdirs();
+                }
+
+                File targetFile = new File(UPLOAD_DIR, savedFileName);
+                file.transferTo(targetFile);
+
+                // 3. 새 이미지 DTO 생성 및 DB에 삽입
+                ImageDTO imageDTO = new ImageDTO();
+                imageDTO.setImgProdId(form.getProdId());
+                imageDTO.setImgPath(savedFilePath);
+                imageDTO.setIsMain("Y");
+                imageDTO.setImgOrder(0);
+
+                imageDAO.insertImage(imageDTO);
+
+            } catch (IOException e) {
+                log.error("파일 업데이트 중 오류 발생: {}", e.getMessage());
+                throw new RuntimeException("파일 업로드 중 오류가 발생했습니다.", e);
+            }
+        }
+
         // 기존 카테고리 매핑 삭제 및 새로 삽입
         productCategoryDAO.deleteAllByProdId(form.getProdId());
 
@@ -139,8 +188,14 @@ public class ProductServiceImpl implements ProductService {
             mainCatId = catIds.get(0);
         }
 
+        // ⭐️ 상위 카테고리 ID를 포함한 전체 카테고리 ID 목록 생성
+        HashSet<Long> fullCatIds = new HashSet<>(catIds);
+        if (!catIds.isEmpty()) {
+            fullCatIds.addAll(categoryDAO.selectAllParentIds(catIds));
+        }
+
         List<ProductCategoryDTO> list = new ArrayList<ProductCategoryDTO>();
-        for (Long cid : catIds) {
+        for (Long cid : fullCatIds) { // ⭐️ 수정: catIds 대신 fullCatIds 사용
             ProductCategoryDTO m = new ProductCategoryDTO();
             m.setProdId(form.getProdId());
             m.setCatId(cid);
