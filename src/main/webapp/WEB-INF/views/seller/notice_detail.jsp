@@ -6,8 +6,8 @@
 <head>
   <meta charset="UTF-8">
   <title>공지사항 상세보기</title>
-  <link rel="stylesheet" href=<c:url value='/css/sellerstyle.css' />/>
-  <link rel="stylesheet" href="<c:url value='/css/header.css' />">
+  <link rel="stylesheet" href="<c:url value='/css/sellerstyle.css' />" />
+  <link rel="stylesheet" href="<c:url value='/css/header.css' />" />
 </head>
 <body>
   <jsp:include page="/WEB-INF/views/fragments/header.jsp" />
@@ -17,37 +17,45 @@
       <nav>
         <ul>
           <li class="sidebar-title">판매자 마이페이지</li>
-          <li><a href="${pageContext.request.contextPath}/seller/products" >상품 관리</a></li>
+          <li><a href="${pageContext.request.contextPath}/seller/products">상품 관리</a></li>
           <li><a href="${pageContext.request.contextPath}/seller/members">회원 관리</a></li>
           <li><a href="${pageContext.request.contextPath}/seller/notices" class="active">공지사항</a></li>
         </ul>
       </nav>
     </aside>
 
+    <!-- ▶ 여기부터 공지 상세 카드 레이아웃 -->
     <section class="mypage-content-area">
-      <h2>공지사항 상세 보기</h2>
+      <div class="notice-detail">
 
-      <div class="info-form">
-        <div class="form-group"><label>제목</label> ${notice.NOT_TITLE}</div>
-        <div class="form-group"><label>작성자</label> ${notice.NOT_NAME}</div>
-        <div class="form-group">
-          <label>작성일</label>
-          <fmt:formatDate value="${notice.NOT_TIME}" pattern="yyyy-MM-dd HH:mm" />
+        <!-- 상단: 제목 + 작성자/작성일 -->
+        <div class="notice-header">
+          <h2 class="notice-title">${notice.NOT_TITLE}</h2>
+          <div class="notice-meta">
+            <span>작성자 ${notice.NOT_NAME}</span>
+            <span class="divider">·</span>
+            <span>작성일 <fmt:formatDate value="${notice.NOT_TIME}" pattern="yyyy-MM-dd HH:mm" /></span>
+          </div>
         </div>
-        <div class="form-group">
-          <label>내용</label>
-          <pre style="white-space:pre-wrap">${notice.NOT_CONTENT}</pre>
+
+        <!-- 내용 박스 -->
+        <div class="notice-content-box">
+          <pre>${notice.NOT_CONTENT}</pre>
         </div>
-      </div>
 
-      <div class="button-group" style="margin-top:20px;">
-        <a href="${pageContext.request.contextPath}/seller/notices" class="btn-submit">목록으로</a>
-        <a href="${pageContext.request.contextPath}/seller/notices/modify?notNo=${notice.NOT_NO}" class="btn-submit">수정</a>
+        <!-- 하단 버튼 (가운데 정렬) -->
+        <div class="notice-buttons">
+          <a href="${pageContext.request.contextPath}/seller/notices" class="btn btn-outline">목록으로</a>
+          <a href="${pageContext.request.contextPath}/seller/notices/modify?notNo=${notice.NOT_NO}" class="btn btn-primary">수정</a>
 
-        <form action="${pageContext.request.contextPath}/seller/notices/delete" method="post" style="display:inline;">
-          <input type="hidden" name="notNo" value="${notice.NOT_NO}" />
-          <button type="submit" class="reset-btn" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</button>
-        </form>
+          <form action="${pageContext.request.contextPath}/seller/notices/delete"
+                method="post" style="display:inline;">
+            <input type="hidden" name="notNo" value="${notice.NOT_NO}" />
+            <button type="submit" class="btn btn-ghost"
+                    onclick="return confirm('정말 삭제하시겠습니까?');">삭제</button>
+          </form>
+        </div>
+
       </div>
     </section>
   </main>

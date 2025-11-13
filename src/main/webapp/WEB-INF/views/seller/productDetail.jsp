@@ -6,70 +6,107 @@
 <head>
   <meta charset="UTF-8" />
   <title>상품 상세</title>
-  <link rel="stylesheet" href=<c:url value='/css/sellerstyle.css' />/>
-  <link rel="stylesheet" href="<c:url value='/css/header.css' />">>
+  <link rel="stylesheet" href="<c:url value='/css/sellerstyle.css' />">
+  <link rel="stylesheet" href="<c:url value='/css/header.css' />">
 </head>
 <body>
   <jsp:include page="/WEB-INF/views/fragments/header.jsp" />
 
   <main class="mypage-body">
-    <aside class="mypage-sidebar">
-      <nav>
-        <ul>
-          <li class="sidebar-title">판매자 마이페이지</li>
-          <li><a href="${pageContext.request.contextPath}/seller/products" class="active">상품 관리</a></li>
-          <li><a href="${pageContext.request.contextPath}/seller/members">회원 관리</a></li>
-          <li><a href="${pageContext.request.contextPath}/seller/notices">공지사항</a></li>
-        </ul>
-      </nav>
-    </aside>
+      <aside class="mypage-sidebar">
+        <nav>
+          <ul>
+            <li class="sidebar-title">판매자 마이페이지</li>
+            <li><a href="${pageContext.request.contextPath}/seller/products" class="active">상품 관리</a></li>
+            <li><a href="${pageContext.request.contextPath}/seller/members">회원 관리</a></li>
+            <li><a href="${pageContext.request.contextPath}/seller/notices">공지사항</a></li>
+          </ul>
+        </nav>
+      </aside>
 
-    <section class="mypage-content-area">
-      <h2>상품 상세 (#${product.prodId})</h2>
-      
-      <!-- 플래시 메시지 -->
-  <c:if test="${not empty msg}">
-    <div class="alert success">${msg}</div>
-  </c:if>
-  <c:if test="${not empty error}">
-    <div class="alert danger">${error}</div>
-  </c:if>
+      <section class="mypage-content-area">
+        <h2>상품 상세 (#${product.prodId})</h2>
 
-      <c:choose>
-        <c:when test="${empty product}">
-          <p>상품 정보를 찾을 수 없습니다.</p>
-        </c:when>
-        <c:otherwise>
-          <div class="info-form">
-            <div class="form-group"><label>상품명</label> ${product.prodName}</div>
-            <div class="form-group"><label>가격</label> <fmt:formatNumber value="${product.prodPrice}" type="number" />원</div>
-            <div class="form-group"><label>재고</label> ${product.prodStock}</div>
-            <div class="form-group"><label>판매자</label> ${product.prodSeller}</div>
-            <div class="form-group"><label>코드</label> ${product.prodCode}</div>
-            <div class="form-group"><label>등록일</label> <fmt:formatDate value="${product.prodReg}" pattern="yyyy-MM-dd HH:mm" /></div>
-                    <!-- 수정일: 있을 때만 노출 -->
-        <c:if test="${not empty product.prodUpd}">
-          <div class="form-group"><label>수정일</label> <fmt:formatDate value="${product.prodUpd}" pattern="yyyy-MM-dd HH:mm" /></div>
+        <!-- 메시지 -->
+        <c:if test="${not empty msg}">
+          <div class="alert success">${msg}</div>
         </c:if>
-            <div class="form-group"><label>설명</label> <pre style="white-space:pre-wrap">${product.prodDesc}</pre></div>
-          </div>
-          
-        <!-- 버튼 영역: 수정 · 목록으로 · 삭제 (중앙정렬) -->
-<div class="detail-actions">
-  <a class="reset-btn" href="${pageContext.request.contextPath}/seller/products/${product.prodId}/edit">수정</a>
-  <a class="reset-btn" href="${pageContext.request.contextPath}/seller/products">목록으로</a>
-  <form action="${pageContext.request.contextPath}/seller/products/${product.prodId}/delete"
-        method="post" class="inline-form"
-        onsubmit="return confirm('정말 삭제하시겠습니까? 삭제 후 복구할 수 없습니다.');">
-    <button type="submit" class="reset-btn">삭제</button>
-  </form>
-</div>
+        <c:if test="${not empty error}">
+          <div class="alert danger">${error}</div>
+        </c:if>
 
-        </c:otherwise>
-      </c:choose>
-    </section>
-  </main>
+        <c:choose>
+          <c:when test="${empty product}">
+            <p>상품 정보를 찾을 수 없습니다.</p>
+          </c:when>
 
-  <jsp:include page="/WEB-INF/views/fragments/footer.jsp" />
-</body>
-</html>
+          <c:otherwise>
+
+            <!-- ⭐ 이미지 + 기본정보 2단 배치 -->
+            <div class="prod-detail-layout">
+
+              <!-- LEFT: 이미지 -->
+              <div class="prod-img-box">
+                <c:choose>
+                  <c:when test="${not empty product.prodImgPath}">
+                    <img src="${pageContext.request.contextPath}${product.prodImgPath}" alt="${product.prodName}">
+                  </c:when>
+                  <c:otherwise>
+                    <div class="prod-img-placeholder">
+                      등록된 대표 이미지가 없습니다.
+                    </div>
+                  </c:otherwise>
+                </c:choose>
+              </div>
+
+              <!-- RIGHT: 정보 -->
+              <div class="prod-info-box">
+
+                <h3>${product.prodName}</h3>
+
+                <p class="prod-price">
+                  <fmt:formatNumber value="${product.prodPrice}" type="number" />원
+                </p>
+
+                <p>재고: <strong>${product.prodStock}</strong> 개</p>
+                <p>판매자: ${product.prodSeller}</p>
+                <p>상품 코드: ${product.prodCode}</p>
+                <p>등록일:
+                  <fmt:formatDate value="${product.prodReg}" pattern="yyyy-MM-dd HH:mm" />
+                </p>
+
+                <c:if test="${not empty product.prodUpd}">
+                  <p>수정일:
+                    <fmt:formatDate value="${product.prodUpd}" pattern="yyyy-MM-dd HH:mm" />
+                  </p>
+                </c:if>
+
+              </div>
+            </div>
+
+            <!-- 상세 설명 -->
+            <div class="prod-desc-card">
+              <h4>상품 설명</h4>
+              <pre class="prod-desc">${product.prodDesc}</pre>
+            </div>
+
+            <!-- 버튼 -->
+            <div class="detail-actions">
+              <a class="btn blue" href="${pageContext.request.contextPath}/seller/products/${product.prodId}/edit">수정</a>
+              <a class="btn blue" href="${pageContext.request.contextPath}/seller/products">목록으로</a>
+              <form action="${pageContext.request.contextPath}/seller/products/${product.prodId}/delete"
+                    method="post" class="inline-form"
+                    onsubmit="return confirm('정말 삭제하시겠습니까? 삭제 후 복구할 수 없습니다.');">
+                <button type="submit" class="btn red">삭제</button>
+              </form>
+            </div>
+
+          </c:otherwise>
+        </c:choose>
+
+      </section>
+    </main>
+
+    <jsp:include page="/WEB-INF/views/fragments/footer.jsp" />
+  </body>
+  </html>
