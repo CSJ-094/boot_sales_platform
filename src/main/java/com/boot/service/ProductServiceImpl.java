@@ -142,6 +142,42 @@ public class ProductServiceImpl implements ProductService {
         // 상품 정보 업데이트
         prodDAO.updateProduct(form);
         
+        // ⭐️ 이미지 파일 처리 및 DB 업데이트
+        if (file != null && !file.isEmpty()) {
+            try {
+                // 1. 기존 이미지 정보 삭제 (DB 및 실제 파일)
+                // 실제 파일 삭제 로직은 필요에 따라 추가 구현 (예: 스케줄러로 정리)
+                imageDAO.deleteByProdId(form.getProdId());
+
+                // 2. 새 파일 정보 설정 및 저장
+                String originalFileName = file.getOriginalFilename();
+                String fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
+                String savedFileName = UUID.randomUUID().toString() + fileExtension;
+                String savedFilePath = "/upload/images/" + savedFileName;
+
+                File uploadDirectory = new File(UPLOAD_DIR);
+                if (!uploadDirectory.exists()) {
+                    uploadDirectory.mkdirs();
+                }
+
+                File targetFile = new File(UPLOAD_DIR, savedFileName);
+                file.transferTo(targetFile);
+
+                // 3. 새 이미지 DTO 생성 및 DB에 삽입
+                ImageDTO imageDTO = new ImageDTO();
+                imageDTO.setImgProdId(form.getProdId());
+                imageDTO.setImgPath(savedFilePath);
+                imageDTO.setIsMain("Y");
+                imageDTO.setImgOrder(0);
+
+                imageDAO.insertImage(imageDTO);
+
+            } catch (IOException e) {
+                log.error("파일 업데이트 중 오류 발생: {}", e.getMessage());
+                throw new RuntimeException("파일 업로드 중 오류가 발생했습니다.", e);
+            }
+        }
+
         // 기존 카테고리 매핑 삭제 및 새로 삽입
         productCategoryDAO.deleteAllByProdId(form.getProdId());
 
