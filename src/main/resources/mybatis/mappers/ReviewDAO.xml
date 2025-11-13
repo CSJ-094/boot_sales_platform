@@ -37,4 +37,47 @@
         ORDER BY NVL(r.REVIEW_PARENT_ID, r.REVIEW_ID), r.REVIEW_REG_DATE ASC
     </select>
 
+    <insert id="insertReply" parameterType="com.boot.dto.ReviewDTO">
+        INSERT INTO REVIEW_DB (
+            REVIEW_ID,
+            PROD_ID,
+            MEMBER_ID,
+            REVIEW_CONTENT,
+            REVIEW_PARENT_ID
+        ) VALUES (
+            REVIEW_SEQ.NEXTVAL,
+            #{prodId},
+            #{memberId},
+            #{reviewContent},
+            #{reviewParentId}
+        )
+    </insert>
+
+    <select id="findBySellerId" resultType="com.boot.dto.ReviewDTO">
+        SELECT
+            r.REVIEW_ID as reviewId, r.PROD_ID as prodId, p.PROD_NAME as prodName,
+            r.MEMBER_ID as memberId, u.MEMBER_NAME as memberName,
+            r.REVIEW_CONTENT as reviewContent, r.RATING as rating,
+            r.REVIEW_REG_DATE as reviewRegDate,
+            CASE WHEN EXISTS (SELECT 1 FROM REVIEW_DB rr WHERE rr.REVIEW_PARENT_ID = r.REVIEW_ID)
+                 THEN 'Y' ELSE 'N' END as replied
+        FROM REVIEW_DB r
+        JOIN PRODUCT_DB p ON r.PROD_ID = p.PROD_ID
+        JOIN USER_DB u ON r.MEMBER_ID = u.MEMBER_ID
+        WHERE p.PROD_SELLER = #{sellerId}
+          AND r.REVIEW_PARENT_ID IS NULL
+        ORDER BY r.REVIEW_REG_DATE DESC
+    </select>
+
+    <select id="findById" resultType="com.boot.dto.ReviewDTO">
+        SELECT
+            r.REVIEW_ID as reviewId, r.PROD_ID as prodId, p.PROD_NAME as prodName,
+            r.MEMBER_ID as memberId, u.MEMBER_NAME as memberName,
+            r.REVIEW_CONTENT as reviewContent, r.RATING as rating, r.REVIEW_REG_DATE as reviewRegDate
+        FROM REVIEW_DB r
+        JOIN PRODUCT_DB p ON r.PROD_ID = p.PROD_ID
+        JOIN USER_DB u ON r.MEMBER_ID = u.MEMBER_ID
+        WHERE r.REVIEW_ID = #{reviewId}
+    </select>
+
 </mapper>
