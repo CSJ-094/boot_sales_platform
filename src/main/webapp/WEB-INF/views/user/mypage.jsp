@@ -390,7 +390,7 @@
             
             <div id="member-info-content" class="content-panel active">
                 <div class="member-info-panel">
-                    <form action="user_info" method="post" class="info-form">
+                    <form action="mypage/user_info" method="post" class="info-form">
                         
                         <div class="form-group">
                             <div class="form-row">
@@ -555,7 +555,7 @@
                                     <td>
                                         <%-- 상태에 따라 다른 버튼 표시 --%>
                                         <c:choose>
-                                            <c:when test="${order.ordStatus == '배송완료'}">
+                                             <c:when test="${order.ordStatus == '배송완료'}">
                                                 <form action="<c:url value='/order/confirm'/>" method="post" style="display:inline;">
                                                     <input type="hidden" name="orderId" value="${order.ordId}">
                                                     <button type="submit" class="action-btn" style="background-color: #28a745;">구매 확정</button>

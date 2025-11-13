@@ -27,14 +27,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Slf4j
 public class LoginController {
 
-	@Autowired
-	private SqlSession sqlSession;
-
-	@Autowired
-	private WishlistService wishlistService;
-
-	@Autowired
-	private OrderService orderService;
 
 	@Autowired
 	private MemDAO memDAO;
