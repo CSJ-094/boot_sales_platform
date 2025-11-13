@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.boot.dao.ReviewDAO">
+
+    <insert id="insertReview" parameterType="com.boot.dto.ReviewDTO">
+        INSERT INTO REVIEW_DB (
+            REVIEW_ID,
+            PROD_ID,
+            MEMBER_ID,
+            REVIEW_CONTENT,
+            RATING
+        ) VALUES (
+            REVIEW_SEQ.NEXTVAL,
+            #{prodId},
+            #{memberId},
+            #{reviewContent},
+            #{rating}
+        )
+    </insert>
+
+    <select id="findByProdId" resultType="com.boot.dto.ReviewDTO">
+        SELECT
+            r.REVIEW_ID as reviewId,
+            r.PROD_ID as prodId,
+            r.MEMBER_ID as memberId,
+            u.MEMBER_NAME as memberName, -- ⭐️ 작성자 이름 JOIN
+            r.REVIEW_CONTENT as reviewContent,
+            r.RATING as rating,
+            r.REVIEW_PARENT_ID as reviewParentId,
+            r.REVIEW_REG_DATE as reviewRegDate
+        FROM REVIEW_DB r
+        JOIN USER_DB u ON r.MEMBER_ID = u.MEMBER_ID
+        WHERE r.PROD_ID = #{prodId}
+        ORDER BY NVL(r.REVIEW_PARENT_ID, r.REVIEW_ID), r.REVIEW_REG_DATE ASC
+    </select>
+
+</mapper>

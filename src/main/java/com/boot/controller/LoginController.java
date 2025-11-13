@@ -3,7 +3,6 @@ package com.boot.controller;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import com.boot.dao.MemDAO;
@@ -73,7 +72,7 @@ public class LoginController {
 			session.setAttribute("memberName", member.getMemberName());
 			session.setAttribute("sessionUserType", userType);
 			log.info("@# 로그인 성공: ID={}, UserType={}", username, userType);
-			return "redirect:user/mypage";
+			return "redirect:/mypage";
 		} else {
 			redirectAttributes.addFlashAttribute("loginError", "아이디 또는 비밀번호가 일치하지 않습니다.");
 			log.warn("@# 로그인 실패: ID={}", username);
@@ -170,51 +169,4 @@ public class LoginController {
 		return result;
 	}
 
-	@RequestMapping(value = "/mypage", method = RequestMethod.GET)
-	public String mypage_view(HttpSession session, Model model) {
-		log.info("@# mypage_view() - 정보 조회 및 리스트 로드");
-
-		String memberId = (String) session.getAttribute("memberId");
-
-		// 로그인 체크
-		if (memberId == null) {
-			log.warn("@# mypage_view() - 세션 ID 없음. 로그인 페이지로 리다이렉트.");
-			return "redirect:/login"; // 절대 경로 유지
-		}
-
-		// 1. 회원 정보 조회
-		MemDAO memDao = sqlSession.getMapper(MemDAO.class);
-		MemDTO memberInfo = memDao.getMemberInfo(memberId);
-
-
-		if (memberInfo != null) {
-			model.addAttribute("memberInfo", memberInfo);
-		} else {
-			log.error("@# 회원 정보 조회 실패: ID={}", memberId);
-		}
-
-		// 찜목록 조회 및 Model에 추가
-		List<ProdDTO> wishlist = wishlistService.getWishlistByMemberId(memberId);
-		model.addAttribute("wishlist", wishlist);
-
-		// 주문 내역 조회 및 Model에 추가
-		List<OrdDTO> orderList = orderService.getOrdersByMemberId(memberId);
-		model.addAttribute("orderList", orderList);
-
-		return "user/mypage"; // mypage.jsp 뷰를 반환
-	}
-
-	// 마이페이지 정보 수정 처리 (URL: /user_info)
-	@PostMapping(value = "/user_info")
-	public String mypage_update(@ModelAttribute MemDTO member, RedirectAttributes redirectAttributes) {
-		log.info("@# mypage_update() - 정보 수정 요청", member);
-
-		MemDAO dao = sqlSession.getMapper(MemDAO.class);
-
-		dao.modify(member);
-//		addFlashAttribute = 일회성으로 값 전달 후 사라짐.
-		redirectAttributes.addFlashAttribute("updateSuccess", true);
-		// ⭐️ 수정: 절대 경로로 리다이렉트
-		return "redirect:/mypage";
-	}
 }

@@ -152,6 +152,69 @@
             font-size: 16px;
         }
 
+        /* 리뷰 탭 스타일 */
+        .review-list {
+            margin-bottom: 40px;
+        }
+        .review-item {
+            padding: 20px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .review-item:last-child {
+            border-bottom: none;
+        }
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .review-author {
+            font-weight: 600;
+        }
+        .review-date {
+            font-size: 13px;
+            color: #999;
+        }
+        .review-rating {
+            color: #f5b301;
+            font-size: 1.2em;
+        }
+        .review-content {
+            margin-top: 10px;
+            line-height: 1.7;
+        }
+
+        /* 답변 스타일 */
+        .reply-item {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-left: 3px solid #b08d57;
+            border-radius: 0 4px 4px 0;
+        }
+        .reply-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .reply-author {
+            font-weight: 600;
+            color: #333;
+        }
+        .reply-badge {
+            background-color: #b08d57;
+            color: white;
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: 500;
+        }
+        .reply-content {
+            font-size: 15px;
+        }
+
         /* 이전 페이지 링크 */
         .back-link-container {
             text-align: center;
@@ -217,8 +280,37 @@
             </div>
 
             <div id="reviews" class="tab-content">
-                <p class="content-placeholder">아직 작성된 리뷰가 없습니다.</p>
-                <%-- 리뷰 목록 및 작성 폼이 여기에 위치합니다. --%>
+                <c:choose>
+                    <c:when test="${not empty reviewList}">
+                        <div class="review-list">
+                            <c:forEach var="review" items="${reviewList}">
+                                <div class="review-item">
+                                    <div class="review-header">
+                                        <span class="review-author">${review.memberName}</span>
+                                        <span class="review-date"><fmt:formatDate value="${review.reviewRegDate}" pattern="yyyy-MM-dd"/></span>
+                                    </div>
+                                    <div class="review-rating">
+                                        <c:forEach begin="1" end="${review.rating}">&#9733;</c:forEach>
+                                    </div>
+                                    <p class="review-content">${review.reviewContent}</p>
+
+                                    <%-- 답변 표시 --%>
+                                    <c:if test="${not empty review.replies}">
+                                        <c:forEach var="reply" items="${review.replies}">
+                                            <div class="reply-item">
+                                                <div class="reply-header"><span class="reply-badge">판매자</span><span class="reply-author">${reply.memberName}</span></div>
+                                                <p class="reply-content">${reply.reviewContent}</p>
+                                            </div>
+                                        </c:forEach>
+                                    </c:if>
+                                </div>
+                            </c:forEach>
+                        </div>
+                    </c:when>
+                    <c:otherwise>
+                        <p class="content-placeholder">아직 작성된 리뷰가 없습니다.</p>
+                    </c:otherwise>
+                </c:choose>
             </div>
 
             <div id="qna" class="tab-content">
