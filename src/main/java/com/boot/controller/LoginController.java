@@ -62,6 +62,7 @@ public class LoginController {
 	        if (passwordEncoder.matches(in_pw, db_pw)) { //matches를 이용해 값 비교. in_pw가 항상 앞에
 	            session.setAttribute("memberId", loginDTO.getMemberId());
 	            session.setAttribute("memberName", resultDTO.getMemberName());
+				session.setAttribute("userType", "customer");
 	            log.info("@# 로그인 성공");
 	            return "redirect:/"; // 메인 페이지로 리다이렉트
 	        } else {

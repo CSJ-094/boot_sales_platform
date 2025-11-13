@@ -68,7 +68,9 @@ public class SellerController {
 
         if (resultDTO != null) {
             // 로그인 성공: 세션에 판매자 정보(seller) 저장
-            session.setAttribute("seller", resultDTO); 
+			session.setAttribute("memberId", resultDTO.getSelId());
+			session.setAttribute("userType", "seller");
+			session.setAttribute("memberName", resultDTO.getSelName());
             return "redirect:/seller/mypage"; // 판매자 메인 페이지로 이동
         } else {
             // 로그인 실패
