@@ -50,10 +50,10 @@ function check_ok(){
 		alert("이메일 중복 체크를 해주세요.");
 		return;
 	}
-	if (!reg_frm.mail_check_input.readOnly) {
+	if (!reg_frm.mail_check_input.readOnly) { //테스트 시 인증 번거로우면 이부분 주석처리 하시면 됩니다.
 		alert("이메일 인증을 해주세요");
 		return;
-	}//테스트 시 인증 번거로우면 이부분 주석처리 해주세요
+	}
 	reg_frm.submit();
 }
 
