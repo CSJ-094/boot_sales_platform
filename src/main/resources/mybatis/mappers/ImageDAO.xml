@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.boot.dao.ImageDAO">
+    
+    <insert id="insertImage" parameterType="com.boot.dto.ImageDTO">
+        <selectKey keyProperty="imgId" resultType="long" order="BEFORE">
+            SELECT IMG_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+        
+        INSERT INTO IMAGE_DB (
+            IMG_ID, 
+            IMG_PROD_ID, 
+            IMG_PATH, 
+            IMG_MAIN, 
+            IMG_ORDER,
+            IMG_REGDATE
+        ) VALUES (
+            #{imgId},           #{imgProdId},
+            #{imgPath},
+            #{isMain},
+            #{imgOrder},
+            SYSDATE             )
+    </insert>
+
+</mapper>

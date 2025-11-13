@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.boot.dao.SellerDAO">
+    
+    <select id="loginCheck" resultType="com.boot.dto.SellerDTO">
+        SELECT SEL_ID as selId, SEL_PW as selPw, SEL_NAME as selName, SEL_CNAME as selCName, SEL_EMAIL as selEmail, SEL_PHONE as selPhone, SEL_ZIPCODE as selZipcode, SEL_ADDR1 as selAddr1, SEL_ADDR2 as selAddr2
+        FROM SELLER_DB  WHERE SEL_ID = #{selId} AND SEL_PW = #{selPw}
+    </select>
+</mapper>

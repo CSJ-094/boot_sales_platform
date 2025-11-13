@@ -1,0 +1,154 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+    <mapper namespace="com.boot.dao.ProdDAO">
+
+ <select id="getProductById" resultType="com.boot.dto.ProdDTO">
+        SELECT
+            PROD_ID as prodId,
+            PROD_SELLER as prodSeller,
+            PROD_NAME as prodName,
+            PROD_PRICE as prodPrice,
+            PROD_STOCK as prodStock,
+            PROD_DESC as prodDesc,
+            PROD_CODE as prodCode,
+            PROD_REG as prodReg,
+            PROD_UPD as prodUpd
+        FROM PRODUCT_DB
+        WHERE PROD_ID = #{prodId}
+    </select>
+  
+  <!-- resultMap: DB 컬럼 → ProdDTO 필드 매핑 -->
+	<resultMap id="ProductMap"
+		type="com.boot.dto.ProdDTO">
+		<id column="PROD_ID" property="prodId" />
+		<result column="PROD_SELLER" property="prodSeller" />
+		<result column="PROD_NAME" property="prodName" />
+		<result column="PROD_PRICE" property="prodPrice" />
+		<result column="PROD_STOCK" property="prodStock" />
+		<result column="PROD_DESC" property="prodDesc" />
+		<result column="PROD_CODE" property="prodCode" />
+		<result column="PROD_REG" property="prodReg" />
+		<result column="PROD_UPD" property="prodUpd" />
+		<result property="prodImgPath" column="PROD_IMG_PATH" /> 
+	</resultMap>
+
+	<!-- 목록 -->
+	<select id="getProductList" resultMap="ProductMap">
+		SELECT PROD_ID, PROD_SELLER, PROD_NAME, PROD_PRICE, PROD_STOCK,
+		PROD_DESC, PROD_CODE, PROD_REG, PROD_UPD
+		FROM PRODUCT_DB
+		ORDER BY PROD_ID DESC
+	</select>
+
+	<!-- 상세 -->
+	<select id="getProduct" parameterType="long"
+		resultMap="ProductMap">
+		SELECT PROD_ID, PROD_SELLER, PROD_NAME, PROD_PRICE, PROD_STOCK,
+		PROD_DESC, PROD_CODE, PROD_REG, PROD_UPD
+		FROM PRODUCT_DB
+		WHERE PROD_ID = #{prodId}
+	</select>
+
+<!-- 	등록 (PROD_ID: 시퀀스 사용) -->
+	<insert id="insertProduct"
+		parameterType="com.boot.dto.ProdDTO">
+	
+	<!-- PROD_ID 선발급 -->	
+	<selectKey keyProperty="prodId" resultType="long" order="BEFORE">
+		SELECT PRODUCT_SEQ.NEXTVAL FROM DUAL
+	</selectKey>
+	
+		INSERT INTO PRODUCT_DB (
+		PROD_ID, PROD_SELLER, PROD_NAME, PROD_PRICE,
+		PROD_STOCK,PROD_DESC, PROD_CODE, PROD_REG
+		) VALUES (
+		#{prodId},
+		#{prodSeller, jdbcType=VARCHAR}, 
+		#{prodName}, 
+		#{prodPrice}, 
+		#{prodStock},
+		#{prodDesc,  jdbcType=VARCHAR},
+    	SEQ_PROD_CODE.NEXTVAL,
+    	NVL(#{prodReg, jdbcType=TIMESTAMP}, SYSDATE)
+		)
+	</insert>
+	
+	<select id="getProdCodeById" parameterType="long" resultType="long">
+  SELECT PROD_CODE FROM PRODUCT_DB WHERE PROD_ID = #{prodId}
+</select>
+
+	<!-- 수정 (수정일 자동 반영) -->
+	<update id="updateProduct"
+		parameterType="com.boot.dto.ProdDTO">
+		UPDATE PRODUCT_DB
+		SET 
+		PROD_NAME = #{prodName},
+		PROD_PRICE = #{prodPrice},
+		PROD_STOCK =
+		#{prodStock},
+		PROD_DESC = #{prodDesc},
+		PROD_UPD = SYSDATE
+		WHERE PROD_ID = #{prodId}
+	</update>
+
+	<!-- 삭제 -->
+	<delete id="deleteProduct" parameterType="long">
+		DELETE FROM PRODUCT_DB
+		WHERE PROD_ID = #{prodId}
+	</delete>
+  
+  <select id="selectProductsByCategory" parameterType="int" 
+            resultMap="ProductMap"> 
+            SELECT * FROM (
+        	SELECT 
+            P.PROD_ID,
+            P.PROD_NAME,
+            P.PROD_PRICE,
+            I.IMG_PATH AS PROD_IMG_PATH,
+            ROWNUM AS RNUM              FROM 
+            PRODUCT_DB P
+        JOIN 
+            PRODUCT_CATEGORY_DB PC 
+        ON 
+            P.PROD_ID = PC.PROD_ID
+        LEFT JOIN 
+            IMAGE_DB I 
+        ON 
+            P.PROD_ID = I.IMG_PROD_ID AND I.IMG_MAIN = 'Y'
+        WHERE
+            PC.CAT_ID = #{catId}  
+        ORDER BY 
+            P.PROD_REG DESC       
+    )
+    WHERE RNUM &lt;= 4
+    </select>
+    
+    <select id="getAllProdsByCatId" parameterType="int" 
+        resultMap="ProductMap">
+    
+    SELECT * FROM (
+        SELECT 
+            P.PROD_ID,
+            P.PROD_NAME,
+            P.PROD_PRICE,
+            I.IMG_PATH AS PROD_IMG_PATH,
+            ROWNUM AS RNUM              
+        FROM 
+            PRODUCT_DB P
+        JOIN 
+            PRODUCT_CATEGORY_DB PC 
+        ON 
+            P.PROD_ID = PC.PROD_ID
+        LEFT JOIN 
+            IMAGE_DB I 
+        ON 
+            P.PROD_ID = I.IMG_PROD_ID AND I.IMG_MAIN = 'Y'
+        WHERE
+            PC.CAT_ID = #{catId}  
+        ORDER BY 
+            P.PROD_REG DESC       
+    )
+    </select>
+</mapper>
