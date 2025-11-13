@@ -11,6 +11,8 @@ import com.boot.dto.LoginDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
@@ -24,7 +26,8 @@ public class LoginServiceImpl implements LoginService {
 
 	@Autowired
 	private LoginDAO loginDAO;
-	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 	// 이메일 인증 기능 사용을 위해 추가
 	@Autowired
 	private JavaMailSenderImpl mailSender; 
@@ -43,6 +46,9 @@ public class LoginServiceImpl implements LoginService {
 	@Override
 	public void write(LoginDTO loginDTO) {
 		log.info("@# write({})", loginDTO.getMemberId());
+
+		String encodedPw = passwordEncoder.encode(loginDTO.getMemberPw());
+		loginDTO.setMemberPw(encodedPw);
 		loginDAO.write(loginDTO);
 	}
 

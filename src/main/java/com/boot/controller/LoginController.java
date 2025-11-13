@@ -15,6 +15,8 @@ import com.boot.service.OrderService;
 import com.boot.service.WishlistService;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -34,43 +36,41 @@ public class LoginController {
 	@Autowired
 	private LoginService service;
 
-	// ===================================================================
-	// 1. 로그인/회원가입 기능
-	// ===================================================================
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
-	// 로그인 화면 이동
 	@RequestMapping("login")
 	public String login() {
 		log.info("@# login()");
 		return "login/login";
 	}
 
-	@RequestMapping(value = "/login", method = RequestMethod.POST)
-	public String login_process(
-			@RequestParam("username") String username,
-			@RequestParam("password") String password,
-			@RequestParam("userType") String userType,
-			HttpSession session,
-			RedirectAttributes redirectAttributes) {
-
-		log.info("@# login_process() - 로그인 시도: ID={}, UserType={}", username, userType);
-
-		MemDTO member = memDAO.getUserById(username);
-
-		if (member != null && member.getMemberPw().equals(password)) {
-			// ⭐️ 세션 키 통일: memberId로 유지
-			session.setAttribute("memberId", member.getMemberId());
-			// ⭐️ 세션 키 통일: sessionName 대신 memberName 권장
-			session.setAttribute("memberName", member.getMemberName());
-			session.setAttribute("sessionUserType", userType);
-			log.info("@# 로그인 성공: ID={}, UserType={}", username, userType);
-			return "redirect:/mypage";
-		} else {
-			redirectAttributes.addFlashAttribute("loginError", "아이디 또는 비밀번호가 일치하지 않습니다.");
-			log.warn("@# 로그인 실패: ID={}", username);
-			return "redirect:/login";
-		}
-	}
+//	@RequestMapping(value = "/login", method = RequestMethod.POST)
+//	public String login_process(
+//			@RequestParam("username") String username,
+//			@RequestParam("password") String password,
+//			@RequestParam("userType") String userType,
+//			HttpSession session,
+//			RedirectAttributes redirectAttributes) {
+//
+//		log.info("@# login_process() - 로그인 시도: ID={}, UserType={}", username, userType);
+//
+//		MemDTO member = memDAO.getUserById(username);
+//
+//		if (member != null && member.getMemberPw().equals(password)) {
+//			// ⭐️ 세션 키 통일: memberId로 유지
+//			session.setAttribute("memberId", member.getMemberId());
+//			// ⭐️ 세션 키 통일: sessionName 대신 memberName 권장
+//			session.setAttribute("memberName", member.getMemberName());
+//			session.setAttribute("sessionUserType", userType);
+//			log.info("@# 로그인 성공: ID={}, UserType={}", username, userType);
+//			return "redirect:/mypage";
+//		} else {
+//			redirectAttributes.addFlashAttribute("loginError", "아이디 또는 비밀번호가 일치하지 않습니다.");
+//			log.warn("@# 로그인 실패: ID={}", username);
+//			return "redirect:/login";
+//		}
+//	}
 
 
 
@@ -79,16 +79,17 @@ public class LoginController {
 	public String login_yn(LoginDTO loginDTO, HttpSession session, Model model) {
 	    log.info("@# login_yn() - ID: {}", loginDTO.getMemberId());
 
+		//1. DB에서 아이디 조회
 	    LoginDTO resultDTO = service.loginYn(loginDTO);
 
-	    if (resultDTO != null) {
-	        String db_pw = resultDTO.getMemberPw();
-	        String in_pw = loginDTO.getMemberPw();
 
-	        if (db_pw.equals(in_pw)) {
+	    if (resultDTO != null) {
+	        String db_pw = resultDTO.getMemberPw(); // Security를 이용해 암호화 된 비밀번호
+	        String in_pw = loginDTO.getMemberPw(); // 페이지에서 입력한 비밀번호
+
+	        if (passwordEncoder.matches(in_pw, db_pw)) { //matches를 이용해 값 비교. in_pw가 항상 앞에
 	            session.setAttribute("memberId", loginDTO.getMemberId());
 	            session.setAttribute("memberName", resultDTO.getMemberName());
-
 	            log.info("@# 로그인 성공");
 	            return "redirect:/"; // 메인 페이지로 리다이렉트
 	        } else {
