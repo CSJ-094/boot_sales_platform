@@ -45,34 +45,6 @@ public class LoginController {
 		return "login/login";
 	}
 
-//	@RequestMapping(value = "/login", method = RequestMethod.POST)
-//	public String login_process(
-//			@RequestParam("username") String username,
-//			@RequestParam("password") String password,
-//			@RequestParam("userType") String userType,
-//			HttpSession session,
-//			RedirectAttributes redirectAttributes) {
-//
-//		log.info("@# login_process() - 로그인 시도: ID={}, UserType={}", username, userType);
-//
-//		MemDTO member = memDAO.getUserById(username);
-//
-//		if (member != null && member.getMemberPw().equals(password)) {
-//			// ⭐️ 세션 키 통일: memberId로 유지
-//			session.setAttribute("memberId", member.getMemberId());
-//			// ⭐️ 세션 키 통일: sessionName 대신 memberName 권장
-//			session.setAttribute("memberName", member.getMemberName());
-//			session.setAttribute("sessionUserType", userType);
-//			log.info("@# 로그인 성공: ID={}, UserType={}", username, userType);
-//			return "redirect:/mypage";
-//		} else {
-//			redirectAttributes.addFlashAttribute("loginError", "아이디 또는 비밀번호가 일치하지 않습니다.");
-//			log.warn("@# 로그인 실패: ID={}", username);
-//			return "redirect:/login";
-//		}
-//	}
-
-
 
 	// 로그인 여부 판단
 	@RequestMapping(value = "login_yn", method = RequestMethod.POST)

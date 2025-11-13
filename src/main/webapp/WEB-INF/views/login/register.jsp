@@ -228,7 +228,7 @@
 			</div>
 			<div class="form-group">
 				<label for="member_email">이메일 인증</label>
-				<input  placeholder="인증번호 6자리를 입력해주세요." disabled="disabled"  maxlength="6" id="mail_check_input" name="mail_check_input">
+				<input type="text" placeholder="인증번호 6자리를 입력해주세요." disabled="disabled"  maxlength="6" id="mail_check_input" name="mail_check_input">
 			</div>
 			<div class="form-group">
 				<span id="mail_check_warn"></span>
