@@ -8,6 +8,7 @@ import com.boot.service.OrderService;
 import com.boot.service.WishlistService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +24,9 @@ public class MyPageController {
 
     @Autowired
     private MemDAO memDAO;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private WishlistService wishlistService;
@@ -59,6 +63,17 @@ public class MyPageController {
     @PostMapping("/user_info")
     public String mypage_update(@ModelAttribute MemDTO member, RedirectAttributes redirectAttributes) {
         log.info("@# mypage_update() - 정보 수정 요청: {}", member.getMemberId());
+
+        if(member.getMemberPw() != null && !member.getMemberPw().isEmpty()) {
+            String encodePw = passwordEncoder.encode(member.getMemberPw());
+            member.setMemberPw(encodePw);
+            //정보 수정 시 다시 비밀번호 암호화 하기.
+        }
+        else{
+            MemDTO OriginalInfo = memDAO.getMemberInfo(member.getMemberId());
+            member.setMemberPw(OriginalInfo.getMemberPw());
+            //정보 수정 시 비밀번호 란이 비어있으면 기존 비밀번호 유지.
+        }
 
         memDAO.modify(member);
         redirectAttributes.addFlashAttribute("updateSuccess", true);
