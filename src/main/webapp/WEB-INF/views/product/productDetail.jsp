@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="ko">
 <head>
@@ -23,7 +24,6 @@
         .detail-container {
             max-width: 1200px;
             margin: 40px auto;
-            padding: 0 20px;
         }
 
         /* 상품 기본 정보 섹션 */
@@ -31,7 +31,7 @@
             display: flex;
             gap: 30px;
             align-items: flex-start;
-            background-color: #fff;
+            background-color: #fff; /* ⭐️ 배경색 유지 */
             padding: 40px;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
@@ -114,6 +114,7 @@
         .tab-navigation {
             display: flex;
             border-bottom: 2px solid #ddd;
+            padding: 0 20px; /* ⭐️ 좌우 여백 추가 */
             margin-bottom: 30px;
         }
         .tab-link {
@@ -133,7 +134,7 @@
         /* 탭 콘텐츠 */
         .tab-content {
             display: none;
-            padding: 20px;
+            padding: 30px 40px; /* ⭐️ 여백 조정 */
             background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
@@ -151,6 +152,34 @@
             line-height: 1.8;
             font-size: 16px;
         }
+
+        /* Q&A, 리뷰 공통 스타일 */
+        .board-list { margin-bottom: 40px; }
+        .board-item { padding: 20px 0; border-bottom: 1px solid #eee; }
+        .board-item:last-child { border-bottom: none; }
+        .board-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .board-author { font-weight: 600; }
+        .board-date { font-size: 13px; color: #999; }
+        .board-author-masked {
+            font-size: 13px;
+            color: #888;
+            margin-top: 5px; /* ⭐️ 제목과의 간격 조정 */
+        }
+        .board-title {
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        .board-content {
+            margin-top: 20px; line-height: 1.7; color: #555; padding-left: 5px; /* ⭐️ 제목과의 간격 확보 */
+        }
+        .secret-qna { color: #888; font-style: italic; }
+        .secret-qna .lock-icon { margin-right: 5px; }
+
+        .write-section { padding: 25px; background-color: #f9f9f9; border-radius: 8px; border: 1px solid #e9e9e9; }
+        .write-section h4 { font-size: 18px; font-weight: 600; margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: 500; margin-bottom: 8px; }
 
         /* 리뷰 탭 스타일 */
         .review-list {
@@ -188,7 +217,7 @@
         /* 답변 스타일 */
         .reply-item {
             margin-top: 20px;
-            padding: 15px;
+            padding: 20px; /* ⭐️ 여백 조정 */
             background-color: #f8f9fa;
             border-left: 3px solid #b08d57;
             border-radius: 0 4px 4px 0;
@@ -214,6 +243,26 @@
         .reply-content {
             font-size: 15px;
         }
+
+        /* Q&A 작성 폼 스타일 */
+        .qna-form input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .qna-form textarea {
+            width: 100%;
+            height: 120px;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 15px;
+            resize: vertical;
+        }
+        .secret-check { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+        .qna-form button { background-color: #b08d57; color: white; padding: 12px 25px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: 500; }
 
         /* 이전 페이지 링크 */
         .back-link-container {
@@ -290,7 +339,7 @@
                                         <span class="review-date"><fmt:formatDate value="${review.reviewRegDate}" pattern="yyyy-MM-dd"/></span>
                                     </div>
                                     <div class="review-rating">
-                                        <c:forEach begin="1" end="${review.rating}">&#9733;</c:forEach>
+                                        <c:forEach begin="1" end="${review.rating}">&#9733;</c:forEach> <%-- ★ --%>
                                     </div>
                                     <p class="review-content">${review.reviewContent}</p>
 
@@ -314,8 +363,67 @@
             </div>
 
             <div id="qna" class="tab-content">
-                <p class="content-placeholder">아직 등록된 상품 문의가 없습니다.</p>
-                <%-- 상품 문의 목록 및 작성 폼이 여기에 위치합니다. --%>
+                <div class="board-list">
+                    <c:choose>
+                        <c:when test="${not empty qnaList}">
+                            <c:forEach var="qna" items="${qnaList}">
+                                <div class="board-item">
+                                    <div class="board-header">
+                                        <span class="board-date"><fmt:formatDate value="${qna.qnaRegDate}" pattern="yyyy-MM-dd"/></span>
+                                    </div>
+                                    <%-- 비밀글 처리 --%>
+                                    <c:choose>
+                                        <c:when test="${qna.qnaIsSecret == 'Y' and qna.memberId != memberId and sessionScope.sessionUserType != 'seller'}">
+                                            <p class="secret-qna"><span class="lock-icon">&#128274;</span>비밀글입니다.</p>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <h5 class="board-title">${qna.qnaTitle}</h5>
+                                            <div class="board-author-masked" style="margin-bottom: 20px;"> <%-- ⭐️ 내용과의 간격 확보 --%>
+                                                <%-- 작성자 이름 마스킹 처리 --%>
+                                                <c:choose>
+                                                    <c:when test="${fn:length(qna.memberName) > 2}">
+                                                        ${fn:substring(qna.memberName, 0, 1)}*${fn:substring(qna.memberName, 2, fn:length(qna.memberName))}
+                                                    </c:when>
+                                                    <c:when test="${fn:length(qna.memberName) == 2}">
+                                                        ${fn:substring(qna.memberName, 0, 1)}*
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        ${qna.memberName}
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </div>
+                                            <p class="board-content">${qna.qnaContent}</p>
+                                        </c:otherwise>
+                                    </c:choose>
+
+                                    <%-- 답변 표시 --%>
+                                    <c:if test="${not empty qna.replies}">
+                                        <c:forEach var="reply" items="${qna.replies}">
+                                            <div class="reply-item">
+                                                <div class="reply-header"><span class="reply-badge">판매자</span></div>
+                                                <p class="reply-content">${reply.qnaContent}</p>
+                                            </div>
+                                        </c:forEach>
+                                    </c:if>
+                                </div>
+                            </c:forEach>
+                        </c:when>
+                        <c:otherwise>
+                            <p class="content-placeholder">아직 등록된 상품 문의가 없습니다.</p>
+                        </c:otherwise>
+                    </c:choose>
+                </div>
+
+                <div class="write-section qna-form">
+                    <h4>상품 문의하기</h4>
+                    <form action="<c:url value='/qna/add'/>" method="post">
+                        <input type="hidden" name="prodId" value="${product.prodId}">
+                        <div class="form-group"><label for="qnaTitle">제목</label><input type="text" id="qnaTitle" name="qnaTitle" required></div>
+                        <div class="form-group"><label for="qnaContent">내용</label><textarea id="qnaContent" name="qnaContent" required></textarea></div>
+                        <div class="form-group secret-check"><input type="checkbox" id="qnaIsSecret" name="qnaIsSecret" value="Y"><label for="qnaIsSecret">비밀글로 문의하기</label></div>
+                        <button type="submit">문의 등록</button>
+                    </form>
+                </div>
             </div>
         </c:if>
 

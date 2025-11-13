@@ -9,15 +9,19 @@ import java.util.Set;
 import javax.servlet.http.HttpSession;
 
 import com.boot.dao.CategoryDAO;
-import com.boot.dao.MemDAO;
+import com.boot.dao.QnaDAO;
 import com.boot.dao.ProdDAO;
 import com.boot.dao.ProductCategoryDAO;
 import com.boot.dto.MemDTO;
 import com.boot.dto.ProdDTO;
 import com.boot.dto.ProductCategoryDTO;
+import com.boot.dto.ReviewDTO;
 import com.boot.dto.SellerDTO;
+import com.boot.dto.QnaDTO;
 import com.boot.service.ProductService;
+import com.boot.service.ReviewService;
 import com.boot.service.SellerService;
+import com.boot.service.QnaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,17 +35,19 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import lombok.extern.slf4j.Slf4j;
 @Controller
 @RequestMapping("/seller") // ✅ 모든 URL에 /seller를 붙이는 대신 클래스 레벨에 매핑
 public class SellerController {
 	
 	@Autowired private ProdDAO prodDAO;
-	@Autowired private MemDAO memDAO;
 	// ⭐️ 추가: Service와 DAO들을 주입받습니다.
 	@Autowired private ProductService productService;
 	@Autowired private CategoryDAO categoryDAO;
 	@Autowired private ProductCategoryDAO productCategoryDAO;
 	@Autowired private SellerService sellerService;
+	@Autowired private QnaService qnaService;
+	@Autowired private ReviewService reviewService;
 	
 	// 1. 판매자 로그인 페이지 이동 
 	@GetMapping("/login")
@@ -131,9 +137,7 @@ public class SellerController {
 	
 	//상품 상세 (/seller/products/{prodId})
 	@GetMapping("/products/{prodId}")
-		// ⭐️ prodId를 Long 타입으로 받도록 통일
 		public String productDetail(@PathVariable("prodId") Long prodId, Model model) { 
-			// ⭐️ DAO 직접 호출 대신 Service 계층 사용
 			ProdDTO product = productService.getProductById(prodId.intValue());
 			model.addAttribute("product", product);
 			model.addAttribute("activeMenu", "product");
@@ -202,7 +206,6 @@ public class SellerController {
 	//회원 목록(/seller/members)
 	@GetMapping("/members")
 	public String memberList(Model model) {
-		model.addAttribute("users", memDAO.getUserList());
 		model.addAttribute("activeMenu", "member");
 		return "seller/members";
 	}
@@ -211,10 +214,111 @@ public class SellerController {
 	@GetMapping("/members/{memberId}")
 	public String memberDetail(@PathVariable("memberId") String memberId ,Model model) {
 		// ⭐️ MemDTO는 import 추가
-		MemDTO user = memDAO.getUser(memberId);
-		model.addAttribute("user", user);
 		model.addAttribute("activeMenu", "member");
 		// TODO: 이후 구매내역 orders도 같이 model에 넣을 예정
 		return "seller/memberDetail";
+	}
+
+	// 문의 관리 목록
+	@GetMapping("/qna")
+	public String qnaList(HttpSession session, Model model) {
+		SellerDTO seller = (SellerDTO) session.getAttribute("seller");
+		if (seller == null) {
+			return "redirect:/seller/login";
+		}
+
+		List<QnaDTO> qnaList = qnaService.getQnaBySellerId(seller.getSelId());
+		model.addAttribute("qnaList", qnaList);
+		model.addAttribute("activeMenu", "qna");
+		return "seller/qna_list";
+	}
+
+	// 답변 작성 폼
+	@GetMapping("/qna/{qnaId}/reply")
+	public String qnaReplyForm(@PathVariable("qnaId") Long qnaId, HttpSession session, Model model) {
+		SellerDTO seller = (SellerDTO) session.getAttribute("seller");
+		if (seller == null) {
+			return "redirect:/seller/login";
+		}
+
+		QnaDTO question = qnaService.getQnaById(qnaId);
+		model.addAttribute("question", question);
+		model.addAttribute("activeMenu", "qna");
+		return "seller/qna_reply";
+	}
+
+	// 답변 등록 처리
+	@PostMapping("/qna/reply")
+	public String addReply(QnaDTO reply, HttpSession session, RedirectAttributes ra) {
+		SellerDTO seller = (SellerDTO) session.getAttribute("seller");
+		if (seller == null) {
+			return "redirect:/seller/login";
+		}
+
+		// ⭐️ 원본 질문 정보를 조회하여 작성자 ID를 가져옴
+		QnaDTO question = qnaService.getQnaById(reply.getQnaParentId());
+		if (question == null) {
+			ra.addFlashAttribute("error", "원본 문의글을 찾을 수 없습니다.");
+			return "redirect:/seller/qna";
+		}
+		// ⭐️ 답변의 작성자 ID를 원본 질문자의 ID로 설정하여 DB 오류를 방지하고,
+		//    판매자가 남긴 답변임을 명확히 하기 위해 제목에 "Re: "를 붙입니다.
+		reply.setMemberId(question.getMemberId());
+		reply.setQnaTitle("Re: " + reply.getQnaTitle()); // 답변 제목 설정
+
+		qnaService.addReply(reply);
+		ra.addFlashAttribute("msg", "답변이 등록되었습니다.");
+		return "redirect:/seller/qna";
+	}
+
+	// 리뷰 관리 목록
+	@GetMapping("/reviews")
+	public String reviewList(HttpSession session, Model model) {
+		SellerDTO seller = (SellerDTO) session.getAttribute("seller");
+		if (seller == null) {
+			return "redirect:/seller/login";
+		}
+
+		List<ReviewDTO> reviewList = reviewService.getReviewsBySellerId(seller.getSelId());
+		model.addAttribute("reviewList", reviewList);
+		model.addAttribute("activeMenu", "review");
+		return "seller/review_list";
+	}
+
+	// 리뷰 답변 작성 폼
+	@GetMapping("/reviews/{reviewId}/reply")
+	public String reviewReplyForm(@PathVariable("reviewId") Long reviewId, HttpSession session, Model model) {
+		SellerDTO seller = (SellerDTO) session.getAttribute("seller");
+		if (seller == null) {
+			return "redirect:/seller/login";
+		}
+
+		ReviewDTO review = reviewService.getReviewById(reviewId);
+		model.addAttribute("review", review);
+		model.addAttribute("activeMenu", "review");
+		return "seller/review_reply";
+	}
+
+	// 리뷰 답변 등록 처리
+	@PostMapping("/reviews/reply")
+	public String addReviewReply(ReviewDTO reply, HttpSession session, RedirectAttributes ra) {
+		SellerDTO seller = (SellerDTO) session.getAttribute("seller");
+		if (seller == null) {
+			return "redirect:/seller/login";
+		}
+
+		// 원본 리뷰 정보를 조회하여 답변에 필요한 정보를 설정
+		ReviewDTO originalReview = reviewService.getReviewById(reply.getReviewParentId());
+		if (originalReview == null) {
+			ra.addFlashAttribute("error", "원본 리뷰를 찾을 수 없습니다.");
+			return "redirect:/seller/reviews";
+		}
+
+		reply.setMemberId(originalReview.getMemberId()); // 답변의 작성자 ID는 원본 리뷰 작성자 ID로 설정
+		reply.setProdId(originalReview.getProdId()); // 상품 ID 설정
+
+		reviewService.addReply(reply);
+		ra.addFlashAttribute("msg", "리뷰 답변이 등록되었습니다.");
+		return "redirect:/seller/reviews";
 	}
 }
