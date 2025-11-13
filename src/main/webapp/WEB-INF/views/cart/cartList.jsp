@@ -236,7 +236,7 @@
                             <td style="text-align: left;">
                                 <a href="${pageContext.request.contextPath}/product/detail?prodId=${cartItem.prodId}">${cartItem.prodName}</a>
                             </td>
-                            <td><fmt:formatNumber value="${cartItem.prodPrice}" type="currency" currencySymbol="₩"/></td>
+                            <td><fmt:formatNumber value="${cartItem.prodPrice}" type="currency" currencySymbol="₩" maxFractionDigits="0"/></td>
                             <td>
                                 <form action="${pageContext.request.contextPath}/cart/update" method="post" style="display:flex; align-items:center; justify-content:center;">
                                     <input type="hidden" name="memberId" value="${memberId}">
@@ -245,7 +245,7 @@
                                     <button type="submit" class="cart-action-btn update-btn">수정</button>
                                 </form>
                             </td>
-                            <td><fmt:formatNumber value="${itemTotalPrice}" type="currency" currencySymbol="₩"/></td>
+                            <td><fmt:formatNumber value="${itemTotalPrice}" type="currency" currencySymbol="₩" maxFractionDigits="0"/></td>
                             <td>
                                 <form action="${pageContext.request.contextPath}/cart/remove" method="post" style="display:inline;">
                                     <input type="hidden" name="memberId" value="${memberId}">
@@ -258,7 +258,7 @@
                 </tbody>
             </table>
             <div class="total-price">
-                총 장바구니 금액: <fmt:formatNumber value="${totalCartPrice}" type="currency" currencySymbol="₩"/>
+                총 장바구니 금액: <fmt:formatNumber value="${totalCartPrice}" type="currency" currencySymbol="₩" maxFractionDigits="0"/>
             </div>
         </c:if>
 

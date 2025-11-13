@@ -1,124 +1,168 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>상품 상세</title>
+    <title>${product.prodName} - MY MODERN SHOP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="<c:url value='/css/header.css' />">
     <style>
+        /* 기본 스타일 */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 40px;
+            font-family: 'Noto Sans KR', 'Montserrat', sans-serif;
             background-color: #f4f7f6;
             color: #333;
             line-height: 1.6;
         }
-        .container {
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            max-width: 800px;
-            margin: 20px auto;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+        a { text-decoration: none; color: inherit; }
+
+        /* 페이지 컨테이너 */
+        .detail-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
         }
-        h1 {
-            color: #2c3e50;
-            margin-bottom: 25px;
-            font-size: 2.5em;
-            border-bottom: 2px solid #e0e0e0;
-            padding-bottom: 15px;
-            text-align: center;
-        }
-        .product-info {
+
+        /* 상품 기본 정보 섹션 */
+        .product-summary {
             display: flex;
             gap: 30px;
             align-items: flex-start;
-        }
-        .product-image {
-            flex: 1;
-            max-width: 300px;
-            border: 1px solid #eee;
+            background-color: #fff;
+            padding: 40px;
             border-radius: 8px;
-            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 40px;
         }
-        .product-image img {
+        .summary-image {
+            flex: 1;
+            max-width: 450px;
+        }
+        .summary-image img {
             width: 100%;
             height: auto;
-            display: block;
+            border-radius: 8px;
+            border: 1px solid #eee;
         }
-        .product-details {
-            flex: 2;
-            text-align: left;
+        .summary-details {
+            flex: 1.5;
         }
-        .product-details h2 {
-            font-size: 2em;
-            color: #34495e;
-            margin-top: 0;
-            margin-bottom: 10px;
-        }
-        .product-details p {
-            margin-bottom: 8px;
-            font-size: 1.1em;
-        }
-        .product-details .price {
-            font-size: 1.8em;
-            color: #e74c3c;
-            font-weight: bold;
+        .summary-details h2 {
+            font-size: 28px;
+            font-weight: 600;
             margin-bottom: 15px;
         }
-        .product-details .description {
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 1px dashed #eee;
-            font-size: 1em;
-            color: #555;
+        .summary-details .seller-info {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 20px;
         }
+        .summary-details .price {
+            font-size: 32px;
+            font-weight: 700;
+            color: #b08d57;
+            margin-bottom: 20px;
+        }
+        .summary-details .stock-info {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 25px;
+        }
+
+        /* 장바구니 폼 */
         .add-to-cart-form {
             display: flex;
-            align-items: center;
+            flex-direction: column;
             gap: 15px;
-            margin-top: 20px;
             padding-top: 20px;
             border-top: 1px solid #eee;
         }
-        .add-to-cart-form label {
-            font-weight: bold;
-            font-size: 1.1em;
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        .add-to-cart-form input[type="number"] {
-            width: 60px;
+        .quantity-control label {
+            font-weight: 500;
+        }
+        .quantity-control input[type="number"] {
+            width: 70px;
             padding: 8px;
             border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 1em;
+            border-radius: 4px;
             text-align: center;
         }
         .add-to-cart-form button {
-            background-color: #6c757d; /* 회색 */
+            background-color: #333;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 15px 20px;
             cursor: pointer;
-            border-radius: 5px;
-            font-size: 1.1em;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 600;
             transition: background-color 0.3s ease;
         }
         .add-to-cart-form button:hover {
-            background-color: #5a6268;
+            background-color: #555;
+        }
+
+        /* 탭 네비게이션 */
+        .tab-navigation {
+            display: flex;
+            border-bottom: 2px solid #ddd;
+            margin-bottom: 30px;
+        }
+        .tab-link {
+            padding: 15px 30px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            color: #888;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .tab-link.active {
+            color: #333;
+            border-bottom-color: #b08d57;
+        }
+
+        /* 탭 콘텐츠 */
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            min-height: 300px;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .tab-content .content-placeholder {
+            color: #999;
+            text-align: center;
+            padding-top: 50px;
+        }
+        .product-description-content {
+            line-height: 1.8;
+            font-size: 16px;
+        }
+
+        /* 이전 페이지 링크 */
+        .back-link-container {
+            text-align: center;
+            margin-top: 40px;
         }
         .back-link {
             display: inline-block;
-            margin-top: 30px;
-            padding: 10px 20px;
+            padding: 10px 25px;
             background-color: #6c757d;
             color: white;
-            text-decoration: none;
-            border-radius: 5px;
+            border-radius: 4px;
             transition: background-color 0.3s ease;
         }
         .back-link:hover {
@@ -127,36 +171,89 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>상품 상세 정보</h1>
+    <%-- 헤더 프래그먼트 포함 --%>
+    <jsp:include page="/WEB-INF/views/fragments/header.jsp" />
 
+    <div class="detail-container">
         <c:if test="${empty product}">
             <p class="no-items">상품 정보를 찾을 수 없습니다.</p>
         </c:if>
+
         <c:if test="${not empty product}">
-            <div class="product-info">
-                <div class="product-image">
+            <%-- 상품 기본 정보 --%>
+            <div class="product-summary">
+                <div class="summary-image">
                     <img src="${pageContext.request.contextPath}${product.prodImgPath}" alt="${product.prodName}">
                 </div>
-                <div class="product-details">
+                <div class="summary-details">
                     <h2>${product.prodName}</h2>
-                    <p><strong>판매자:</strong> ${product.prodSeller}</p>
-                    <p class="price"><fmt:formatNumber value="${product.prodPrice}" type="currency" currencySymbol="₩"/></p>
-                    <p><strong>재고:</strong> ${product.prodStock}개</p>
-                    <p class="description">${product.prodDesc}</p>
+                    <p class="seller-info">판매자: ${product.prodSeller}</p>
+                    <p class="price"><fmt:formatNumber value="${product.prodPrice}" type="number" maxFractionDigits="0"/>원</p>
+                    <p class="stock-info">재고: ${product.prodStock}개</p>
 
                     <form action="${pageContext.request.contextPath}/cart/add" method="post" class="add-to-cart-form">
-                        <input type="hidden" name="memberId" value="${memberId}">
                         <input type="hidden" name="prodId" value="${product.prodId}">
-                        <label for="cartQty">수량:</label>
-                        <input type="number" id="cartQty" name="cartQty" value="1" min="1" max="${product.prodStock}">
+                        <div class="quantity-control">
+                            <label for="cartQty">수량:</label>
+                            <input type="number" id="cartQty" name="cartQty" value="1" min="1" max="${product.prodStock}">
+                        </div>
                         <button type="submit">장바구니에 추가</button>
                     </form>
                 </div>
             </div>
+
+            <%-- 탭 네비게이션 --%>
+            <div class="tab-navigation">
+                <div class="tab-link active" onclick="openTab(event, 'description')">상품 상세정보</div>
+                <div class="tab-link" onclick="openTab(event, 'reviews')">리뷰</div>
+                <div class="tab-link" onclick="openTab(event, 'qna')">상품 문의</div>
+            </div>
+
+            <%-- 탭 콘텐츠 --%>
+            <div id="description" class="tab-content active">
+                <div class="product-description-content">
+                    ${product.prodDesc}
+                </div>
+            </div>
+
+            <div id="reviews" class="tab-content">
+                <p class="content-placeholder">아직 작성된 리뷰가 없습니다.</p>
+                <%-- 리뷰 목록 및 작성 폼이 여기에 위치합니다. --%>
+            </div>
+
+            <div id="qna" class="tab-content">
+                <p class="content-placeholder">아직 등록된 상품 문의가 없습니다.</p>
+                <%-- 상품 문의 목록 및 작성 폼이 여기에 위치합니다. --%>
+            </div>
         </c:if>
 
-        <p><a href="#" onclick="history.back();" class="back-link">이전 페이지로</a></p>
+        <div class="back-link-container">
+            <a href="#" onclick="history.back();" class="back-link">이전 페이지로</a>
+        </div>
     </div>
+
+    <%-- 푸터 프래그먼트 포함 (푸터 파일이 있다면) --%>
+    <%-- <jsp:include page="/WEB-INF/views/fragments/footer.jsp" /> --%>
+
+    <script>
+        function openTab(evt, tabName) {
+            // 모든 탭 콘텐츠를 숨김
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+
+            // 모든 탭 링크에서 'active' 클래스 제거
+            tablinks = document.getElementsByClassName("tab-link");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+
+            // 클릭된 탭 콘텐츠를 보여주고, 링크에 'active' 클래스 추가
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+    </script>
 </body>
 </html>
