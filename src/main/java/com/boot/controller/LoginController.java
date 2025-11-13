@@ -206,17 +206,15 @@ public class LoginController {
 
 	// 마이페이지 정보 수정 처리 (URL: /user_info)
 	@PostMapping(value = "/user_info")
-	public String mypage_update(HttpServletRequest request, Model model) {
-		log.info("@# mypage_update() - 정보 수정 요청");
-
-		MemDTO member = new MemDTO();
-		// ... (파라미터 설정 로직 생략) ...
+	public String mypage_update(@ModelAttribute MemDTO member, RedirectAttributes redirectAttributes) {
+		log.info("@# mypage_update() - 정보 수정 요청", member);
 
 		MemDAO dao = sqlSession.getMapper(MemDAO.class);
 
 		dao.modify(member);
-
+//		addFlashAttribute = 일회성으로 값 전달 후 사라짐.
+		redirectAttributes.addFlashAttribute("updateSuccess", true);
 		// ⭐️ 수정: 절대 경로로 리다이렉트
-		return "redirect:user/mypage";
+		return "redirect:/mypage";
 	}
 }

@@ -397,34 +397,34 @@
                                 <label for="MEMBER_ID_VIEW">아이디</label>
                                 <input type="text" id="MEMBER_ID_VIEW" value="${memberInfo.memberId}" disabled>
                             </div>
-                            <input type="hidden" name="MEMBER_ID" value="${memberInfo.memberId}">
+                            <input type="hidden" name="memberId" value="${memberInfo.memberId}">
                         </div>
 
                         <div class="form-group">
                             <div class="form-row">
                                 <label for="MEMBER_PW">새 비밀번호</label>
-                                <input type="password" id="MEMBER_PW" name="MEMBER_PW" placeholder="새 비밀번호를 입력해주세요 (변경 시에만 입력)" > 
+                                <input type="password" id="MEMBER_PW" name="memberPw" placeholder="새 비밀번호를 입력해주세요 (변경 시에만 입력)" >
                             </div>
                         </div>
                         
                         <div class="form-group">
                             <div class="form-row">
                                 <label for="MEMBER_NAME">이름</label>
-                                <input type="text" id="MEMBER_NAME" name="MEMBER_NAME" value="${memberInfo.memberName}" required>
+                                <input type="text" id="MEMBER_NAME" name="memberName" value="${memberInfo.memberName}" required>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <div class="form-row">
                                 <label for="MEMBER_EMAIL">이메일</label>
-                                <input type="email" id="MEMBER_EMAIL" name="MEMBER_EMAIL" value="${memberInfo.memberEmail}" required>
+                                <input type="email" id="MEMBER_EMAIL" name="memberEmail" value="${memberInfo.memberEmail}" required>
                             </div>
                         </div>
                         
                         <div class="form-group">
                             <div class="form-row">
                                 <label for="MEMBER_PHONE">전화번호</label>
-                                <input type="tel" id="MEMBER_PHONE" name="MEMBER_PHONE" value="${memberInfo.memberPhone}" placeholder="예: 010-1234-5678">
+                                <input type="tel" id="MEMBER_PHONE" name="memberPhone" value="${memberInfo.memberPhone}" placeholder="예: 010-1234-5678">
                             </div>
                         </div>
 
@@ -607,5 +607,8 @@
             });
         });
     </script>
+    <c:if test="${updateSuccess}">
+        <script> alert('정보 수정이 완료되었습니다.'); </script>
+    </c:if>
 </body>
 </html>
