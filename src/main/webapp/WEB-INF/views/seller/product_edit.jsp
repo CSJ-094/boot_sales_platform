@@ -35,42 +35,50 @@
 	    <!-- 상단 2열: 왼쪽 이미지, 오른쪽 기본 정보 -->
 	    <div class="prod-edit-grid">
 
-	      <!-- LEFT: 이미지 편집 -->
-	      <section class="prod-image-edit">
-	        <h3>상품 이미지</h3>
+			<!-- LEFT: 이미지 편집 -->
+			      <section class="prod-image-edit">
+			        <h3>상품 이미지</h3>
 
-			<div class="prod-image-wrapper">
-			   <!-- 이미지 박스 -->
-			   <div class="current-image-box">
-			     <c:choose>
-			       <c:when test="${not empty product.prodImgPath}">
-			         <img src="${pageContext.request.contextPath}${product.prodImgPath}"
-			              alt="${product.prodName}">
-			         <!-- 삭제 X 버튼 (이미지 있을 때만 의미 있음) -->
-			         <button type="button" class="img-delete-btn" title="대표 이미지 삭제">
-			           ×
-			         </button>
-			         <!-- 실제 서버로 넘어가는 체크박스는 숨김 -->
-			         <input type="checkbox" name="deleteImage" value="Y" class="img-delete-check" hidden>
-			       </c:when>
-			       <c:otherwise>
-			         <div class="no-image">
-			           등록된 대표 이미지가 없습니다.
-			         </div>
-			       </c:otherwise>
-			     </c:choose>
-			   </div>
+			        <div class="prod-image-wrapper">
+			          <!-- 이미지 박스 -->
+			          <div class="current-image-box">
+			            <c:choose>
+			              <c:when test="${not empty product.prodImgPath}">
+			                <img id="product-preview"
+			                     src="${pageContext.request.contextPath}${product.prodImgPath}"
+			                     alt="${product.prodName}">
+			              </c:when>
+			              <c:otherwise>
+			                <!-- 기본 placeholder 이미지는 프로젝트에 맞게 경로 수정 -->
+			                <img id="product-preview"
+			                     src="<c:url value='/images/product-placeholder.png'/>"
+			                     alt="상품 이미지 없음">
+			              </c:otherwise>
+			            </c:choose>
 
-			   <!-- 하단 작은 버튼/파일명 -->
-			       <div class="image-footer">
-			         <label class="image-upload-small">
-			           이미지 변경
-			           <input type="file" name="uploadFile" accept="image/*">
-			         </label>
-			         <span class="file-name-small" id="fileNameDisplay">선택된 파일 없음</span>
-			       </div>
-			     </div>
-			   </section>
+			            <!-- X 버튼 (항상 존재) -->
+			            <button type="button"
+			                    class="img-delete-btn"
+			                    id="btn-image-delete"
+			                    title="대표 이미지 삭제">×</button>
+			          </div>
+
+			          <!-- 삭제 여부를 서버로 넘기는 hidden -->
+			          <input type="hidden" name="deleteImage" id="deleteImageFlag" value="false">
+
+			          <!-- 하단 작은 버튼/파일명 -->
+			          <div class="image-footer">
+			            <label class="image-upload-small">
+			              이미지 변경
+			              <input type="file"
+			                     id="uploadFile"
+			                     name="uploadFile"
+			                     accept="image/*">
+			            </label>
+			            <span class="file-name-small" id="fileNameDisplay">선택된 파일 없음</span>
+			          </div>
+			        </div>
+			      </section>
 
 	      <!-- RIGHT: 기본 정보 -->
 		  <section class="prod-basic-edit">
@@ -155,39 +163,71 @@
   <jsp:include page="/WEB-INF/views/fragments/footer.jsp" />
   <script>
   (function(){
-    // 카테고리 라디오/체크 동기화
+    // ===== 카테고리 라디오/체크 동기화 =====
     const checks = document.querySelectorAll('.cat-check');
     const mains  = document.querySelectorAll('.cat-main');
+
     function syncRadios(){
       checks.forEach((chk,i)=>{
-        const r=mains[i];
-        r.disabled=!chk.checked;
-        if(!chk.checked && r.checked) r.checked=false;
+        const r = mains[i];
+        r.disabled = !chk.checked;
+        if (!chk.checked && r.checked) r.checked = false;
       });
-      const anyChecked=[...checks].some(c=>c.checked);
-      const anyMain=[...mains].some(r=>r.checked);
-      if(anyChecked && !anyMain){
-        const i=[...checks].findIndex(c=>c.checked);
-        if(i>=0) mains[i].checked=true;
+      const anyChecked = [...checks].some(c=>c.checked);
+      const anyMain    = [...mains].some(r=>r.checked);
+      if (anyChecked && !anyMain){
+        const i = [...checks].findIndex(c=>c.checked);
+        if (i >= 0) mains[i].checked = true;
       }
     }
     checks.forEach(chk=>chk.addEventListener('change', syncRadios));
     syncRadios();
 
-    // 파일 선택 시 파일 이름 표시
-    const fileInput = document.querySelector('input[name="newImage"]');
+    // ===== 이미지 업로드 / 삭제 =====
+    const previewImg   = document.getElementById('product-preview');
+    const fileInput    = document.getElementById('uploadFile');
+    const deleteBtn    = document.getElementById('btn-image-delete');
+    const deleteFlag   = document.getElementById('deleteImageFlag');
     const fileNameSpan = document.getElementById('fileNameDisplay');
-    if (fileInput && fileNameSpan) {
+
+    // 원본 이미지 src (없으면 placeholder로)
+    const placeholderSrc = '<c:url value="/images/product-placeholder.png"/>';
+    const originalSrc = previewImg ? previewImg.getAttribute('src') : placeholderSrc;
+
+    function setFileName(text){
+      if (fileNameSpan) fileNameSpan.textContent = text;
+    }
+
+    // 파일 선택 시: 미리보기 변경 + 파일명 표시 + 삭제 플래그 해제
+    if (fileInput && previewImg) {
       fileInput.addEventListener('change', function(){
-        if (this.files && this.files.length > 0) {
-          fileNameSpan.textContent = this.files[0].name;
+        const file = this.files && this.files[0];
+        if (file) {
+          const url = URL.createObjectURL(file);
+          previewImg.src = url;
+          setFileName(file.name);
+          deleteFlag.value = 'false';  // 새 파일 올리면 삭제 체크는 의미 없게
         } else {
-          fileNameSpan.textContent = '선택된 파일 없음';
+          // 선택 취소했을 때
+          previewImg.src = originalSrc || placeholderSrc;
+          setFileName('선택된 파일 없음');
         }
+      });
+    }
+
+    // X 버튼 클릭 시: 이미지 제거 + 파일 입력 초기화 + 삭제 플래그 on
+    if (deleteBtn && previewImg) {
+      deleteBtn.addEventListener('click', function(e){
+        e.preventDefault();
+        previewImg.src = placeholderSrc;
+        if (fileInput) fileInput.value = '';
+        setFileName('선택된 파일 없음');
+        deleteFlag.value = 'true';   // 서버에 "이미지 삭제"라고 알림
       });
     }
   })();
   </script>
+
 
 </body>
 </html>

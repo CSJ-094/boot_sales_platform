@@ -177,14 +177,12 @@ public class SellerController {
 					@RequestParam(value = "catIds", required = false) List<Long> catIds,
 					@RequestParam(value = "mainCatId", required = false) Long mainCatId, // 이미지 파일 추가
 					@RequestParam(value = "uploadFile", required = false) MultipartFile file,
-					 @RequestParam(value = "deleteImage", required = false) String deleteImage,
+					 @RequestParam(value = "deleteImage", defaultValue = "false") boolean deleteImage,
 					RedirectAttributes ra) {
 
 		form.setProdId(id);
-		boolean deleteFlag = "Y".equals(deleteImage);
-		
-		productService.updateProductWithCategories(form, catIds, mainCatId, file, deleteFlag); // ✅ 트랜잭션 경계
-		
+//		boolean deleteFlag = "Y".equals(deleteImage);
+		productService.updateProductWithCategories(form, catIds, mainCatId, file, deleteImage); 
 		ra.addFlashAttribute("msg", "수정되었습니다.");
 		return "redirect:/seller/products/" + id; // 상세로 이동
 	}
