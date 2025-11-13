@@ -8,7 +8,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>판매자 마이페이지</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
-
+	<link rel="stylesheet" href=<c:url value='/css/sellerstyle.css' />/>
+	<link rel="stylesheet" href="<c:url value='/css/header.css' />">
 <style>
 /* ==================== 전역 설정 및 폰트 ==================== */
 * { box-sizing: border-box; margin: 0; padding: 0; }

@@ -6,7 +6,8 @@
 <head>
   <meta charset="UTF-8" />
   <title>공지사항 목록</title>
-  <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/sellerstyle.css" />
+  <link rel="stylesheet" href=<c:url value='/css/sellerstyle.css' />/>
+  <link rel="stylesheet" href="<c:url value='/css/header.css' />">
 </head>
 <body>
 

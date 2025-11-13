@@ -6,7 +6,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>판매자 마이페이지</title>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/sellerstyle.css" />
+	<link rel="stylesheet" href=<c:url value='/css/sellerstyle.css' />/>
+	<link rel="stylesheet" href="<c:url value='/css/header.css' />">
 </head>
 <body>
 	<!-- 공통 header include -->
