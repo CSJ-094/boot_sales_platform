@@ -12,18 +12,11 @@
 <body>
 
 <jsp:include page="/WEB-INF/views/fragments/header.jsp" />
-
 <main class="mypage-body">
-  <aside class="mypage-sidebar">
-    <nav>
-      <ul>
-        <li class="sidebar-title">판매자 마이페이지</li>
-        <li><a href="${pageContext.request.contextPath}/seller/products">상품 관리</a></li>
-        <li><a href="${pageContext.request.contextPath}/seller/members">회원 관리</a></li>
-          <li><a href="${pageContext.request.contextPath}/seller/notices" class="active">공지사항</a></li>
-      </ul>
-    </nav>
-  </aside>
+    <jsp:include page="/WEB-INF/views/fragments/sidebar.jsp">
+        <jsp:param name="menu" value="notices"/>
+    </jsp:include>
+
 
   <section class="mypage-content-area">
     <h2>공지사항 목록</h2>
