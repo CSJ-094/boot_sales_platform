@@ -224,6 +224,14 @@
 				<label for="member_email">이메일</label> 
 				<input type="text" id="member_email" name="memberEmail" size="20" placeholder="이메일을 입력하세요.">
 				<button type="button" onclick="fn_emailCheck()" id="emailCheck" value="N">중복 확인</button>
+				<button type="button" id="emailNumCheck" name="emailNumCheck" onclick="fn_emailNumCheck()">이메일 인증</button>
+			</div>
+			<div class="form-group">
+				<label for="member_email">이메일 인증</label>
+				<input  placeholder="인증번호 6자리를 입력해주세요." disabled="disabled"  maxlength="6" id="mail_check_input" name="mail_check_input">
+			</div>
+			<div class="form-group">
+				<span id="mail_check_warn"></span>
 			</div>
 
 			<div class="form-group">

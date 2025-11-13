@@ -161,4 +161,11 @@ public class LoginController {
 		return result;
 	}
 
+	@PostMapping("/mailCheck")
+	@ResponseBody
+	public String mailCheck(@RequestParam String email) {
+		System.out.println("이메일 인증 요청이 들어옴!");
+		System.out.println("이메일 인증 이메일 : " + email);
+		return service.joinEmail(email);
+	}
 }
