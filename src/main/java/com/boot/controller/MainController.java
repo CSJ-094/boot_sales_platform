@@ -23,8 +23,8 @@ public class MainController {
     public String mainPage(Model model) {
         log.info("@# mainPage() - 메인 페이지 상품 목록 조회 시작");
 
-        final int MANS_CAT_ID = 5;
-        final int WOMANS_CAT_ID = 9;
+        final int MANS_CAT_ID = 200; // DB에 맞게 수정
+        final int WOMANS_CAT_ID = 100; // DB에 맞게 수정
 
         try {
             List<ProdDTO> mansList = productService.selectProductsByCategory(MANS_CAT_ID);

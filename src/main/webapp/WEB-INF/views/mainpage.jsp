@@ -209,8 +209,7 @@ ul {
 				<c:choose>
 					<c:when test="${not empty mansRecommendList}">
 						<c:forEach var="product" items="${mansRecommendList}">
-							<a
-								href="${pageContext.request.contextPath}/product/detail?id=${product.prodId}">
+							<a href="${pageContext.request.contextPath}/products/detail?prodId=${product.prodId}">
 								<div class="product-item">
 									<div class="product-img">
 										<img
@@ -238,8 +237,7 @@ ul {
 				<c:choose>
 					<c:when test="${not empty womansRecommendList}">
 						<c:forEach var="product" items="${womansRecommendList}">
-							<a
-								href="${pageContext.request.contextPath}/product/detail?id=${product.prodId}">
+							<a href="${pageContext.request.contextPath}/products/detail?prodId=${product.prodId}">
 								<div class="product-item">
 									<div class="product-img">
 										<img

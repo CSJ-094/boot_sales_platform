@@ -145,7 +145,7 @@
                     <p><strong>재고:</strong> ${product.prodStock}개</p>
                     <p class="description">${product.prodDesc}</p>
 
-                    <form action="/cart/add" method="post" class="add-to-cart-form">
+                    <form action="${pageContext.request.contextPath}/cart/add" method="post" class="add-to-cart-form">
                         <input type="hidden" name="memberId" value="${memberId}">
                         <input type="hidden" name="prodId" value="${product.prodId}">
                         <label for="cartQty">수량:</label>

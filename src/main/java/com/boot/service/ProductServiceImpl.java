@@ -3,8 +3,10 @@ package com.boot.service;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import com.boot.dao.ImageDAO;
 import com.boot.dao.ProdDAO;
@@ -12,6 +14,7 @@ import com.boot.dao.ProductCategoryDAO;
 import com.boot.dto.ImageDTO;
 import com.boot.dto.ProdDTO;
 import com.boot.dto.ProductCategoryDTO;
+import com.boot.dao.CategoryDAO; // CategoryDAO import 추가
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +35,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProdDAO prodDAO;
     private final ProductCategoryDAO productCategoryDAO;
     private final ImageDAO imageDAO; // @RequiredArgsConstructor를 통해 주입됨
+    private final CategoryDAO categoryDAO; // 상위 카테고리 조회를 위해 추가
 
     @Override
     public List<ProdDTO> selectProductsByCategory(int catId) {
@@ -50,7 +54,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProdDTO getProductById(Integer prodId) {
         log.info("Fetching product detail for prodId: {}", prodId);
-        return prodDAO.getProductById(prodId);
+        // ⭐️ DAO 호출 메서드명을 getProduct으로 통일
+        return prodDAO.getProduct(prodId.longValue());
     }
 
     // 2. [Admin 기능] 상품 등록
@@ -112,12 +117,20 @@ public class ProductServiceImpl implements ProductService {
             mainCatId = catIds.get(0);
         }
         
+        // ⭐️ 상위 카테고리 ID를 포함한 전체 카테고리 ID 목록 생성
+        // 1. Set을 사용해 중복을 방지하며 catIds를 추가
+        HashSet<Long> fullCatIds = new HashSet<>(catIds);
+        // 2. catIds에 해당하는 모든 상위 카테고리 ID를 조회하여 추가 (CategoryDAO에 구현 필요)
+        if (!catIds.isEmpty()) {
+            fullCatIds.addAll(categoryDAO.selectAllParentIds(catIds));
+        }
+        
         List<ProductCategoryDTO> list = new ArrayList<ProductCategoryDTO>();
-        for (Long cid : catIds) {
+        for (Long cid : fullCatIds) { // ⭐️ 수정: catIds 대신 fullCatIds 사용
             ProductCategoryDTO m = new ProductCategoryDTO();
             m.setProdId(prodId); // 새로 생성된 prodId 사용
             m.setCatId(cid);
-            m.setIsMain(cid.equals(mainCatId) ? "Y" : "N");
+            m.setIsMain(cid.equals(mainCatId) ? "Y" : "N"); // 대표 카테고리 설정은 유지
             list.add(m);
         }
         productCategoryDAO.bulkInsert(list);
@@ -125,7 +138,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public void updateProductWithCategories(ProdDTO form, List<Long> catIds, Long mainCatId) {
+    public void updateProductWithCategories(ProdDTO form, List<Long> catIds, Long mainCatId, MultipartFile file) {
         // 상품 정보 업데이트
         prodDAO.updateProduct(form);
         
@@ -139,8 +152,14 @@ public class ProductServiceImpl implements ProductService {
             mainCatId = catIds.get(0);
         }
 
+        // ⭐️ 상위 카테고리 ID를 포함한 전체 카테고리 ID 목록 생성
+        HashSet<Long> fullCatIds = new HashSet<>(catIds);
+        if (!catIds.isEmpty()) {
+            fullCatIds.addAll(categoryDAO.selectAllParentIds(catIds));
+        }
+
         List<ProductCategoryDTO> list = new ArrayList<ProductCategoryDTO>();
-        for (Long cid : catIds) {
+        for (Long cid : fullCatIds) { // ⭐️ 수정: catIds 대신 fullCatIds 사용
             ProductCategoryDTO m = new ProductCategoryDTO();
             m.setProdId(form.getProdId());
             m.setCatId(cid);

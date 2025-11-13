@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Controller
 @Slf4j
-@RequestMapping("order/order")
+@RequestMapping("/order")
 public class OrderController {
 
     @Autowired
@@ -75,11 +75,11 @@ public class OrderController {
         } catch (IllegalStateException e) {
             log.error("Order creation failed: {}", e.getMessage());
             redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/cart?memberId=" + memberId; // 장바구니 페이지로 리다이렉트하여 오류 메시지 표시
+            return "redirect:/cart/list"; // 장바구니 페이지로 리다이렉트하여 오류 메시지 표시
         } catch (Exception e) {
             log.error("Order creation failed due to unexpected error", e);
             redirectAttributes.addFlashAttribute("error", "주문 처리 중 예상치 못한 오류가 발생했습니다.");
-            return "redirect:/cart/cart"; 
+            return "redirect:/cart/list"; 
         }
     }
 
@@ -93,6 +93,6 @@ public class OrderController {
             // 주문 정보 없이 직접 접속한 경우, 메인 페이지로 리다이렉트
             return "redirect:/";
         }
-        return "redirect:/order/order/complete"; // order/orderComplete.jsp 뷰를 반환
+        return "order/orderComplete"; // order/orderComplete.jsp 뷰를 반환
     }
 }
