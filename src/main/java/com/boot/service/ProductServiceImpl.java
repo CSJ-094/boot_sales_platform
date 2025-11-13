@@ -138,18 +138,23 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public void updateProductWithCategories(ProdDTO form, List<Long> catIds, Long mainCatId, MultipartFile file) {
+    public void updateProductWithCategories(ProdDTO form, List<Long> catIds, Long mainCatId, MultipartFile file, boolean deleteImage) {
         // 상품 정보 업데이트
         prodDAO.updateProduct(form);
+        Long prodId = form.getProdId();
         
-        // ⭐️ 이미지 파일 처리 및 DB 업데이트
-        if (file != null && !file.isEmpty()) {
-            try {
-                // 1. 기존 이미지 정보 삭제 (DB 및 실제 파일)
-                // 실제 파일 삭제 로직은 필요에 따라 추가 구현 (예: 스케줄러로 정리)
-                imageDAO.deleteByProdId(form.getProdId());
+        // 2) 이미지 처리
+        boolean hasNewFile = (file != null && !file.isEmpty());
 
-                // 2. 새 파일 정보 설정 및 저장
+        // 삭제 체크 되거나, 새 파일이 올라오면 기존 대표 이미지 삭제
+        if (deleteImage || hasNewFile) {
+            imageDAO.deleteByProdId(prodId);
+        }
+
+        
+     // 새 파일 있으면 업로드 후 대표 이미지로 등록
+        if (hasNewFile) {
+            try {
                 String originalFileName = file.getOriginalFilename();
                 String fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
                 String savedFileName = UUID.randomUUID().toString() + fileExtension;
@@ -163,9 +168,8 @@ public class ProductServiceImpl implements ProductService {
                 File targetFile = new File(UPLOAD_DIR, savedFileName);
                 file.transferTo(targetFile);
 
-                // 3. 새 이미지 DTO 생성 및 DB에 삽입
                 ImageDTO imageDTO = new ImageDTO();
-                imageDTO.setImgProdId(form.getProdId());
+                imageDTO.setImgProdId(prodId);
                 imageDTO.setImgPath(savedFilePath);
                 imageDTO.setIsMain("Y");
                 imageDTO.setImgOrder(0);
@@ -178,8 +182,8 @@ public class ProductServiceImpl implements ProductService {
             }
         }
 
-        // 기존 카테고리 매핑 삭제 및 새로 삽입
-        productCategoryDAO.deleteAllByProdId(form.getProdId());
+        // 3) 카테고리 매핑 초기화 후 다시 삽입
+        productCategoryDAO.deleteAllByProdId(prodId);
 
         if (catIds == null || catIds.isEmpty()) {
             throw new IllegalArgumentException("카테고리를 최소 1개 선택해 주세요.");
@@ -188,16 +192,15 @@ public class ProductServiceImpl implements ProductService {
             mainCatId = catIds.get(0);
         }
 
-        // ⭐️ 상위 카테고리 ID를 포함한 전체 카테고리 ID 목록 생성
         HashSet<Long> fullCatIds = new HashSet<>(catIds);
         if (!catIds.isEmpty()) {
             fullCatIds.addAll(categoryDAO.selectAllParentIds(catIds));
         }
 
-        List<ProductCategoryDTO> list = new ArrayList<ProductCategoryDTO>();
-        for (Long cid : fullCatIds) { // ⭐️ 수정: catIds 대신 fullCatIds 사용
+        List<ProductCategoryDTO> list = new ArrayList<>();
+        for (Long cid : fullCatIds) {
             ProductCategoryDTO m = new ProductCategoryDTO();
-            m.setProdId(form.getProdId());
+            m.setProdId(prodId);
             m.setCatId(cid);
             m.setIsMain(cid.equals(mainCatId) ? "Y" : "N");
             list.add(m);

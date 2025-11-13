@@ -23,5 +23,23 @@
             #{imgOrder},
             SYSDATE             )
     </insert>
+    
+<select id="selectByProdId" parameterType="long" resultType="com.boot.dto.ImageDTO">
+        SELECT
+            IMG_ID       AS imgId,
+            IMG_PROD_ID  AS imgProdId,
+            IMG_PATH     AS imgPath,
+            IMG_MAIN     AS isMain,
+            IMG_ORDER    AS imgOrder,
+            IMG_REGDATE  AS imgRegDate
+        FROM IMAGE_DB
+        WHERE IMG_PROD_ID = #{prodId}
+        ORDER BY IMG_MAIN DESC, IMG_ORDER ASC
+    </select>
+
+<delete id="deleteByProdId" parameterType="long">
+        DELETE FROM IMAGE_DB
+        WHERE IMG_PROD_ID = #{prodId}
+    </delete>
 
 </mapper>
