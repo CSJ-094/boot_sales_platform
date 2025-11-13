@@ -8,5 +8,8 @@ import java.util.List;
 @Mapper
 public interface ReviewDAO {
     void insertReview(ReviewDTO review);
+    void insertReply(ReviewDTO review);
     List<ReviewDTO> findByProdId(Long prodId);
+    List<ReviewDTO> findBySellerId(String sellerId);
+    ReviewDTO findById(Long reviewId);
 }

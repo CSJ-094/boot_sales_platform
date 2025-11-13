@@ -19,6 +19,8 @@
           <li class="sidebar-title">판매자 마이페이지</li>
           <li><a href="${pageContext.request.contextPath}/seller/mypage">상품 관리</a></li>
           <li><a class="active" href="${pageContext.request.contextPath}/seller/members" class="active">회원 관리</a></li>
+          <li><a href="${pageContext.request.contextPath}/seller/qna">문의 관리</a></li>
+          <li><a href="${pageContext.request.contextPath}/seller/reviews">리뷰 관리</a></li>
           <li><a href="${pageContext.request.contextPath}/seller/notices">공지사항</a></li>
         </ul>
       </nav>

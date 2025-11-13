@@ -1,0 +1,99 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>문의 답변 작성</title>
+    <link rel="stylesheet" href="<c:url value='/css/sellerstyle.css' />">
+    <link rel="stylesheet" href="<c:url value='/css/header.css' />">
+    <style>
+        /* 버튼 스타일 재정의 */
+        .button-group .btn-submit,
+        .button-group .reset-btn {
+            display: inline-block;
+            min-width: 100px; /* 버튼의 최소 너비를 지정하여 글자 깨짐 방지 */
+            padding: 10px 20px; /* 상하, 좌우 여백을 충분히 줍니다. */
+            font-size: 15px;
+            font-weight: 500;
+            text-align: center;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .button-group .btn-submit {
+            background-color: #333; color: white; border: 1px solid #333;
+        }
+        .button-group .reset-btn {
+            background-color: #f8f9fa; color: #6c757d; border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <jsp:include page="/WEB-INF/views/fragments/header.jsp" />
+
+    <main class="mypage-body">
+        <aside class="mypage-sidebar">
+            <nav>
+                <ul>
+                    <li class="sidebar-title">판매자 마이페이지</li>
+                    <li><a href="${pageContext.request.contextPath}/seller/products">상품 관리</a></li>
+                    <li><a href="${pageContext.request.contextPath}/seller/members">회원 관리</a></li>
+                    <li><a href="${pageContext.request.contextPath}/seller/qna" class="active">문의 관리</a></li>
+                    <li><a href="${pageContext.request.contextPath}/seller/reviews">리뷰 관리</a></li>
+                    <li><a href="${pageContext.request.contextPath}/seller/notices">공지사항</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <section class="mypage-content-area">
+            <h1>문의 답변 작성</h1>
+
+            <div class="info-form">
+                <h3>고객 문의 내용</h3>
+                <table class="table-bordered" style="margin-top:15px; margin-bottom: 30px;">
+                    <tr>
+                        <th style="width:120px;">상품명</th>
+                        <td>${question.prodName}</td>
+                    </tr>
+                    <tr>
+                        <th>작성자</th>
+                        <td>${question.memberName}</td>
+                    </tr>
+                    <tr>
+                        <th>작성일</th>
+                        <td><fmt:formatDate value="${question.qnaRegDate}" pattern="yyyy-MM-dd HH:mm"/></td>
+                    </tr>
+                    <tr>
+                        <th>문의 제목</th>
+                        <td>${question.qnaTitle}</td>
+                    </tr>
+                    <tr>
+                        <th>문의 내용</th>
+                        <td style="white-space: pre-wrap; min-height: 100px;">${question.qnaContent}</td>
+                    </tr>
+                </table>
+
+                <h3>답변 작성</h3>
+                <form action="<c:url value='/seller/qna/reply'/>" method="post" style="margin-top:15px;">
+                    <input type="hidden" name="qnaParentId" value="${question.qnaId}">
+                    <input type="hidden" name="prodId" value="${question.prodId}">
+                    <input type="hidden" name="qnaTitle" value="${question.qnaTitle}">
+
+                    <div class="form-group">
+                        <label for="qnaContent">답변 내용</label>
+                        <textarea id="qnaContent" name="qnaContent" rows="8" required style="width:100%"></textarea>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" class="btn-submit">답변등록</button>
+                        <a href="<c:url value='/seller/qna'/>" class="reset-btn">목록으로</a>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <jsp:include page="/WEB-INF/views/fragments/footer.jsp" />
+</body>
+</html>

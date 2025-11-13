@@ -22,6 +22,11 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    public void addReply(ReviewDTO reviewDTO) {
+        reviewDAO.insertReply(reviewDTO);
+    }
+
+    @Override
     public List<ReviewDTO> getReviewsByProductId(Long productId) {
         List<ReviewDTO> flatList = reviewDAO.findByProdId(productId);
         Map<Long, ReviewDTO> reviewMap = new HashMap<>();
@@ -45,5 +50,15 @@ public class ReviewServiceImpl implements ReviewService {
             }
         }
         return topLevelReviews;
+    }
+
+    @Override
+    public List<ReviewDTO> getReviewsBySellerId(String sellerId) {
+        return reviewDAO.findBySellerId(sellerId);
+    }
+
+    @Override
+    public ReviewDTO getReviewById(Long reviewId) {
+        return reviewDAO.findById(reviewId);
     }
 }
