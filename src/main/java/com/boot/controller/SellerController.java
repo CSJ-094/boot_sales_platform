@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.http.HttpSession;
 
 import com.boot.dao.CategoryDAO;
 import com.boot.dao.MemDAO;
@@ -18,6 +17,9 @@ import com.boot.dto.ProductCategoryDTO;
 import com.boot.dto.SellerDTO;
 import com.boot.service.ProductService;
 import com.boot.service.SellerService;
+
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

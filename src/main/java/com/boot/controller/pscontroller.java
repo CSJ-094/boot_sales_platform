@@ -1,7 +1,5 @@
 package com.boot.controller;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import com.boot.dao.MemDAO;
 import com.boot.dto.MemDTO;
@@ -9,6 +7,10 @@ import com.boot.dto.OrdDTO;
 import com.boot.dto.ProdDTO;
 import com.boot.service.OrderService;
 import com.boot.service.WishlistService;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
