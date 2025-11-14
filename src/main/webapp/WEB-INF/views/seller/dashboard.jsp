@@ -210,6 +210,64 @@
 		                    </table>
 		                </c:if>
 		            </section>
+					<!-- 최근 문의 섹션 -->
+					<section class="dash-panel dash-recent dash-recent-qna">
+					    <div class="dash-panel-header">
+					        <h3>최근 문의</h3>
+							<div class="dash-filter">
+							    <button type="button" class="filter-btn qna-filter-btn is-active" data-status="ALL">전체</button>
+							    <button type="button" class="filter-btn qna-filter-btn" data-status="답변대기">답변대기</button>
+							    <button type="button" class="filter-btn qna-filter-btn" data-status="답변완료">답변완료</button>
+							</div>
+
+					    </div>
+
+					    <c:if test="${empty recentQna}">
+					        <p class="dash-empty">최근 문의가 없습니다.</p>
+					    </c:if>
+
+					    <c:if test="${not empty recentQna}">
+					        <table class="dash-table">
+					            <thead>
+					            <tr>
+					                <th>문의일</th>
+					                <th>상품명</th>
+					                <th>작성자</th>
+					                <th>제목</th>
+					                <th>상태</th>
+					            </tr>
+					            </thead>
+					            <tbody>
+					            <c:forEach var="q" items="${recentQna}">
+					                <tr data-status="${q.status}">
+					                    <td><fmt:formatDate value="${q.qnaDate}" pattern="yyyy-MM-dd" /></td>
+					                    <td>${q.prodName}</td>
+					                    <td>${q.memberId}</td>
+					                    <td class="qna-title-cell">
+					                        <a href="<c:url value='/seller/qna/${q.qnaId}' />">
+					                            ${q.title}
+					                        </a>
+					                    </td>
+					                    <td>
+					                        <c:choose>
+					                            <c:when test="${q.status == '답변대기'}">
+					                                <span class="badge badge-pending">답변대기</span>
+					                            </c:when>
+					                            <c:when test="${q.status == '답변완료'}">
+					                                <span class="badge badge-done">답변완료</span>
+					                            </c:when>
+					                            <c:otherwise>
+					                                <span class="badge badge-etc">${q.status}</span>
+					                            </c:otherwise>
+					                        </c:choose>
+					                    </td>
+					                </tr>
+					            </c:forEach>
+					            </tbody>
+					        </table>
+					    </c:if>
+					</section>
+
 		        </div>
 		    </section>
 		</main>
