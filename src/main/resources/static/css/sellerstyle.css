@@ -1,6 +1,12 @@
 /* ==================== sellerstyle.css (MY MODERN SHOP - Dark/Gold Theme) ==================== */
 
-/* 기본 스타일 및 초기화 (mainpage.jsp 스타일 적용) */
+/* 공통 레이아웃 기준값 */
+:root {
+  --layout-width: 1200px;   /* 화면 안쪽 공통 폭 */
+  --layout-padding-x: 20px; /* 좌우 여백 */
+}
+
+/* 기본 스타일 및 초기화 */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -13,8 +19,7 @@ body {
   line-height: 1.6;
   background-color: #f9f9f9;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+  
 }
 
 a {
@@ -26,83 +31,12 @@ a:hover { color: #b08d57; }   /* 메인 테마 색상: Gold/Brown */
 
 ul { list-style: none; }
 
-/* 1. 헤더 스타일 (mainpage.jsp dark theme) */
-.main-header {
-  width: 100%;                       /* 배경 전체 채우기 */
-  background-color: #2c2c2c;         /* Dark Background */
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-  padding: 10px 0 5px 0;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-/* 안쪽 실제 컨텐츠 폭 */
-.header-top {
-  max-width: 1200px;                 /* 본문/푸터와 통일 */
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 20px 5px;               /* 좌우 20px */
-  position: relative;
-}
-
-.logo a {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 18px;
-  font-weight: 800;
-  color: #ffffff;
-  letter-spacing: 1px;
-}
-.logo a:hover { color: #b08d57; }
-
-.user-auth {
-  display: flex;
-  gap: 5px;
-  align-items: center;
-}
-
-.auth-welcome {
-  font-size: 13px;
-  color: #ddd;
-  padding-right: 5px;
-}
-
-.auth-btn {
-  padding: 4px 10px;
-  border: 1px solid #555;
-  border-radius: 3px;
-  font-size: 12px;
-  color: #ccc !important;
-  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
-}
-.auth-btn:hover {
-  background-color: #b08d57;
-  border-color: #b08d57;
-  color: #2c2c2c !important;
-}
-
-/* 1-1. 카테고리 라인도 동일하게 맞추기 (헤더 아래 메뉴 라인) */
-.main-header .category-nav {
-  width: 100%;
-  padding-top: 5px;
-}
-
-.main-header .category-nav .category-list {
-  display: flex;
-  justify-content: flex-start;
-  max-width: 1200px;           /* 본문/푸터와 같은 폭 */
-  margin: 0 auto;
-  padding: 0 20px;             /* 헤더-top / 본문과 동일 좌우 여백 */
-}
-
-/* 2. 대시보드 본문 레이아웃 및 테마 색상 적용 */
+/* 2. 판매자 마이페이지 레이아웃 */
 .mypage-body {
   display: flex;
-  max-width: 1200px;           /* 헤더 안쪽이랑 같은 폭 */
-  margin: 40px auto 56px;      /* 가운데 정렬 */
-  padding: 0 20px;             /* 헤더/카테고리와 같은 좌우 여백 */
+  max-width: var(--layout-width);       /* 헤더 안쪽이랑 같은 폭 */
+  margin: 40px auto 56px;               /* 가운데 정렬 */
+  padding: 0 var(--layout-padding-x);   /* 헤더/카테고리와 같은 좌우 여백 */
   gap: 24px;
 }
 
@@ -133,19 +67,22 @@ ul { list-style: none; }
   font-size: 0.95em;
   transition: background-color 0.2s, color 0.2s;
 }
+
 .mypage-sidebar nav ul li a:hover {
   background-color: #e9ecef;
   color: #b08d57;
 }
+
 .mypage-sidebar nav ul li a.active {
   background-color: #b08d57;
   color: #ffffff;
   font-weight: 500;
 }
 
-/* 콘텐츠 영역 스타일 */
+/* 콘텐츠 영역 – 오른쪽 카드 */
 .mypage-content-area {
-  flex-grow: 1;
+  flex: 1 1 0;                 /* 남는 공간 전부 차지하게 강제 */
+  min-width: 0;                /* 내용 길어져도 줄바꿈되게 */
   background-color: #ffffff;
   padding: 30px;
   border-radius: 6px;
@@ -348,7 +285,7 @@ table tbody tr:nth-child(even) { background-color: #f9f9f9; }
   color: #6c757d;
 }
 
-/* 5. 푸터 스타일 (mainpage.jsp style) */
+/* 5. 푸터 스타일 */
 .main-footer {
   background-color: #e0e0e0;
   color: #666;
@@ -360,9 +297,9 @@ table tbody tr:nth-child(even) { background-color: #f9f9f9; }
 }
 
 .footer-content {
-  max-width: 1200px;
+  max-width: var(--layout-width);
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 var(--layout-padding-x);
   text-align: center;
 }
 .footer-content p { margin-bottom: 4px; }
@@ -475,7 +412,6 @@ table tbody tr:nth-child(even) { background-color: #f9f9f9; }
 
 /* ===== Notice Detail : 내용 박스형 ===== */
 
-/* 바깥 카드 느낌 제거 – mypage-content-area 한 장만 보이게 */
 .notice-detail {
   max-width: 100%;
   margin: 0;
@@ -486,14 +422,12 @@ table tbody tr:nth-child(even) { background-color: #f9f9f9; }
   box-shadow: none;
 }
 
-/* 제목 + 메타 영역 */
 .notice-header {
   padding-bottom: 8px;
   margin-bottom: 10px;
   border: none;
 }
 
-/* 제목 아래 골드 라인만 남기기 */
 .mypage-content-area h2.notice-title {
   border-bottom: 2px solid #b08d57;
   padding-bottom: 10px;
@@ -509,7 +443,6 @@ table tbody tr:nth-child(even) { background-color: #f9f9f9; }
   color: #ccc;
 }
 
-/* 본문 네모 박스 */
 .notice-content-box {
   margin-top: 18px;
   background: #fafafa;
@@ -530,7 +463,6 @@ table tbody tr:nth-child(even) { background-color: #f9f9f9; }
   border: none;
 }
 
-/* 버튼 영역 – 위에 점선, 가운데 정렬 */
 .notice-buttons {
   border-top: 1px dashed #e6e8ec;
   padding-top: 22px;
@@ -899,4 +831,13 @@ table tbody tr:nth-child(even) { background-color: #f9f9f9; }
   .prod-edit-grid {
     grid-template-columns: 1fr;
   }
+}
+
+html, body {
+    height: 100%;
+}
+
+main.mypage-body {
+    min-height: calc(100vh - 180px); 
+    /* ↑ 헤더 + 푸터 높이를 빼준 값 (사이트마다 다름) */
 }
