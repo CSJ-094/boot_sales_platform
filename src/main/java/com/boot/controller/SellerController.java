@@ -246,6 +246,11 @@ public class SellerController {
 
 		QnaDTO question = qnaService.getQnaById(qnaId);
 		model.addAttribute("question", question);
+
+		// ⭐️ 기존 답변 목록을 조회하여 모델에 추가
+		List<QnaDTO> replies = qnaService.getRepliesByParentId(qnaId);
+		model.addAttribute("replies", replies);
+
 		model.addAttribute("activeMenu", "qna");
 		return "seller/qna_reply";
 	}
