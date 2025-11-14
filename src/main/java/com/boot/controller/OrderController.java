@@ -53,19 +53,21 @@ public class OrderController {
             return "redirect:/cart/list"; 
         }
 
+        // ⭐️ 1. 결제 완료 후 주문을 생성하기 위해, 장바구니 정보를 세션에 임시 저장합니다.
+        session.setAttribute("cartItemsForOrder", cartItems);
+
+        // ⭐️ 2. JSP에 필요한 정보들을 모델에 추가합니다.
         model.addAttribute("cartItems", cartItems);
-        
-        // ⭐️ 총 상품 금액 계산
+
+        // 총 상품 금액 계산
         int totalAmount = cartItems.stream()
-                                   .mapToInt(item -> item.getProdPrice() * item.getCartQty())
-                                   .sum();
+                .mapToInt(item -> item.getProdPrice() * item.getCartQty())
+                .sum();
         model.addAttribute("totalAmount", totalAmount);
 
-        // 배송비 설정 (실제로는 DB에서 가져오거나 설정 파일에서 읽어오는 것이 좋음)
-        final int SHIPPING_FEE = 3000;
+        final int SHIPPING_FEE = 3000; // 배송비는 3000원으로 가정
         model.addAttribute("shippingFee", SHIPPING_FEE);
-        
-        return "order/orderForm"; // order/orderForm.jsp 뷰를 반환
+        return "order/orderForm";
     }
 
     /**

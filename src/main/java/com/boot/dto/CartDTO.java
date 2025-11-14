@@ -20,4 +20,5 @@ public class CartDTO {
     private int prodPrice;      // 상품 가격
     private String prodSeller;  // 상품 판매자
     private String prodImage; // 상품 이미지 URL
+    private String prodImgPath;
 }

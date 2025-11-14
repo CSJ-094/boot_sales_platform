@@ -70,4 +70,117 @@
         ]]>
     </select>
 
+	<!--	일별 매출-->
+	 <select id="selectDailySales"
+            resultType="com.boot.dto.SalesStatDTO">
+        <![CDATA[
+        SELECT
+            TO_CHAR(ORD_DATE, 'YYYY-MM-DD') AS label,
+            NVL(SUM(ORD_AMOUNT), 0)         AS salesAmount,
+            COUNT(*)                        AS orderCount
+        FROM ORDER_DB
+        WHERE ORD_DATE >= TRUNC(SYSDATE) - 6
+          AND ORD_DATE <  TRUNC(SYSDATE) + 1
+        GROUP BY TO_CHAR(ORD_DATE, 'YYYY-MM-DD')
+        ORDER BY label
+        ]]>
+    </select>
+    
+<!--    주별 매출-->
+	<select id="selectWeeklySales"
+            resultType="com.boot.dto.SalesStatDTO">
+        <![CDATA[
+        SELECT
+            TO_CHAR(ORD_DATE, 'IYYY') || '년 ' || TO_CHAR(ORD_DATE, 'IW') || '주' AS label,
+            NVL(SUM(ORD_AMOUNT), 0) AS salesAmount,
+            COUNT(*)                AS orderCount
+        FROM ORDER_DB
+        WHERE ORD_DATE >= TRUNC(SYSDATE, 'IW') - (7 * 7)  -- 최근 8주
+          AND ORD_DATE <  TRUNC(SYSDATE, 'IW') + 7
+        GROUP BY TO_CHAR(ORD_DATE, 'IYYY'), TO_CHAR(ORD_DATE, 'IW')
+        ORDER BY MIN(ORD_DATE)
+        ]]>
+    </select>
+    
+<!--    월별 매출-->
+ 	<select id="selectMonthlySales"
+            resultType="com.boot.dto.SalesStatDTO">
+        <![CDATA[
+        SELECT
+            TO_CHAR(ORD_DATE, 'YYYY-MM') AS label,
+            NVL(SUM(ORD_AMOUNT), 0)      AS salesAmount,
+            COUNT(*)                     AS orderCount
+        FROM ORDER_DB
+        WHERE ORD_DATE >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -5)
+          AND ORD_DATE <  ADD_MONTHS(TRUNC(SYSDATE, 'MM'), 1)
+        GROUP BY TO_CHAR(ORD_DATE, 'YYYY-MM')
+        ORDER BY label
+        ]]>
+   	 </select>
+   	 
+	<!-- 일별 방문자 -->
+    <select id="selectDailyVisitors"
+            resultType="com.boot.dto.VisitStatDTO">
+        <![CDATA[
+        SELECT
+            TO_CHAR(VISIT_DATE, 'YYYY-MM-DD')              AS label,
+            COUNT(DISTINCT NVL(MEMBER_ID, IP))             AS visitor_count
+        FROM VISIT_LOG_DB
+        WHERE VISIT_DATE >= TRUNC(SYSDATE) - 6
+          AND VISIT_DATE <  TRUNC(SYSDATE) + 1
+        GROUP BY TO_CHAR(VISIT_DATE, 'YYYY-MM-DD')
+        ORDER BY label
+        ]]>
+    </select>
+
+    <!-- 주별 방문자 -->
+    <select id="selectWeeklyVisitors"
+            resultType="com.boot.dto.VisitStatDTO">
+        <![CDATA[
+        SELECT
+            TO_CHAR(VISIT_DATE, 'IYYY') || '년 ' || TO_CHAR(VISIT_DATE, 'IW') || '주' AS label,
+            COUNT(DISTINCT NVL(MEMBER_ID, IP))                                     AS visitor_count
+        FROM VISIT_LOG_DB
+        WHERE VISIT_DATE >= TRUNC(SYSDATE, 'IW') - (7 * 7)  -- 최근 8주
+          AND VISIT_DATE <  TRUNC(SYSDATE, 'IW') + 7
+        GROUP BY TO_CHAR(VISIT_DATE, 'IYYY'), TO_CHAR(VISIT_DATE, 'IW')
+        ORDER BY MIN(VISIT_DATE)
+        ]]>
+    </select>
+
+    <!-- 월별 방문자 -->
+    <select id="selectMonthlyVisitors"
+            resultType="com.boot.dto.VisitStatDTO">
+        <![CDATA[
+        SELECT
+            TO_CHAR(VISIT_DATE, 'YYYY-MM')                 AS label,
+            COUNT(DISTINCT NVL(MEMBER_ID, IP))             AS visitor_count
+        FROM VISIT_LOG_DB
+        WHERE VISIT_DATE >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -5)
+          AND VISIT_DATE <  ADD_MONTHS(TRUNC(SYSDATE, 'MM'), 1)
+        GROUP BY TO_CHAR(VISIT_DATE, 'YYYY-MM')
+        ORDER BY label
+        ]]>
+    </select>
+    
+    <!-- 최근 주문 10건 -->
+	<select id="selectRecentOrders"
+	        resultType="com.boot.dto.SellerRecentOrderDTO">
+	    <![CDATA[
+	    SELECT *
+	    FROM (
+	        SELECT
+	            o.ORD_DATE    AS ordDate,
+	            o.ORD_ID      AS ordId,
+	            u.MEMBER_NAME AS buyerName,
+	            o.ORD_AMOUNT  AS ordAmount,
+	            o.ORD_STATUS  AS ordStatus
+	        FROM ORDER_DB o
+	             JOIN USER_DB u ON o.ORD_MEMID = u.MEMBER_ID
+	        ORDER BY o.ORD_DATE DESC
+	    )
+	    WHERE ROWNUM <= 10
+	    ]]>
+	</select>
+
 </mapper>

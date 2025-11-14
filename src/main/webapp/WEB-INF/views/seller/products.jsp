@@ -8,6 +8,7 @@
   <title>상품 관리</title>
   <link rel="stylesheet" href=<c:url value='/css/sellerstyle.css' />/>
   <link rel="stylesheet" href="<c:url value='/css/header.css' />">
+  <link rel="stylesheet" href="<c:url value='/css/sidebar.css' />"/>
 </head>
 <body>
 	<jsp:include page="/WEB-INF/views/fragments/header.jsp" />

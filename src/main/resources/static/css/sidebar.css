@@ -9,14 +9,3 @@
        font-weight: 700;
        margin-bottom: 12px;
    }
-
-   .mypage-sidebar a {
-       display: block;
-       padding: 8px 0;
-       text-decoration: none;
-   }
-
-   .mypage-sidebar a.active {
-       font-weight: 700;
-       /* 여기서 색이나 배경 강조 줄 거면 css/header랑 톤 맞춰서 조정 */
-   }

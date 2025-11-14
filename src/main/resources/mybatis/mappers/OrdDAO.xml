@@ -39,5 +39,13 @@
         FROM ORDER_DB
         WHERE ORD_ID = #{orderId}
     </select>
+
+    <!-- 결제 완료 후 주문 상태 및 결제 키 업데이트 -->
+    <update id="updateAfterPayment">
+        UPDATE ORDER_DB
+        SET ORD_STATUS = #{status},
+            ORD_PAYMENT_KEY = #{paymentKey}
+        WHERE ORD_ID = #{orderId}
+    </update>
   
 </mapper>

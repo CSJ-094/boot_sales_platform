@@ -1,8 +1,8 @@
 package com.boot.dao;
 
 import com.boot.dto.ProdDTO;
-import com.boot.dto.WishlistDTO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -22,13 +22,20 @@ public interface WishlistDAO {
 
     /**
      * 찜목록에 상품을 추가합니다.
-     * @param wishlistDTO 추가할 찜목록 정보 (회원 ID, 상품 ID)
+     * @param memberId 회원 ID
+     * @param prodId 상품 ID
      */
-    void addWishlist(WishlistDTO wishlistDTO);
+    void addWishlist(@Param("memberId") String memberId, @Param("prodId") Integer prodId);
 
     /**
      * 찜목록에서 특정 상품을 삭제합니다.
-     * @param wishlistDTO 삭제할 찜목록 정보 (회원 ID, 상품 ID)
+     * @param memberId 회원 ID
+     * @param prodId 상품 ID
      */
-    void removeWishlist(WishlistDTO wishlistDTO);
+    void delete(@Param("memberId") String memberId, @Param("prodId") Integer prodId);
+
+    /**
+     * 특정 상품이 찜 목록에 있는지 확인합니다.
+     */
+    int countByMemberIdAndProdId(@Param("memberId") String memberId, @Param("prodId") Integer prodId);
 }
