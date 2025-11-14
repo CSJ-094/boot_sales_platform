@@ -15,8 +15,8 @@ public class OpenAiConfig {
 	    public RestTemplate restTemplate(RestTemplateBuilder restTemplateBuilder) {
 	        return restTemplateBuilder
 	                .additionalInterceptors(((request, body, execution) -> {
-	                    request.getHeaders().add("Authorization", "Bearer " + apiKey);
-	                    request.getHeaders().add("Content-Type", "application/json");
+	                    request.getHeaders().set("Authorization", "Bearer " + apiKey);
+	                    request.getHeaders().set("Content-Type", "application/json");
 	                    return execution.execute(request, body);
 	                }))
 	                .build();
