@@ -90,3 +90,35 @@
     background: #b08d57; /* 너가 쓰는 포인트 컬러로 바꿔도 됨 */
     color: #ffffff;
 }
+.dash-card-header-right{
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.dash-trend{
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    color: #6b7280; /* 기본 회색 */
+}
+
+.dash-trend-label{
+    font-weight: 500;
+}
+
+.dash-trend-value{
+    font-weight: 600;
+}
+
+/* 증감 색상 */
+.dash-trend-value.up{
+    color: #16a34a;  /* 초록 */
+}
+.dash-trend-value.down{
+    color: #dc2626;  /* 빨강 */
+}
+.dash-trend-value.neutral{
+    color: #6b7280;  /* 회색 */
+}

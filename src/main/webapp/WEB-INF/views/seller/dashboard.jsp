@@ -81,23 +81,33 @@
         </div>
     </div>
 	<!-- ==== 매출 그래프 카드 ==== -->
-	    <section class="dash-section">
-	        <div class="dash-card dash-card-large">
-	            <div class="dash-card-header">
-	                <h3>매출 그래프</h3>
-	                <div class="dash-tabs">
-	                    <button type="button" class="sales-tab active" data-period="day">일</button>
-	                    <button type="button" class="sales-tab" data-period="week">주</button>
-	                    <button type="button" class="sales-tab" data-period="month">월</button>
+	        <section class="dash-section">
+	            <div class="dash-card dash-card-large">
+	                <div class="dash-card-header">
+	                    <h3>매출 그래프</h3>
+
+	                    <!-- 오른쪽: 증감 라벨 + 탭 -->
+	                    <div class="dash-card-header-right">
+	                        <div class="dash-trend">
+	                            <span id="salesTrendLabel" class="dash-trend-label">전일 대비</span>
+	                            <span id="salesTrendValue" class="dash-trend-value neutral">-</span>
+	                        </div>
+
+	                        <div class="dash-tabs">
+	                            <button type="button" class="sales-tab active" data-period="day">일</button>
+	                            <button type="button" class="sales-tab" data-period="week">주</button>
+	                            <button type="button" class="sales-tab" data-period="month">월</button>
+	                        </div>
+	                    </div>
+	                </div>
+
+	                <div class="dash-card-body">
+	                    <canvas id="salesChart"></canvas>
 	                </div>
 	            </div>
-	            <div class="dash-card-body">
-	                <canvas id="salesChart"></canvas>
-	            </div>
-	        </div>
-	    </section>
-</div>
-</main>
+	        </section>
+	    </div>
+	</main>
 <jsp:include page="/WEB-INF/views/fragments/footer.jsp" />
 
 <!-- 페이지 전용 JS -->
