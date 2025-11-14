@@ -138,7 +138,7 @@ p {
                     <p>
                         회원님의 정보가 확인되었습니다.
                         <br>
-                        새로운 **임시 비밀번호**는 회원 정보에 등록된 이메일 주소 <span class="highlight">(${dtos[0].memberEmail})</span>로 발송되었습니다.
+                        새로운 **임시 비밀번호**는 회원 정보에 등록된 이메일 주소 <span class="highlight">(${member.memberEmail})</span>로 발송되었습니다.
                     </p>
                     <p>
                         임시 비밀번호로 로그인 후 반드시 <span class="highlight">비밀번호를 변경</span>해 주세요.

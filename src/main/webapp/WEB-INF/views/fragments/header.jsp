@@ -20,10 +20,19 @@
 		<div class="user-auth">
 			<c:choose>
 				<c:when test="${not empty sessionScope.memberId}">
-					<span class="auth-welcome">환영합니다, ${sessionScope.memberName}님!</span>
-					<a href="<c:url value='/mypage' />" class="auth-btn">마이페이지</a> 
-					<a href="<c:url value='/cart/list' />" class="auth-btn cart-btn">장바구니</a>
-					<a href="<c:url value='/logout' />" class="auth-btn">로그아웃</a>
+					<c:choose>
+						<c:when test="${sessionScope.userType == 'customer'}">
+							<span class="auth-welcome">환영합니다, ${sessionScope.memberName}님!</span>
+							<a href="<c:url value='/mypage' />" class="auth-btn">마이페이지</a>
+							<a href="<c:url value='/cart/list' />" class="auth-btn cart-btn">장바구니</a>
+							<a href="<c:url value='/logout' />" class="auth-btn">로그아웃</a>
+						</c:when>
+						<c:when test="${sessionScope.userType == 'seller'}">
+							<span class="auth-welcome">환영합니다, 판매자 ${sessionScope.memberId}님!</span>
+							<a href="<c:url value='/seller/products' />" class="auth-btn">관리페이지</a>
+							<a href="<c:url value='/logout' />" class="auth-btn">로그아웃</a>
+						</c:when>
+					</c:choose>
 				</c:when>
 				<c:otherwise>
 					<a href="<c:url value='/login' />" class="auth-btn">로그인/회원가입</a>

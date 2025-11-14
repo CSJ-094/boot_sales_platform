@@ -45,34 +45,6 @@ public class LoginController {
 		return "login/login";
 	}
 
-//	@RequestMapping(value = "/login", method = RequestMethod.POST)
-//	public String login_process(
-//			@RequestParam("username") String username,
-//			@RequestParam("password") String password,
-//			@RequestParam("userType") String userType,
-//			HttpSession session,
-//			RedirectAttributes redirectAttributes) {
-//
-//		log.info("@# login_process() - 로그인 시도: ID={}, UserType={}", username, userType);
-//
-//		MemDTO member = memDAO.getUserById(username);
-//
-//		if (member != null && member.getMemberPw().equals(password)) {
-//			// ⭐️ 세션 키 통일: memberId로 유지
-//			session.setAttribute("memberId", member.getMemberId());
-//			// ⭐️ 세션 키 통일: sessionName 대신 memberName 권장
-//			session.setAttribute("memberName", member.getMemberName());
-//			session.setAttribute("sessionUserType", userType);
-//			log.info("@# 로그인 성공: ID={}, UserType={}", username, userType);
-//			return "redirect:/mypage";
-//		} else {
-//			redirectAttributes.addFlashAttribute("loginError", "아이디 또는 비밀번호가 일치하지 않습니다.");
-//			log.warn("@# 로그인 실패: ID={}", username);
-//			return "redirect:/login";
-//		}
-//	}
-
-
 
 	// 로그인 여부 판단
 	@RequestMapping(value = "login_yn", method = RequestMethod.POST)
@@ -90,6 +62,7 @@ public class LoginController {
 	        if (passwordEncoder.matches(in_pw, db_pw)) { //matches를 이용해 값 비교. in_pw가 항상 앞에
 	            session.setAttribute("memberId", loginDTO.getMemberId());
 	            session.setAttribute("memberName", resultDTO.getMemberName());
+				session.setAttribute("userType", "customer");
 	            log.info("@# 로그인 성공");
 	            return "redirect:/"; // 메인 페이지로 리다이렉트
 	        } else {
@@ -162,4 +135,11 @@ public class LoginController {
 		return result;
 	}
 
+	@PostMapping("/mailCheck")
+	@ResponseBody
+	public String mailCheck(@RequestParam String email) {
+		System.out.println("이메일 인증 요청이 들어옴!");
+		System.out.println("이메일 인증 이메일 : " + email);
+		return service.joinEmail(email);
+	}
 }

@@ -1,16 +1,17 @@
-<%@ page contentType="text/html; charset=UTF-8" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c"   uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"  %>
+<c:set var="ctx" value="${pageContext.request.contextPath}" />
 <!DOCTYPE html>
 <html lang="ko">
 <head>
 	<meta charset="UTF-8">
     <title>판매자 대시보드</title>
+	<link rel="stylesheet" href="<c:url value='/css/sellerstyle.css' />" />
 	<link rel="stylesheet" href="<c:url value='/css/dashboard.css' />" />
 	<link rel="stylesheet" href="<c:url value='/css/header.css' />" />
-</head>
+	</head>
 <body>
-	<jsp:include page="/WEB-INF/views/fragments/header.jsp" />
 	<jsp:include page="/WEB-INF/views/fragments/header.jsp" />
 	<main class="mypage-body">
 	    <jsp:include page="/WEB-INF/views/fragments/sidebar.jsp">
@@ -19,7 +20,6 @@
 	
 <div class="dash-wrap">
     <div class="dash-title">판매자 대시보드</div>
-
     <!-- 핵심 지표 카드 -->
     <div class="dash-cards">
 
@@ -79,9 +79,68 @@
                 <c:out value="${summary.pendingQnaCount}" />건
             </div>
         </div>
-
     </div>
-</div>
+	<!-- ==== 매출 그래프 카드 ==== -->
+	        <section class="dash-section">
+	            <div class="dash-card dash-card-large">
+	                <div class="dash-card-header">
+	                    <h3>매출 그래프</h3>
+
+	                    <!-- 오른쪽: 증감 라벨 + 탭 -->
+	                    <div class="dash-card-header-right">
+	                        <div class="dash-trend">
+	                            <span id="salesTrendLabel" class="dash-trend-label">전일 대비</span>
+	                            <span id="salesTrendValue" class="dash-trend-value neutral">-</span>
+	                        </div>
+
+	                        <div class="dash-tabs">
+	                            <button type="button" class="sales-tab active" data-period="day">일</button>
+	                            <button type="button" class="sales-tab" data-period="week">주</button>
+	                            <button type="button" class="sales-tab" data-period="month">월</button>
+	                        </div>
+	                    </div>
+	                </div>
+
+	                <div class="dash-card-body">
+	                    <canvas id="salesChart"></canvas>
+	                </div>
+	            </div>
+	        </section>
+			<!-- ==== 방문자 그래프 카드 ==== -->
+			<section class="dash-section">
+			    <div class="dash-card dash-card-large">
+			        <div class="dash-card-header">
+			            <h3>방문자 그래프</h3>
+
+			            <div class="dash-card-header-right">
+			                <div class="dash-trend">
+			                    <span id="visitorTrendLabel" class="dash-trend-label">전일 대비</span>
+			                    <span id="visitorTrendValue" class="dash-trend-value neutral">-</span>
+			                </div>
+
+			                <div class="dash-tabs">
+			                    <button type="button" class="visitor-tab active" data-period="day">일</button>
+			                    <button type="button" class="visitor-tab" data-period="week">주</button>
+			                    <button type="button" class="visitor-tab" data-period="month">월</button>
+			                </div>
+			            </div>
+			        </div>
+
+			        <div class="dash-card-body">
+			            <canvas id="visitorChart"></canvas>
+			        </div>
+			    </div>
+			</section>
+	    </div>
+	</main>
 <jsp:include page="/WEB-INF/views/fragments/footer.jsp" />
+
+<!-- 페이지 전용 JS -->
+<script>
+    const ctxPath = '<c:url value="/" />'.replace(/\/$/, '');
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="<c:url value='/js/dashboard-sales.js' />"></script>
+<script src="<c:url value='/js/dashboard-visitors.js' />"></script>
 </body>
 </html>

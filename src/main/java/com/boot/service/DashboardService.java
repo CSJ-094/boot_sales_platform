@@ -18,7 +18,10 @@ public class DashboardService {
 	
 	// 요약 정보 가져오기
     public SellerDashboardDTO getSummary() {
-        return dashboardDAO.selectSummary();
+    	SellerDashboardDTO dto = dashboardDAO.selectSummary();
+        System.out.println("=== DASH SUMMARY TEST ===");
+        System.out.println(dto);
+        return dto;
     }
 
     // 일간 매출 통계
@@ -36,9 +39,19 @@ public class DashboardService {
         return dashboardDAO.selectMonthlySales();
     }
 
-    // 방문자 통계
+ // 방문자 통계 - 일간
     public List<VisitStatDTO> getDailyVisitors() {
         return dashboardDAO.selectDailyVisitors();
+    }
+
+    // 방문자 통계 - 주간
+    public List<VisitStatDTO> getWeeklyVisitors() {
+        return dashboardDAO.selectWeeklyVisitors();
+    }
+
+    // 방문자 통계 - 월간
+    public List<VisitStatDTO> getMonthlyVisitors() {
+        return dashboardDAO.selectMonthlyVisitors();
     }
 	
 }

@@ -43,3 +43,97 @@
     font-size: 0.8rem;
     color: #888;
 }
+
+.dash-section{
+    margin-top: 32px;
+}
+
+.dash-card-large{
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(15,23,42,0.08);
+    padding: 20px 24px;
+    max-width: 900px;
+}
+
+.dash-card-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.dash-card-header h3{
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.dash-tabs{
+    display: inline-flex;
+    gap: 4px;
+    padding: 2px;
+    border-radius: 999px;
+    background: #f3f4f6;
+}
+
+.sales-tab{
+    border: none;
+    background: transparent;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    color: #6b7280;
+}
+
+.sales-tab.active{
+    background: #b08d57; /* 너가 쓰는 포인트 컬러로 바꿔도 됨 */
+    color: #ffffff;
+}
+.dash-card-header-right{
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.dash-trend{
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    color: #6b7280; /* 기본 회색 */
+}
+
+.dash-trend-label{
+    font-weight: 500;
+}
+
+.dash-trend-value{
+    font-weight: 600;
+}
+
+/* 증감 색상 */
+.dash-trend-value.up{
+    color: #16a34a;  /* 초록 */
+}
+.dash-trend-value.down{
+    color: #dc2626;  /* 빨강 */
+}
+.dash-trend-value.neutral{
+    color: #6b7280;  /* 회색 */
+}
+.sales-tab,
+.visitor-tab {
+    border: none;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: #f3f4f6;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+.sales-tab.active,
+.visitor-tab.active {
+    background: #2563eb;
+    color: #fff;
+}
