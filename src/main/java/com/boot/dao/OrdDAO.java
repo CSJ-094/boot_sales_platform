@@ -13,4 +13,6 @@ public interface OrdDAO {
     OrdDTO getOrderByOrderId(String orderId);
 
     void updateStatus(@Param("orderId") String orderId, @Param("status") String status);
+
+    void updateAfterPayment(@Param("orderId") String orderId, @Param("status") String status, @Param("paymentKey") String paymentKey);
 }

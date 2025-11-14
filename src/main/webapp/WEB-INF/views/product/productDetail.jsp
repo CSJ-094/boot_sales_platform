@@ -5,6 +5,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="ko">
 <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <meta charset="UTF-8">
     <title>${product.prodName} - MY MODERN SHOP</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -77,6 +78,10 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
             padding-top: 20px;
             border-top: 1px solid #eee;
         }
@@ -89,13 +94,13 @@
             font-weight: 500;
         }
         .quantity-control input[type="number"] {
-            width: 70px;
+            width: 60px;
             padding: 8px;
             border: 1px solid #ccc;
             border-radius: 4px;
             text-align: center;
         }
-        .add-to-cart-form button {
+        .action-buttons button {
             background-color: #333;
             color: white;
             border: none;
@@ -105,9 +110,22 @@
             font-size: 16px;
             font-weight: 600;
             transition: background-color 0.3s ease;
+            width: 100%; /* ⭐️ 버튼이 form의 너비를 꽉 채우도록 수정 */
         }
-        .add-to-cart-form button:hover {
+        .action-buttons button:hover {
             background-color: #555;
+        }
+        .btn-wishlist {
+            background-color: #fff !important;
+            color: #333 !important;
+            border: 1px solid #ccc !important;
+        }
+        .btn-wishlist:hover {
+            background-color: #f8f8f8 !important;
+        }
+        .btn-wishlist.wished { /* 찜 완료 상태 스타일 */
+            background-color: #fff0f0 !important;
+            border-color: #ffc2c2 !important;
         }
 
         /* 탭 네비게이션 */
@@ -303,14 +321,32 @@
                     <p class="price"><fmt:formatNumber value="${product.prodPrice}" type="number" maxFractionDigits="0"/>원</p>
                     <p class="stock-info">재고: ${product.prodStock}개</p>
 
-                    <form action="${pageContext.request.contextPath}/cart/add" method="post" class="add-to-cart-form">
-                        <input type="hidden" name="prodId" value="${product.prodId}">
-                        <div class="quantity-control">
-                            <label for="cartQty">수량:</label>
-                            <input type="number" id="cartQty" name="cartQty" value="1" min="1" max="${product.prodStock}">
-                        </div>
-                        <button type="submit">장바구니에 추가</button>
-                    </form>
+                    <div class="quantity-control">
+                        <label for="cartQty">수량:</label>
+                        <input type="number" id="cartQty" name="cartQty" value="1" min="1" max="${product.prodStock}" form="cart-form">
+                    </div>
+                    <div class="action-buttons">
+                        <form id="cart-form" action="${pageContext.request.contextPath}/cart/add" method="post" style="flex: 3;">
+                            <input type="hidden" name="prodId" value="${product.prodId}">
+                            <button type="submit">장바구니</button>
+                        </form>
+                        <c:choose>
+                            <c:when test="${isWished}">
+                                <%-- 찜한 상태일 때 --%>
+                                <form action="${pageContext.request.contextPath}/wishlist/remove" method="post" style="flex: 1;">
+                                    <input type="hidden" name="prodId" value="${product.prodId}">
+                                    <button type="submit" class="btn-wishlist wished"><i class="fas fa-heart" style="color: #e53e3e;"></i> 찜 해제</button>
+                                </form>
+                            </c:when>
+                            <c:otherwise>
+                                <%-- 찜하지 않은 상태일 때 --%>
+                                <form action="${pageContext.request.contextPath}/wishlist/add" method="post" style="flex: 1;">
+                                    <input type="hidden" name="prodId" value="${product.prodId}">
+                                    <button type="submit" class="btn-wishlist"><i class="far fa-heart"></i> 찜하기</button>
+                                </form>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
                 </div>
             </div>
 
