@@ -24,6 +24,9 @@ public class QnaServiceImpl implements QnaService {
     @Override
     public void addReply(QnaDTO qnaDTO) {
         qnaDAO.insertReply(qnaDTO);
+        if (qnaDTO.getQnaParentId() != null) {
+            qnaDAO.updateStatus(qnaDTO.getQnaParentId(), "답변완료");
+        }
     }
 
     @Override
@@ -52,5 +55,10 @@ public class QnaServiceImpl implements QnaService {
     @Override
     public QnaDTO getQnaById(Long qnaId) {
         return qnaDAO.findById(qnaId);
+    }
+
+    @Override
+    public List<QnaDTO> getRepliesByParentId(Long parentId) {
+        return qnaDAO.findByParentId(parentId);
     }
 }
