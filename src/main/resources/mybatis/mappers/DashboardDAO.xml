@@ -162,4 +162,25 @@
         ORDER BY label
         ]]>
     </select>
+    
+    <!-- 최근 주문 10건 -->
+	<select id="selectRecentOrders"
+	        resultType="com.boot.dto.SellerRecentOrderDTO">
+	    <![CDATA[
+	    SELECT *
+	    FROM (
+	        SELECT
+	            o.ORD_DATE    AS ordDate,
+	            o.ORD_ID      AS ordId,
+	            u.MEMBER_NAME AS buyerName,
+	            o.ORD_AMOUNT  AS ordAmount,
+	            o.ORD_STATUS  AS ordStatus
+	        FROM ORDER_DB o
+	             JOIN USER_DB u ON o.ORD_MEMID = u.MEMBER_ID
+	        ORDER BY o.ORD_DATE DESC
+	    )
+	    WHERE ROWNUM <= 10
+	    ]]>
+	</select>
+
 </mapper>

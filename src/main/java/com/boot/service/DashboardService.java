@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.boot.dao.DashboardDAO;
 import com.boot.dto.SalesStatDTO;
 import com.boot.dto.SellerDashboardDTO;
+import com.boot.dto.SellerRecentOrderDTO;
 import com.boot.dto.VisitStatDTO;
 
 @Service
@@ -53,5 +54,9 @@ public class DashboardService {
     public List<VisitStatDTO> getMonthlyVisitors() {
         return dashboardDAO.selectMonthlyVisitors();
     }
-	
+    
+    // 최근 주문 목록
+    public List<SellerRecentOrderDTO> getRecentOrders() {
+        return dashboardDAO.selectRecentOrders();
+    }
 }

@@ -24,10 +24,8 @@ public class DashboardController {
 	@GetMapping("/dashboard")
 	public String dashboard(Model model) {
 		model.addAttribute("summary", dashboardService.getSummary());
-//		model.addAttribute("dailySales", dashboardService.getDailySales());
-//		model.addAttribute("dailyVisitors", dashboardService.getDailyVisitors());
-		
 		model.addAttribute("menu", "dashboard");
+		model.addAttribute("recentOrders", dashboardService.getRecentOrders());
 		
 		return "seller/dashboard";
 	}

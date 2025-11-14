@@ -80,57 +80,124 @@
             </div>
         </div>
     </div>
-	<!-- ==== 매출 그래프 카드 ==== -->
-	        <section class="dash-section">
-	            <div class="dash-card dash-card-large">
-	                <div class="dash-card-header">
-	                    <h3>매출 그래프</h3>
+	<!-- ==== 그래프 2열 섹션 ==== -->
+	<section class="dash-section">
+	    <div class="dash-graph-grid">
 
-	                    <!-- 오른쪽: 증감 라벨 + 탭 -->
-	                    <div class="dash-card-header-right">
-	                        <div class="dash-trend">
-	                            <span id="salesTrendLabel" class="dash-trend-label">전일 대비</span>
-	                            <span id="salesTrendValue" class="dash-trend-value neutral">-</span>
-	                        </div>
+	        <!-- 매출 그래프 카드 -->
+	        <div class="dash-card dash-card-large">
+	            <div class="dash-card-header">
+	                <h3>매출 그래프</h3>
 
-	                        <div class="dash-tabs">
-	                            <button type="button" class="sales-tab active" data-period="day">일</button>
-	                            <button type="button" class="sales-tab" data-period="week">주</button>
-	                            <button type="button" class="sales-tab" data-period="month">월</button>
-	                        </div>
+	                <!-- 오른쪽: 증감 라벨 + 탭 -->
+	                <div class="dash-card-header-right">
+	                    <div class="dash-trend">
+	                        <span id="salesTrendLabel" class="dash-trend-label">전일 대비</span>
+	                        <span id="salesTrendValue" class="dash-trend-value neutral">-</span>
+	                    </div>
+
+	                    <div class="dash-tabs">
+	                        <button type="button" class="sales-tab active" data-period="day">일</button>
+	                        <button type="button" class="sales-tab" data-period="week">주</button>
+	                        <button type="button" class="sales-tab" data-period="month">월</button>
 	                    </div>
 	                </div>
+	            </div>
 
-	                <div class="dash-card-body">
-	                    <canvas id="salesChart"></canvas>
+	            <div class="dash-card-body">
+	                <canvas id="salesChart"></canvas>
+	            </div>
+	        </div>
+
+	        <!-- 방문자 그래프 카드 -->
+	        <div class="dash-card dash-card-large">
+	            <div class="dash-card-header">
+	                <h3>방문자 그래프</h3>
+
+	                <div class="dash-card-header-right">
+	                    <div class="dash-trend">
+	                        <span id="visitorTrendLabel" class="dash-trend-label">전일 대비</span>
+	                        <span id="visitorTrendValue" class="dash-trend-value neutral">-</span>
+	                    </div>
+
+	                    <div class="dash-tabs">
+	                        <button type="button" class="visitor-tab active" data-period="day">일</button>
+	                        <button type="button" class="visitor-tab" data-period="week">주</button>
+	                        <button type="button" class="visitor-tab" data-period="month">월</button>
+	                    </div>
 	                </div>
 	            </div>
-	        </section>
-			<!-- ==== 방문자 그래프 카드 ==== -->
-			<section class="dash-section">
-			    <div class="dash-card dash-card-large">
-			        <div class="dash-card-header">
-			            <h3>방문자 그래프</h3>
 
-			            <div class="dash-card-header-right">
-			                <div class="dash-trend">
-			                    <span id="visitorTrendLabel" class="dash-trend-label">전일 대비</span>
-			                    <span id="visitorTrendValue" class="dash-trend-value neutral">-</span>
-			                </div>
+	            <div class="dash-card-body">
+	                <canvas id="visitorChart"></canvas>
+	            </div>
+	        </div>
+	    </div>
+	</section>
+	<section class="dash-panel dash-recent">
+	    <div class="dash-panel-header">
+	        <h3>최근 주문</h3>
+	        <div class="dash-filter">
+	            <button type="button" class="filter-btn is-active" data-status="ALL">전체</button>
+	            <button type="button" class="filter-btn" data-status="결제완료">결제완료</button>
+	            <button type="button" class="filter-btn" data-status="배송중">배송중</button>
+	            <button type="button" class="filter-btn" data-status="취소">취소</button>
+	        </div>
+	    </div>
 
-			                <div class="dash-tabs">
-			                    <button type="button" class="visitor-tab active" data-period="day">일</button>
-			                    <button type="button" class="visitor-tab" data-period="week">주</button>
-			                    <button type="button" class="visitor-tab" data-period="month">월</button>
-			                </div>
-			            </div>
-			        </div>
+	    <c:if test="${empty recentOrders}">
+	        <p class="dash-empty">최근 주문이 없습니다.</p>
+	    </c:if>
 
-			        <div class="dash-card-body">
-			            <canvas id="visitorChart"></canvas>
-			        </div>
-			    </div>
-			</section>
+	    <c:if test="${not empty recentOrders}">
+	        <table class="dash-table">
+	            <thead>
+	            <tr>
+	                <th>주문일</th>
+	                <th>주문번호</th>
+	                <th>주문자</th>
+	                <th>금액</th>
+	                <th>상태</th>
+	            </tr>
+	            </thead>
+	            <tbody>
+	            <c:forEach var="o" items="${recentOrders}">
+	                <tr data-status="${o.ordStatus}">
+	                    <td><fmt:formatDate value="${o.ordDate}" pattern="yyyy-MM-dd" /></td>
+	                    <td>${o.ordId}</td>
+	                    <td>${o.buyerName}</td>
+	                    <td><fmt:formatNumber value="${o.ordAmount}" type="number" />원</td>
+	                    <td>
+	                        <c:choose>
+	                            <c:when test="${o.ordStatus == '결제대기'}">
+	                                <span class="badge badge-pending">결제대기</span>
+	                            </c:when>
+	                            <c:when test="${o.ordStatus == '결제완료'}">
+	                                <span class="badge badge-pay">결제완료</span>
+	                            </c:when>
+	                            <c:when test="${o.ordStatus == '배송중'}">
+	                                <span class="badge badge-ship">배송중</span>
+	                            </c:when>
+	                            <c:when test="${o.ordStatus == '배송완료'}">
+	                                <span class="badge badge-done">배송완료</span>
+	                            </c:when>
+	                            <c:when test="${o.ordStatus == '취소'}">
+	                                <span class="badge badge-cancel">취소</span>
+	                            </c:when>
+	                            <c:when test="${o.ordStatus == '구매확정'}">
+	                                <span class="badge badge-confirm">구매확정</span>
+	                            </c:when>
+	                            <c:otherwise>
+	                                <span class="badge badge-etc">${o.ordStatus}</span>
+	                            </c:otherwise>
+	                        </c:choose>
+	                    </td>
+	                </tr>
+	            </c:forEach>
+	            </tbody>
+	        </table>
+	    </c:if>
+	</section>
 	    </div>
 	</main>
 <jsp:include page="/WEB-INF/views/fragments/footer.jsp" />
@@ -142,5 +209,6 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="<c:url value='/js/dashboard-sales.js' />"></script>
 <script src="<c:url value='/js/dashboard-visitors.js' />"></script>
+<script src="<c:url value='/js/dashboard-recent.js' />"></script>
 </body>
 </html>
