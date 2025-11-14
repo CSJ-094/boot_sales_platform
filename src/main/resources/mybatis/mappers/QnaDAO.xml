@@ -41,14 +41,16 @@
             MEMBER_ID,
             QNA_TITLE,
             QNA_CONTENT,
-            QNA_PARENT_ID
+            QNA_PARENT_ID,
+            QNA_STATUS
         ) VALUES (
             QNA_SEQ.NEXTVAL,
             #{prodId},
             #{memberId},
             #{qnaTitle},
             #{qnaContent},
-            #{qnaParentId}
+            #{qnaParentId},
+            '답변'
         )
     </insert>
 
@@ -80,4 +82,27 @@
         WHERE q.QNA_ID = #{qnaId}
     </select>
 
+    <!-- 답변 상태 업데이트 -->
+    <update id="updateStatus">
+        UPDATE QNA_DB
+        SET QNA_STATUS = #{status}
+        WHERE QNA_ID = #{qnaId}
+    </update>
+
+    <!-- 부모 ID로 답변 목록 조회 -->
+    <select id="findByParentId" resultType="com.boot.dto.QnaDTO">
+        SELECT
+            QNA_ID as qnaId,
+            PROD_ID as prodId,
+            MEMBER_ID as memberId,
+            QNA_TITLE as qnaTitle,
+            QNA_CONTENT as qnaContent,
+            QNA_IS_SECRET as qnaIsSecret,
+            QNA_PARENT_ID as qnaParentId,
+            QNA_STATUS as qnaStatus,
+            QNA_REG_DATE as qnaRegDate
+        FROM QNA_DB
+        WHERE QNA_PARENT_ID = #{parentId}
+        ORDER BY QNA_REG_DATE ASC
+    </select>
 </mapper>

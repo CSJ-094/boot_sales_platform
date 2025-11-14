@@ -9,4 +9,5 @@ public interface QnaService {
     List<QnaDTO> getQnaByProductId(Long productId);
     List<QnaDTO> getQnaBySellerId(String sellerId);
     QnaDTO getQnaById(Long qnaId);
+    List<QnaDTO> getRepliesByParentId(Long parentId);
 }
