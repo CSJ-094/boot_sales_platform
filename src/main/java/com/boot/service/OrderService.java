@@ -186,6 +186,47 @@ public class OrderService {
     }
 
     /**
+     * 결제 성공 후, 세션의 장바구니 정보로 주문을 생성합니다.
+     * @param memberId 회원 ID
+     * @param cartItems 세션에 저장된 장바구니 상품 목록
+     * @param orderId 토스페이먼츠에서 사용된 주문 ID
+     * @param paymentKey 토스페이먼츠 결제 키
+     * @param amount 최종 결제 금액
+     * @return 생성된 주문 정보 DTO
+     */
+    @Transactional
+    public OrdDTO createOrderFromCart(String memberId, List<CartDTO> cartItems, String orderId, String paymentKey, Long amount) {
+        log.info("Creating order from cart for member: {}, orderId: {}", memberId, orderId);
+
+        if (cartItems == null || cartItems.isEmpty()) {
+            throw new IllegalStateException("주문할 상품 정보가 없습니다.");
+        }
+
+        // 1. 주문 총 상품 금액 및 배송비 계산
+        int totalProductPrice = cartItems.stream()
+                .mapToInt(item -> item.getProdPrice() * item.getCartQty())
+                .sum();
+        final int SHIPPING_FEE = 3000;
+
+        // 2. 주문(Orders) 정보 생성 및 DB 저장
+        OrdDTO newOrder = new OrdDTO();
+        newOrder.setOrdId(orderId); // 토스에서 받은 주문 ID 사용
+        newOrder.setOrdMemId(memberId);
+        newOrder.setOrdAmount(totalProductPrice);
+        newOrder.setOrdDfee(SHIPPING_FEE);
+        newOrder.setOrdDiscount(0);
+        newOrder.setOrdStatus("결제완료");
+        newOrder.setOrdPaymentKey(paymentKey); // 결제 키 저장
+        ordDAO.save(newOrder);
+        log.info("Order saved: {}", orderId);
+
+        // 3. 주문 상세(Order_details) 정보 생성 및 DB 저장
+        saveOrderDetails(orderId, cartItems);
+
+        return newOrder;
+    }
+
+    /**
      * 특정 사용자가 특정 상품을 구매했는지 확인합니다.
      * @param memberId 회원 ID
      * @param productId 상품 ID

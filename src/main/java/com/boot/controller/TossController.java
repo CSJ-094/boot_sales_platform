@@ -2,6 +2,7 @@ package com.boot.controller;
 
 import com.boot.service.OrderService;
 import com.boot.dto.OrdDTO;
+import com.boot.dto.CartDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
@@ -21,6 +22,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.List;
 
 @Controller
 @Slf4j
@@ -43,27 +45,27 @@ public class TossController {
             return "redirect:/login";
         }
 
-        // 1. ⭐️ DB에서 주문 정보를 조회하여 유효성을 검증합니다.
-        OrdDTO order = orderService.getOrderByOrderId(orderId);
-        if (order == null) {
-            model.addAttribute("message", "존재하지 않는 주문입니다.");
-            model.addAttribute("code", "INVALID_ORDER");
+        // ⭐️ 1. 세션에서 주문할 상품 정보를 가져옵니다.
+        List<CartDTO> cartItems = (List<CartDTO>) session.getAttribute("cartItemsForOrder");
+        if (cartItems == null || cartItems.isEmpty()) {
+            model.addAttribute("message", "주문 정보가 만료되었거나 유효하지 않습니다.");
+            model.addAttribute("code", "EXPIRED_ORDER");
             return "toss/fail";
         }
 
-        // 2. ⭐️ 결제 금액 위변조 검증: 요청된 금액과 DB에 저장된 실제 주문 금액을 비교합니다.
-        long totalAmount = order.getOrdAmount() + order.getOrdDfee();
+        // ⭐️ 2. 결제 금액 위변조 검증: 세션의 상품 정보로 실제 결제 금액을 다시 계산하여 비교합니다.
+        int totalProductPrice = cartItems.stream().mapToInt(item -> item.getProdPrice() * item.getCartQty()).sum();
+        final int SHIPPING_FEE = 3000;
+        long totalAmount = totalProductPrice + SHIPPING_FEE;
+
         if (totalAmount != amount) {
-            model.addAttribute("message", "결제 금액이 일치하지 않습니다. (요청:" + amount + ", 실제:" + totalAmount + ")");
+            model.addAttribute("message", "결제 금액이 일치하지 않습니다. (요청: " + amount + ", 실제: " + totalAmount + ")");
             model.addAttribute("code", "INVALID_AMOUNT");
-            // 💡 실제 운영에서는 금액 불일치 시 결제를 강제 취소하는 로직을 추가해야 합니다.
             return "toss/fail";
         }
 
-        // ⚠️ 시크릿 키는 application.yml 또는 .properties 파일에서 관리하세요.
         String secretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6"; // 공용 테스트 시크릿 키
 
-        // 3. 토스페이먼츠 결제 승인 API 호출
         URL url = new URL("https://api.tosspayments.com/v1/payments/confirm");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestProperty("Authorization", "Basic " + Base64.getEncoder().encodeToString((secretKey + ":").getBytes()));
@@ -83,8 +85,10 @@ public class TossController {
         boolean isSuccess = code == 200;
 
         if (isSuccess) {
-            // 4. ⭐️ 결제 승인 성공 시, 주문 상태를 '결제완료'로 업데이트합니다.
-            orderService.confirmPayment(orderId, paymentKey, amount);
+            // ⭐️ 3. 결제 승인 성공 시, 세션의 상품 정보로 주문을 생성합니다.
+            // 이 로직은 OrderService에 구현되어야 합니다.
+            orderService.createOrderFromCart(memberId, cartItems, orderId, paymentKey, amount);
+            session.removeAttribute("cartItemsForOrder"); // ⭐️ 주문 생성 후 세션 정보 제거
  
             return "redirect:/order/complete?orderId=" + orderId;
         } else {

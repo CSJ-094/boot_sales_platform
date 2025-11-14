@@ -53,22 +53,21 @@ public class OrderController {
             return "redirect:/cart/list"; 
         }
 
-        try {
-            // ⭐️ 1. '결제 대기' 상태의 주문을 미리 생성하고, 고유한 orderId와 결제 정보를 받아옵니다.
-            // 이 로직은 OrderService에 구현되어야 합니다.
-            OrdDTO pendingOrder = orderService.prepareOrder(memberId, cartItems);
+        // ⭐️ 1. 결제 완료 후 주문을 생성하기 위해, 장바구니 정보를 세션에 임시 저장합니다.
+        session.setAttribute("cartItemsForOrder", cartItems);
 
-            // ⭐️ 2. JSP에 필요한 정보들을 모델에 추가합니다.
-            model.addAttribute("cartItems", cartItems);
-            model.addAttribute("orderId", pendingOrder.getOrdId()); // 고유 주문번호
-            model.addAttribute("totalAmount", pendingOrder.getOrdAmount()); // 총 상품 금액
-            model.addAttribute("shippingFee", pendingOrder.getOrdDfee()); // 배송비
-            return "order/orderForm";
-        } catch (Exception e) {
-            log.error("주문서 생성 중 오류 발생: {}", e.getMessage());
-            model.addAttribute("error", "주문서를 생성하는 중 오류가 발생했습니다.");
-            return "redirect:/cart/list";
-        }
+        // ⭐️ 2. JSP에 필요한 정보들을 모델에 추가합니다.
+        model.addAttribute("cartItems", cartItems);
+
+        // 총 상품 금액 계산
+        int totalAmount = cartItems.stream()
+                .mapToInt(item -> item.getProdPrice() * item.getCartQty())
+                .sum();
+        model.addAttribute("totalAmount", totalAmount);
+
+        final int SHIPPING_FEE = 3000; // 배송비는 3000원으로 가정
+        model.addAttribute("shippingFee", SHIPPING_FEE);
+        return "order/orderForm";
     }
 
     /**

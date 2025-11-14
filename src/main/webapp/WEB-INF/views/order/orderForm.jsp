@@ -9,8 +9,9 @@
 <title>주문서 작성</title>
 <%-- ⭐️ 토스페이먼츠 '결제위젯' SDK로 변경 --%>
 <script src="https://js.tosspayments.com/v1/payment-widget"></script>
-<script src="<c:url value='/js/jquery.js'/>"></script>
+
 <link rel="stylesheet" href="<c:url value='/css/header.css' />">
+<link rel="stylesheet" href="<c:url value='/css/sellerstyle.css' />">
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
     body {
@@ -21,26 +22,27 @@
         margin: 0;
         padding: 20px;
     }
-    .container {
-        max-width: 900px;
-        margin: 40px auto;
-        padding: 30px;
-        background-color: #fff;
-        border-radius: 10px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    /* 기존 .container 스타일은 mypage-content-area가 대체하므로 주석 처리 또는 삭제 */
+    .mypage-content-area {
+        /*max-width: 900px;*/ /* mypage-body에서 너비를 관리하므로 제거 */
+        /*margin: 40px auto;*/
+        /*padding: 30px;*/
+        /*background-color: #fff;*/
+        /*border-radius: 10px;*/
+        /*box-shadow: 0 4px 20px rgba(0,0,0,0.05);*/
     }
     h1 {
         font-size: 28px;
         font-weight: 700;
-        border-bottom: 2px solid #333;
-        padding-bottom: 15px;
-        margin-bottom: 30px;
+        /* border-bottom: 2px solid #333; */ /* 밑줄 제거 */
+        /* padding-bottom: 15px; */
+        /* margin-bottom: 30px; */
     }
     h2 {
         font-size: 22px;
         font-weight: 500;
         margin-bottom: 20px;
-        border-left: 4px solid #007bff;
+        border-left: 4px solid #333;
         padding-left: 10px;
     }
     .order-section {
@@ -85,7 +87,7 @@
     .summary-row.total {
         font-size: 24px;
         font-weight: 700;
-        color: #007bff;
+        color: #333;
         border-top: 1px solid #ddd;
         padding-top: 15px;
         margin-top: 15px;
@@ -114,11 +116,20 @@
 </style>
 </head>
 <body>
-    <div class="container">
-        <h1>주문서 작성</h1>
+	<jsp:include page="/WEB-INF/views/fragments/header.jsp" />
+	<main class="mypage-body">
+	    <%-- 사이드바가 필요하다면 추가, 필요 없다면 mypage-body 클래스 제거 --%>
+	    <%-- 
+	    <jsp:include page="/WEB-INF/views/fragments/sidebar.jsp">
+	        <jsp:param name="menu" value="someMenu"/>
+	    </jsp:include>
+	    --%>
+
+    <section class="mypage-content-area">
+        <h2>주문서 작성</h2>
 
         <div class="order-section">
-            <h2>주문 상품</h2>
+            <h3>주문 상품</h3>
             <table class="product-table">
                 <thead>
                     <tr>
@@ -143,7 +154,7 @@
         </div>
 
         <div class="order-section">
-            <h2>최종 결제 금액</h2>
+            <h3>최종 결제 금액</h3>
             <div class="summary">
                 <div class="summary-row">
                     <span>총 상품 금액</span>
@@ -161,7 +172,7 @@
         </div>
 
         <div class="order-section">
-            <h2>결제 수단</h2>
+            <h3>결제 수단</h3>
             <%-- 결제 위젯이 렌더링될 영역 --%>
             <div id="payment-method"></div>
         </div>
@@ -170,10 +181,12 @@
             <%-- 기존 form 태그를 제거하고, API 호출 버튼으로 변경 --%>
             <button id="payment-button" class="btn btn-primary">결제하기</button>
         </div>
-    </div>
+    </section>
+  </main>
 
     <jsp:include page="/WEB-INF/views/fragments/footer.jsp" />
 
+    <script src="<c:url value='/js/jquery.js'/>"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             console.log("DOM 로드 완료. 토스페이먼츠 스크립트 초기화를 시작합니다.");
@@ -186,14 +199,14 @@
 
             console.log("결제 위젯 객체:", paymentWidget);
 
-            // ⭐️ 서버에서 생성된 고유한 주문번호를 사용합니다.
-            const orderId = "${orderId}";
+            // 임시 주문번호 생성 (세션 ID와 타임스탬프 조합)
+            const orderId = "ORD-" + new Date().getTime() + "-" + "${sessionScope.memberId}".substring(0, 4);
 
             // ⭐️ 서버에서 계산된 최종 금액을 사용합니다.
             const amount = ${totalAmount + shippingFee};
 
             // 상품명 (첫 번째 상품명 외 N건 형식)
-            const orderName = "${cartItems[0].prodName}" + "${fn:length(cartItems) > 1 ? ' 외 ' + (fn:length(cartItems) - 1) + '건' : ''}";
+            const orderName = "${cartItems[0].prodName}${fn:length(cartItems) > 1 ? ' 외 '.concat(fn:length(cartItems) - 1).concat('건') : ''}";
 
             console.log("결제 위젯 렌더링을 시도합니다. (결제 금액: " + amount + ")");
             // 결제 위젯 렌더링
