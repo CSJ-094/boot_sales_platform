@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.boot.dto.SalesStatDTO;
+import com.boot.dto.VisitStatDTO;
 import com.boot.service.DashboardService;
 
 @Controller
@@ -44,5 +45,19 @@ public class DashboardController {
 				default:
 					return dashboardService.getDailySales();
 			}
+		}
+	// 방문자 그래프 데이터
+		@GetMapping("/dashboard/visitors")
+		@ResponseBody
+		public List<VisitStatDTO> getVisitorStats(@RequestParam(defaultValue = "day") String period) {
+			switch (period) {
+            case "week":
+                return dashboardService.getWeeklyVisitors();
+            case "month":
+                return dashboardService.getMonthlyVisitors();
+            case "day":
+            default:
+                return dashboardService.getDailyVisitors();
+        }
 		}
 }

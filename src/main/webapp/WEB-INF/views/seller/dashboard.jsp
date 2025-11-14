@@ -7,9 +7,9 @@
 <head>
 	<meta charset="UTF-8">
     <title>판매자 대시보드</title>
-	<link rel="stylesheet" href=<c:url value='/css/sellerstyle.css' />/>
-	<link rel="stylesheet" href=<c:url value='/css/dashboard.css' />/>
-	<link rel="stylesheet" href="<c:url value='/css/header.css' />">
+	<link rel="stylesheet" href="<c:url value='/css/sellerstyle.css' />" />
+	<link rel="stylesheet" href="<c:url value='/css/dashboard.css' />" />
+	<link rel="stylesheet" href="<c:url value='/css/header.css' />" />
 	</head>
 <body>
 	<jsp:include page="/WEB-INF/views/fragments/header.jsp" />
@@ -106,6 +106,31 @@
 	                </div>
 	            </div>
 	        </section>
+			<!-- ==== 방문자 그래프 카드 ==== -->
+			<section class="dash-section">
+			    <div class="dash-card dash-card-large">
+			        <div class="dash-card-header">
+			            <h3>방문자 그래프</h3>
+
+			            <div class="dash-card-header-right">
+			                <div class="dash-trend">
+			                    <span id="visitorTrendLabel" class="dash-trend-label">전일 대비</span>
+			                    <span id="visitorTrendValue" class="dash-trend-value neutral">-</span>
+			                </div>
+
+			                <div class="dash-tabs">
+			                    <button type="button" class="visitor-tab active" data-period="day">일</button>
+			                    <button type="button" class="visitor-tab" data-period="week">주</button>
+			                    <button type="button" class="visitor-tab" data-period="month">월</button>
+			                </div>
+			            </div>
+			        </div>
+
+			        <div class="dash-card-body">
+			            <canvas id="visitorChart"></canvas>
+			        </div>
+			    </div>
+			</section>
 	    </div>
 	</main>
 <jsp:include page="/WEB-INF/views/fragments/footer.jsp" />
@@ -115,6 +140,7 @@
     const ctxPath = '<c:url value="/" />'.replace(/\/$/, '');
 </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="<c:url value='/js/Chart.js' />"></script>
+<script src="<c:url value='/js/dashboard-sales.js' />"></script>
+<script src="<c:url value='/js/dashboard-visitors.js' />"></script>
 </body>
 </html>

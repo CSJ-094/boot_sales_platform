@@ -17,5 +17,7 @@ public interface DashboardDAO {
 	List<SalesStatDTO> selectWeeklySales(); // 주별 매출 (최근 8주)
 	List<SalesStatDTO> selectMonthlySales(); // 월별 매출 (최근 6개월)
 	
-	List<VisitStatDTO> selectDailyVisitors();
+	 List<VisitStatDTO> selectDailyVisitors();
+	 List<VisitStatDTO> selectWeeklyVisitors();
+	 List<VisitStatDTO> selectMonthlyVisitors();
 }
