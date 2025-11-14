@@ -201,6 +201,17 @@ ul {
 		</div>
 	</section>
 
+	<!-- ==================== 검색 섹션 추가 ==================== -->
+	<section class="search-section" style="max-width: 1440px; margin: 0 auto 30px auto; padding: 0 20px; text-align: center;">
+		<form action="<c:url value='/product/search'/>" method="get" style="display: inline-block; width: 100%; max-width: 750px; position: relative;">
+			<input type="text" name="keyword" placeholder="원하는 상품을 검색해 보세요..." style="width: 100%; padding: 15px 40px 15px 20px; border: 2px solid #b08d57; border-radius: 30px; font-size: 16px;">
+			<button type="submit" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer;">
+				<img src="<c:url value='/img/search_button.png'/>" alt="검색" style="width: 24px; height: 24px;">
+			</button>
+		</form>
+	</section>
+	<!-- ====================================================== -->
+
 	<main class="main-content">
 		<section class="recommend-section">
 

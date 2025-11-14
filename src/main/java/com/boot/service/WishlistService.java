@@ -1,35 +1,16 @@
 package com.boot.service;
 
-import com.boot.dao.WishlistDAO;
-import com.boot.dto.ProdDTO;
 import com.boot.dto.WishlistDTO;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 
 import java.util.List;
 
-@Service
-public class WishlistService {
+public interface WishlistService { // class를 interface로 변경
 
-    @Autowired
-    private WishlistDAO wishlistMapper;
+    void addProductToWishlist(String memberId, Long prodId);
 
-    public List<ProdDTO> getWishlistByMemberId(String memberId) {
-        return wishlistMapper.getWishlistByMemberId(memberId);
-    }
+    void removeProductFromWishlist(String memberId, Long prodId);
 
-    public void addWishlist(String memberId, Integer prodId) {
-        WishlistDTO wishlistDTO = new WishlistDTO();
-        wishlistDTO.setMemberId(memberId);
-        wishlistDTO.setProdId(prodId);
-        wishlistMapper.addWishlist(wishlistDTO);
-    }
+    boolean isProductInWishlist(String memberId, Long prodId);
 
-    public void removeWishlist(String memberId, Integer prodId) {
-        WishlistDTO wishlistDTO = new WishlistDTO();
-        wishlistDTO.setMemberId(memberId);
-        wishlistDTO.setProdId(prodId);
-        wishlistMapper.removeWishlist(wishlistDTO);
-    }
+    List<WishlistDTO> getWishlistByMemberId(String memberId);
 }

@@ -31,6 +31,9 @@ public class OrderService {
     @Autowired
     private CartDAO cartDAO;
 
+    @Autowired
+    private PointService pointService; // PointService 주입
+
     /**
      * 회원 ID로 주문 내역 목록을 조회합니다.
      */
@@ -42,10 +45,21 @@ public class OrderService {
      * 회원 ID로 주문 내역과 각 주문의 상세 항목 목록을 함께 조회합니다.
      */
     public List<OrdDTO> getOrdersWithDetailsByMemberId(String memberId) {
+        log.info("Fetching orders with details for member: {}", memberId);
         List<OrdDTO> orders = ordDAO.getOrdersByMemberId(memberId);
+        if (orders == null || orders.isEmpty()) {
+            log.info("No orders found for member: {}", memberId);
+            return orders;
+        }
         for (OrdDTO order : orders) {
+            log.info("Fetching order details for orderId: {}", order.getOrdId());
             List<OrderDetailDTO> details = orderDetailDAO.findByOrderId(order.getOrdId());
-            order.setOrderDetails(details); // OrdDTO에 setOrderDetails 메서드 필요
+            if (details == null || details.isEmpty()) {
+                log.warn("No order details found for orderId: {}", order.getOrdId());
+            } else {
+                log.info("Found {} order details for orderId: {}", details.size(), order.getOrdId());
+            }
+            order.setOrderDetails(details);
         }
         return orders;
     }
@@ -104,6 +118,13 @@ public class OrderService {
         // 6. 주문 완료 후 장바구니 비우기
         cartDAO.clearCartByMemberId(memberId);
         log.info("Cart cleared for member: {}", memberId);
+
+        // ⭐️ 7. 상품 구매 시 포인트 적립 (총 결제 금액의 1% 적립)
+        int earnedPoint = (int) (ordAmount * 0.01); // 1% 적립
+        if (earnedPoint > 0) {
+            pointService.earnPoint(memberId, earnedPoint, "상품 구매 적립 (주문번호: " + orderId + ")");
+            log.info("상품 구매 포인트 지급: memberId={}, orderId={}, amount={}", memberId, orderId, earnedPoint);
+        }
 
         return newOrder;
     }

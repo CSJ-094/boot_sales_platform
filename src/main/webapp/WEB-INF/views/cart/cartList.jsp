@@ -178,32 +178,35 @@
         }
 
         /* 쇼핑 계속하기 버튼 */
-        .action-buttons a {
+        .action-buttons .continue-shopping-btn { /* 새로운 클래스 추가 */
             padding: 12px 30px;
             font-size: 16px;
             font-weight: 600;
             border-radius: 4px;
             border: 1px solid #ccc;
+            background-color: #f5f5f5; /* 기본 배경색 */
+            color: #444; /* 기본 텍스트 색상 */
             transition: background-color 0.3s;
+        }
+        .action-buttons .continue-shopping-btn:hover {
+            background-color: #e0e0e0;
         }
         
         /* 주문하기 버튼 (강조) */
-        .order-btn {
-            background-color: #b08d57 !important; /* 강조색 적용 */
-            color: #2c2c2c !important;
-            border: 1px solid #b08d57 !important;
+        .action-buttons .order-btn { /* 클래스 선택자 변경 */
+            padding: 12px 30px; /* 쇼핑 계속하기 버튼과 동일한 패딩 */
+            font-size: 16px; /* 쇼핑 계속하기 버튼과 동일한 폰트 크기 */
+            font-weight: 600; /* 쇼핑 계속하기 버튼과 동일한 폰트 굵기 */
+            border-radius: 4px;
+            background-color: #b08d57; /* 강조색 유지 */
+            color: white; /* 텍스트 색상 흰색 유지 */
+            border: 1px solid #b08d57;
+            transition: background-color 0.3s;
         }
         
-        .order-btn:hover {
-            background-color: #a07d47 !important;
-        }
-        
-        .action-buttons a:not(.order-btn) {
-            background-color: #f5f5f5;
-            color: #444;
-        }
-        .action-buttons a:not(.order-btn):hover {
-            background-color: #e0e0e0;
+        .action-buttons .order-btn:hover {
+            background-color: #a07d47;
+            border-color: #a07d47;
         }
 
     </style>
@@ -222,6 +225,7 @@
             <table>
                 <thead>
                     <tr>
+                        <th style="width: 50px;"><input type="checkbox" id="checkAll"></th> <%-- 전체 선택 체크박스 --%>
                         <th>상품명</th>
                         <th>판매가</th>
                         <th style="width: 150px;">수량</th>
@@ -232,9 +236,10 @@
                 <tbody>
                     <c:forEach var="cartItem" items="${cartList}">
                         <c:set var="itemTotalPrice" value="${cartItem.prodPrice * cartItem.cartQty}" />
-                        <tr>
+                        <tr data-price="${cartItem.prodPrice}" data-qty="${cartItem.cartQty}"> <%-- 상품 가격과 수량 데이터 속성 추가 --%>
+                            <td><input type="checkbox" name="selectedCartIds" value="${cartItem.cartId}"></td> <%-- 개별 상품 선택 체크박스 --%>
                             <td style="text-align: left;">
-                                <a href="${pageContext.request.contextPath}/product/detail?prodId=${cartItem.prodId}">${cartItem.prodName}</a>
+                                <a href="${pageContext.request.contextPath}/product/detail?id=${cartItem.prodId}">${cartItem.prodName}</a>
                             </td>
                             <td><fmt:formatNumber value="${cartItem.prodPrice}" type="currency" currencySymbol="₩" maxFractionDigits="0"/></td>
                             <td>
@@ -258,16 +263,92 @@
                 </tbody>
             </table>
             <div class="total-price">
-                총 장바구니 금액: <fmt:formatNumber value="${totalCartPrice}" type="currency" currencySymbol="₩" maxFractionDigits="0"/>
+                총 장바구니 금액: <span id="selectedTotalPrice"><fmt:formatNumber value="${totalCartPrice}" type="currency" currencySymbol="₩" maxFractionDigits="0"/></span>
             </div>
         </c:if>
 
         <div class="action-buttons">
-            <a href="${pageContext.request.contextPath}/">쇼핑 계속하기</a>
+            <a href="${pageContext.request.contextPath}/" class="continue-shopping-btn">쇼핑 계속하기</a> <%-- 클래스 추가 --%>
             <c:if test="${not empty cartList}">
-                <a href="${pageContext.request.contextPath}/order/form" class="order-btn">주문하기</a>
+                <form id="unifiedOrderForm" action="${pageContext.request.contextPath}/order/form" method="get" style="display:inline;">
+                    <input type="hidden" name="cartIds" id="selectedCartIdsInput">
+                    <button type="button" class="btn order-btn" onclick="unifiedOrder()">주문하기</button> <%-- 클래스 변경 --%>
+                </form>
             </c:if>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const checkAll = document.getElementById('checkAll');
+            const itemCheckboxes = document.querySelectorAll('input[name="selectedCartIds"]');
+            const quantityInputs = document.querySelectorAll('.quantity-input'); // 수량 입력 필드
+
+            // 초기 로드 시 총 금액 계산
+            calculateSelectedTotal();
+
+            // 전체 선택/해제
+            checkAll.addEventListener('change', function() {
+                itemCheckboxes.forEach(checkbox => {
+                    checkbox.checked = this.checked;
+                });
+                calculateSelectedTotal(); // 전체 선택/해제 시 총 금액 다시 계산
+            });
+
+            // 개별 선택 시 전체 선택 체크박스 상태 업데이트 및 총 금액 계산
+            itemCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    if (!this.checked) {
+                        checkAll.checked = false;
+                    } else {
+                        const allChecked = Array.from(itemCheckboxes).every(item => item.checked);
+                        checkAll.checked = allChecked;
+                    }
+                    calculateSelectedTotal(); // 개별 선택/해제 시 총 금액 다시 계산
+                });
+            });
+
+            // 수량 변경 시 총 금액 다시 계산 (수정 버튼 클릭 시 반영되므로 여기서는 필요 없을 수 있음)
+            // quantityInputs.forEach(input => {
+            //     input.addEventListener('change', function() {
+            //         calculateSelectedTotal();
+            //     });
+            // });
+        });
+
+        function calculateSelectedTotal() {
+            let total = 0;
+            document.querySelectorAll('input[name="selectedCartIds"]:checked').forEach(checkbox => {
+                const row = checkbox.closest('tr'); // 체크박스가 속한 tr 요소
+                const price = parseInt(row.dataset.price); // data-price 속성 값
+                const qty = parseInt(row.dataset.qty);     // data-qty 속성 값
+                total += price * qty;
+            });
+            document.getElementById('selectedTotalPrice').innerText = formatNumber(total) + '원';
+        }
+
+        function unifiedOrder() {
+            const selectedCartIds = [];
+            document.querySelectorAll('input[name="selectedCartIds"]:checked').forEach(checkbox => {
+                selectedCartIds.push(checkbox.value);
+            });
+
+            const form = document.getElementById('unifiedOrderForm');
+            const cartIdsInput = document.getElementById('selectedCartIdsInput');
+
+            if (selectedCartIds.length === 0) {
+                alert('주문할 상품을 하나 이상 선택해주세요.');
+                return;
+            }
+
+            cartIdsInput.value = selectedCartIds.join(',');
+            cartIdsInput.setAttribute('name', 'cartIds'); // name 속성 다시 설정
+            form.submit();
+        }
+
+        function formatNumber(num) {
+            return new Intl.NumberFormat('ko-KR').format(num);
+        }
+    </script>
 </body>
 </html>

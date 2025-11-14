@@ -33,8 +33,35 @@
     -- ⭐️ 이미지 테이블 JOIN (IMAGE_DB로 변경)
 		LEFT JOIN IMAGE_DB I 
         ON P.PROD_ID = I.IMG_PROD_ID 
-        AND I.IMG_MAIN = 'Y'  WHERE C.MEMBER_ID = #{memberId}
+        AND I.IS_MAIN = 'Y'  WHERE C.MEMBER_ID = #{memberId}
 		ORDER BY C.REG_DATE DESC
+    </select>
+
+    <!-- 특정 cartId 목록에 해당하는 장바구니 상품들을 조회 -->
+    <select id="getCartItemsByCartIds" resultMap="cartResultMap">
+        SELECT
+            C.CART_ID,
+            C.MEMBER_ID,
+            C.PROD_ID,
+            C.CART_QTY,
+            C.REG_DATE,
+            P.PROD_NAME,
+            P.PROD_PRICE,
+            P.PROD_SELLER,
+            I.IMG_PATH AS PROD_IMAGE
+        FROM
+            CART_DB C
+        JOIN
+            PRODUCT_DB P ON C.PROD_ID = P.PROD_ID
+        LEFT JOIN
+            IMAGE_DB I ON P.PROD_ID = I.IMG_PROD_ID AND I.IS_MAIN = 'Y'
+        WHERE
+            C.MEMBER_ID = #{memberId}
+            AND C.CART_ID IN
+            <foreach item="cartId" collection="cartIds" open="(" separator="," close=")">
+                #{cartId}
+            </foreach>
+        ORDER BY C.REG_DATE DESC
     </select>
 
     <!-- 특정 상품이 장바구니에 이미 있는지 확인 -->

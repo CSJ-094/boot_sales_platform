@@ -1,4 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -300,7 +301,21 @@
             <h2>로그인</h2>
             <p>계속하려면 로그인하세요.</p>
             
-            <form id="loginForm" action="login_yn" method="post">
+            <!-- ===== 로그인 실패 메시지 추가 ===== -->
+            <c:if test="${param.error != null}">
+                <div style="color: #d64545; text-align: center; margin-bottom: 15px; font-weight: 500;">
+                    아이디 또는 비밀번호가 일치하지 않습니다.
+                </div>
+            </c:if>
+            <!-- 판매자 로그인 실패 메시지 -->
+            <c:if test="${not empty sellerLoginResult}">
+                <div style="color: #d64545; text-align: center; margin-bottom: 15px; font-weight: 500;">
+                    ${sellerLoginResult}
+                </div>
+            </c:if>
+            <!-- =============================== -->
+
+            <form id="loginForm" action="<c:url value='/login_yn'/>" method="post">
                 <div class="user-type-switch">
                     <input type="radio" id="customer" name="userType" value="customer" checked>
                     <label for="customer">구매자</label>
@@ -310,23 +325,24 @@
                 </div>
 
                 <div class="input-group">
-                    <input type="text" id="loginId" name="memberId" class="input-field" placeholder="아이디" required>
+                    <input type="text" id="loginId" name="username" class="input-field" placeholder="아이디" required>
                     <i class="fas fa-user"></i>
                 </div>
                 <div class="input-group">
-                    <input type="password" id="loginPw" name="memberPw" class="input-field" placeholder="비밀번호" required>
+                    <input type="password" id="loginPw" name="password" class="input-field" placeholder="비밀번호" required>
                     <i class="fas fa-lock"></i>
                 </div>
                 
                 <div class="options-group">
                     <label class="remember-me">
-                        <input type="checkbox" name="remember"> 자동 로그인
+                        <input type="checkbox" name="remember-me"> 자동 로그인
                     </label>
                     <a href='#' onclick="location.href='find/findOption'">아이디/비밀번호 찾기</a>
                 </div>
                 
                 <button type="submit" class="btn btn-login">로그인</button>
-                <button type="button" class="btn btn-signup" onclick="location.href='register'">회원가입</button>
+                <!-- 회원가입 버튼 수정 -->
+                <button type="button" class="btn btn-signup" id="signupBtn">회원가입</button>
             </form>
         </div>
     </div>
@@ -338,14 +354,24 @@
         const loginForm = document.getElementById('loginForm');
         const loginIdField = document.getElementById('loginId');
         const loginPwField = document.getElementById('loginPw');
+        const signupBtn = document.getElementById('signupBtn'); // 회원가입 버튼 참조
 
         // ⭐️ 로그인 URL 설정
-        const customerAction = 'login_yn'; // 일반 유저 로그인 처리 URL
-        const sellerAction = 'seller/loginCheck'; // 판매자 로그인 처리 URL (SellerController 매핑)
-        
-        // ⭐️ 입력 필드 NAME 속성 설정 (구매자 DTO vs 판매자 DTO)
-        const customerNames = { id: 'memberId', pw: 'memberPw' }; // MemDTO 필드명
+        const customerLoginUrl = '<c:url value="/login_yn"/>'; // 구매자 로그인 URL (Spring Security 처리)
+        const sellerLoginUrl = '<c:url value="/seller_login_yn"/>'; // 판매자 로그인 URL (직접 구현)
+
+        loginForm.action = customerLoginUrl; // 초기 폼 액션 설정
+
+        // ⭐️ 입력 필드 NAME 속성 설정 (Spring Security 기본값 vs 판매자 DTO)
+        const customerNames = { id: 'username', pw: 'password' }; // Spring Security 기본 name
         const sellerNames = { id: 'selId', pw: 'selPw' };       // SellerDTO 필드명
+
+        // hidden input 필드 추가 (userType 전송용)
+        let userTypeHiddenInput = document.createElement('input');
+        userTypeHiddenInput.type = 'hidden';
+        userTypeHiddenInput.name = 'userType';
+        userTypeHiddenInput.value = 'customer'; // 기본값
+        loginForm.appendChild(userTypeHiddenInput);
 
         // 라디오 버튼 변경 이벤트 리스너
         userTypeRadios.forEach(radio => {
@@ -359,23 +385,30 @@
                     body.classList.remove('seller-theme');
                 }
 
-                // 2. Form Action URL 변경
-                loginForm.action = isSeller ? sellerAction : customerAction;
-
-                // 3. Input Name 속성 변경
+                // 2. Input Name 속성 변경 및 Form Action 변경
                 if (isSeller) {
-                    loginIdField.name = sellerNames.id; // memberId -> selId
-                    loginPwField.name = sellerNames.pw; // memberPw -> selPw
+                    loginIdField.name = sellerNames.id;
+                    loginPwField.name = sellerNames.pw;
+                    userTypeHiddenInput.value = 'seller';
+                    loginForm.action = sellerLoginUrl; // 판매자 로그인 URL로 변경
                 } else {
-                    loginIdField.name = customerNames.id; // selId -> memberId
-                    loginPwField.name = customerNames.pw; // selPw -> memberPw
+                    loginIdField.name = customerNames.id;
+                    loginPwField.name = customerNames.pw;
+                    userTypeHiddenInput.value = 'customer';
+                    loginForm.action = customerLoginUrl; // 구매자 로그인 URL로 변경
                 }
             });
         });
         
-        // 페이지 로드 시 초기값 설정: 
-        // HTML에서 기본적으로 customer가 checked이고 name이 memberId/memberPw로 설정되어 있으므로,
-        // 이 로직은 기본 설정 확인용으로만 남겨두거나 생략해도 무방합니다.
+        // 페이지 로드 시 초기값 설정
+        loginIdField.name = customerNames.id;
+        loginPwField.name = customerNames.pw;
+
+        // ⭐️ 회원가입 버튼 클릭 이벤트 리스너 추가
+        signupBtn.addEventListener('click', () => {
+            // 라디오 버튼 선택과 관계없이 항상 /register로 이동
+            location.href = '<c:url value="/register"/>'; 
+        });
     });
 </script>
 

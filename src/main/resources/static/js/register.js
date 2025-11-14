@@ -58,80 +58,69 @@ function check_ok(){
 }
 
 function fn_idCheck(){
-		if($("#member_id").val() == ""){
-			alert("아이디가 공백입니다.");
-		}else if($("#member_id").val().length < 4){
-			alert("아이디가 4글자 이상이어야 합니다.");
-		}else{
-		var params = {
-	                memberId : $("#member_id").val() // 🚩 KEY 수정 완료: memberId
-	                }
+    var memberIdValue = $("#member_id").val();
 
-	                $.ajax({
-	                    url : "idCheck", 
-	                    type : "post", 
-	                    dataType : 'text', // 🚩 dataType을 'text'로 변경 (Controller 응답에 맞춤)
-	                    data : params, 
+    if(memberIdValue == ""){
+        alert("아이디를 입력해주세요.");
+        return;
+    }
+    if(memberIdValue.length < 4){
+        alert("아이디는 4글자 이상이어야 합니다.");
+        return;
+    }
 
-	                    
-
-	                    success : function(result){
-	                   	console.log(result);
-	                    
-	                        if(result.trim() == "false"){ // 🚩 문자열 비교
-	                            $("#idCheck").attr("value", "N");
-	                            alert("중복된 아이디입니다.");
-
-	                        }else if(result.trim() == "true"){ // 🚩 문자열 비교
-	                            $("#idCheck").attr("value", "Y");
-	                            alert("사용가능한 아이디입니다.");
-	                            
-
-	                        }else if(member_id == ""){
-	                            alert("아이디가 확인되지 않았습니다. 다시 시도해주세요");
-	                        }
-	                    },error: function() {
-					alert("오류입니다.");
-				}
-		 });
-	 }
+    $.ajax({
+        url: "/id_check",
+        type: "post",
+        dataType: "text",
+        data: {
+            memberId: memberIdValue
+        },
+        success: function(result){
+            if(result.trim() == "n"){
+                $("#idCheck").attr("value", "N");
+                alert("중복된 아이디입니다.");
+            } else if(result.trim() == "y"){
+                $("#idCheck").attr("value", "Y");
+                alert("사용 가능한 아이디입니다.");
+            }
+        },
+        error: function() {
+            alert("오류입니다. 다시 시도해주세요.");
+        }
+    });
 }
+
 function fn_emailCheck(){
-		if($("#member_email").val() == ""){
-			alert("이메일이 공백입니다.");
-		}else{
-		var params = {
-	                memberEmail : $("#member_email").val() // 🚩 KEY 수정 완료: memberEmail
-	                }
+    var memberEmailValue = $("#member_email").val();
 
-	                $.ajax({
-	                    url : "emailCheck", 
-	                    type : "post", 
-	                    dataType : 'text', // 🚩 dataType을 'text'로 변경 (Controller 응답에 맞춤)
-	                    data : params, 
+    if(memberEmailValue == ""){
+        alert("이메일을 입력해주세요.");
+        return;
+    }
 
-	                    
-
-	                    success : function(result){
-	                   	console.log(result);
-	                    
-	                        if(result.trim() == "false"){ // 🚩 문자열 비교
-	                            $("#emailCheck").attr("value", "N");
-	                            alert("중복된 이메일 입니다.");
-
-	                        }else if(result.trim() == "true"){ // 🚩 문자열 비교
-	                            $("#emailCheck").attr("value", "Y");
-	                            alert("사용가능한 이메일입니다.");
-
-	                        }else if(result == ""){
-	                            alert("이메일이 확인되지 않았습니다. 다시 시도해주세요");
-	                        }
-	                    },error: function() {
-					alert("오류입니다.");
-				}
-	 	});
-	 }
+    $.ajax({
+        url: "/email_check",
+        type: "post",
+        dataType: "text",
+        data: {
+            memberEmail: memberEmailValue
+        },
+        success: function(result){
+            if(result.trim() == "n"){
+                $("#emailCheck").attr("value", "N");
+                alert("중복된 이메일입니다.");
+            } else if(result.trim() == "y"){
+                $("#emailCheck").attr("value", "Y");
+                alert("사용 가능한 이메일입니다.");
+            }
+        },
+        error: function() {
+            alert("오류입니다. 다시 시도해주세요.");
+        }
+    });
 }
+
 var code = "";
 
 function fn_emailNumCheck() {
@@ -146,7 +135,7 @@ function fn_emailNumCheck() {
 	// jQuery ajax 사용
 	$.ajax({
 		type: "post",
-		url: "mailCheck",
+		url: "/mailCheck",
 		data: email,
 		success: function(data) {
 			console.log("인증번호 받아옴: " + data);

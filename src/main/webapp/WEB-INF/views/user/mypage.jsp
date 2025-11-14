@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -37,7 +38,6 @@
                     }
 
                     document.getElementById('zipcode').value = data.zonecode;
-                    // MEMBER_ADDR_PRIMARY는 기본 주소, MEMBER_ADDR_DETAIL은 상세 주소
                     document.getElementById("MEMBER_ADDR_PRIMARY").value = addr + extraAddr;
                     document.getElementById("MEMBER_ADDR_DETAIL").focus();
                 }
@@ -55,8 +55,8 @@
         }
 
         body {
-            font-family: 'Noto Sans KR', 'Montserrat', sans-serif;/* ⭐️ mainpage.jsp 폰트 적용 [cite: 178] */
-            background-color: #f9f9f9;/* ⭐️ mainpage.jsp 배경색 적용 [cite: 178] */
+            font-family: 'Noto Sans KR', 'Montserrat', sans-serif;
+            background-color: #f9f9f9;
             color: #333;
             min-height: 100vh;
         }
@@ -67,14 +67,12 @@
             transition: color 0.3s ease;
         }
         a:hover {
-            color: #b08d57; [cite_start]/* ⭐️ mainpage.jsp 강조색 적용 [cite: 184] */
+            color: #b08d57;
         }
 
         ul {
             list-style: none;
         }
-
-        /* ==================== 1. 헤더 스타일 (mainpage.jsp 기준) ==================== */
 
         /* ==================== 2. 바디 (마이페이지 메인 영역) 스타일 ==================== */
         .mypage-body {
@@ -118,12 +116,11 @@
             color: #333;
         }
 
-        /* 현재 선택된 메뉴 강조 */
         .mypage-sidebar a.active {
             background-color: #f0f0f0;
-            color: #b08d57; /* ⭐️ 강조색 적용 */
+            color: #b08d57;
             font-weight: 700;
-            border-left: 4px solid #b08d57; /* ⭐️ 강조색 선 추가 */
+            border-left: 4px solid #b08d57;
             padding-left: 16px;
         }
 
@@ -139,24 +136,21 @@
 
         .mypage-content-area h2 {
             font-size: 26px;
-            border-bottom: 3px solid #b08d57; /* ⭐️ 강조색 적용 */
+            border-bottom: 3px solid #b08d57;
             padding-bottom: 10px;
             margin-bottom: 30px;
             color: #2c2c2c;
         }
 
-        /* **숨김 처리** */
         .content-panel {
             display: none;
         }
 
-        /* **활성화된 콘텐츠** */
         .content-panel.active {
             display: block;
         }
 
-
-        /* --- 회원 정보 폼 전용 스타일 (수정됨) --- */
+        /* --- 회원 정보 폼 전용 스타일 --- */
         .info-form {
             max-width: 700px;
             margin-top: 20px;
@@ -170,20 +164,19 @@
             margin-bottom: 20px;
         }
         
-        .form-row { /* ⭐️ 입력 필드와 라벨을 수평으로 정렬 */
+        .form-row {
             display: flex;
             align-items: center;
         }
 
         .form-group label {
             flex-shrink: 0;
-            width: 120px; /* ⭐️ 라벨 너비 고정 */
+            width: 120px;
             font-weight: 600;
             color: #333;
             margin-bottom: 0;
         }
 
-        /* 기본 입력 필드 스타일 */
         .form-group input[type="text"],
         .form-group input[type="email"],
         .form-group input[type="tel"],
@@ -201,8 +194,6 @@
              border-color: #b08d57;
         }
 
-
-        /* 수정 불가능한 아이디 필드 스타일 */
         #MEMBER_ID_VIEW {
             background-color: #f0f0f0;
             color: #777;
@@ -219,12 +210,11 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            flex-grow: 1; /* 나머지 공간을 모두 차지 */
+            flex-grow: 1;
         }
         
-        /* 우편번호 입력 필드 */
         .address-zip-row #zipcode {
-            width: 100px; /* 우편번호 필드 너비 조정 */
+            width: 100px;
             flex-grow: 0;
             background-color: #f0f0f0;
         }
@@ -246,12 +236,10 @@
             background-color: #5a6268;
         }
 
-        /* 기본 주소 필드 (읽기 전용) */
         #MEMBER_ADDR_PRIMARY {
             background-color: #f0f0f0;
             color: #777;
         }
-        /* 상세주소 (입력 가능) */
         #MEMBER_ADDR_DETAIL {
             background-color: #ffffff;
             color: #333;
@@ -274,7 +262,7 @@
         }
 
         .submit-btn {
-            background-color: #2c2c2c; /* ⭐️ 강조색 적용 */
+            background-color: #2c2c2c;
             color: white;
         }
 
@@ -293,8 +281,7 @@
             background-color: #bbb;
         }
         
-        
-        /* ⭐️ Wishlist Table & Button Styles ⭐️ */
+        /* 테이블 및 공통 스타일 */
         .message {
             padding: 10px 15px;
             margin-bottom: 20px;
@@ -321,7 +308,7 @@
             border-bottom: 1px solid #eee;
         }
         th {
-            background-color: #4a4a4a; /* ⭐️ 어두운 배경색 적용 */
+            background-color: #4a4a4a;
             color: white;
             font-weight: 600;
             text-transform: uppercase;
@@ -355,7 +342,7 @@
             margin-right: 5px; 
         }
         .action-btn:hover {
-            background-color: #b08d57; /* ⭐️ 강조색 적용 */
+            background-color: #b08d57;
             color: #2c2c2c;
         }
         .remove-btn {
@@ -364,7 +351,131 @@
         .remove-btn:hover {
             background-color: #c82333;
         }
-        /* ⭐️ End of Wishlist Styles ⭐️ */
+
+        /* 쿠폰/포인트 섹션 스타일 */
+        .coupon-point-summary {
+            display: flex;
+            justify-content: space-around;
+            background-color: #f0f0f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .summary-item {
+            text-align: center;
+            flex: 1;
+            padding: 10px;
+            border-right: 1px solid #e0e0e0;
+        }
+        .summary-item:last-child {
+            border-right: none;
+        }
+        .summary-item .label {
+            font-size: 15px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        .summary-item .value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #b08d57;
+        }
+        .coupon-item {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .coupon-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .coupon-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+        .coupon-status {
+            font-size: 13px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        .coupon-status.available { background-color: #e6f7e9; color: #1a7c36; }
+        .coupon-status.used { background-color: #f0f0f0; color: #888; }
+        .coupon-status.expired { background-color: #ffe0e0; color: #d64545; }
+
+        .coupon-details p {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 5px;
+        }
+        .coupon-details .highlight {
+            font-weight: 600;
+            color: #b08d57;
+        }
+        .point-history-item {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            background-color: #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .point-info {
+            flex-grow: 1;
+        }
+        .point-description {
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .point-date {
+            font-size: 13px;
+            color: #888;
+        }
+        .point-amount {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .point-amount.earn { color: #28a745; }
+        .point-amount.use { color: #dc3545; }
+        .point-amount.cancel { color: #6c757d; }
+
+        /* 회원 탈퇴 섹션 스타일 */
+        .withdraw-section {
+            margin-top: 50px;
+            padding: 30px;
+            border: 1px solid #dc3545;
+            border-radius: 5px;
+            background-color: #fff6f6;
+        }
+        .withdraw-section h3 {
+            color: #dc3545;
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+        .withdraw-section p {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 20px;
+        }
+        .withdraw-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+        .withdraw-btn:hover {
+            background-color: #c82333;
+        }
     </style>
 </head>
 <body>
@@ -380,6 +491,8 @@
                     <li><a href="#member-info" class="active">회원 정보 수정</a></li>
                     <li><a href="#wishlist">찜목록 (Wishlist)</a></li>
                     <li><a href="#order-history">주문 내역</a></li>
+                    <li><a href="#my-coupons">나의 쿠폰</a></li>
+                    <li><a href="#my-points">나의 포인트</a></li>
                 </ul>
             </nav>
         </aside>
@@ -458,6 +571,23 @@
                             <button type="reset" class="reset-btn">취소</button>
                         </div>
                     </form>
+
+                    <!-- 회원 탈퇴 섹션 추가 -->
+                    <div class="withdraw-section">
+                        <h3>회원 탈퇴</h3>
+                        <p>회원 탈퇴를 원하시면, 현재 비밀번호를 입력하고 '회원 탈퇴' 버튼을 클릭하세요. 탈퇴 시 회원 정보 및 관련 데이터(장바구니, 찜 목록, 쿠폰)는 즉시 삭제되며 복구할 수 없습니다.</p>
+                        <form action="<c:url value='/mypage/withdraw'/>" method="post" onsubmit="return confirm('정말로 탈퇴하시겠습니까?');">
+                            <div class="form-group">
+                                <div class="form-row">
+                                    <label for="MEMBER_PW_WITHDRAW">비밀번호 확인</label>
+                                    <input type="password" id="MEMBER_PW_WITHDRAW" name="memberPw" placeholder="현재 비밀번호를 입력하세요" required>
+                                </div>
+                            </div>
+                            <div class="button-group">
+                                <button type="submit" class="submit-btn withdraw-btn">회원 탈퇴</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
 
@@ -493,14 +623,14 @@
                                     <td>${product.prodStock}</td>
                                     <td>
                                         <form action="/mypage/wishlist/remove" method="post" style="display:inline;">
-                                            <input type="hidden" name="memberId" value="${param.memberId}">
+                                            <input type="hidden" name="memberId" value="${sessionScope.memberId}">
                                             <input type="hidden" name="prodId" value="${product.prodId}">
                                             <button type="submit" class="action-btn remove-btn">삭제</button>
                                         </form>
                                     </td>
                                     <td>
                                         <form action="/cart/moveFromWishlist" method="post" style="display:inline;">
-                                            <input type="hidden" name="memberId" value="${param.memberId}">
+                                            <input type="hidden" name="memberId" value="${sessionScope.memberId}">
                                             <input type="hidden" name="prodId" value="${product.prodId}">
                                             <input type="hidden" name="cartQty" value="1"> 
                                             <button type="submit" class="action-btn">장바구니로 이동</button>
@@ -543,7 +673,6 @@
                                                 <li style="margin-bottom: 5px;">
                                                     <a href="<c:url value='/products/detail?prodId=${detail.productId}'/>">${detail.prodName}</a> - ${detail.quantity}개
                                                     
-                                                    <%-- '구매확정' 상태일 때만 상품별로 '리뷰쓰기' 버튼 표시 --%>
                                                     <c:if test="${order.ordStatus == '구매확정'}">
                                                         <a href="<c:url value='/reviews/write?productId=${detail.productId}&orderId=${order.ordId}'/>" class="action-btn" style="margin-left: 10px; background-color: #b08d57;">리뷰쓰기</a>
                                                     </c:if>
@@ -553,7 +682,6 @@
                                     </td>
                                     <td>${order.ordStatus}</td>
                                     <td>
-                                        <%-- 상태에 따라 다른 버튼 표시 --%>
                                         <c:choose>
                                              <c:when test="${order.ordStatus == '배송완료'}">
                                                 <form action="<c:url value='/order/confirm'/>" method="post" style="display:inline;">
@@ -575,6 +703,91 @@
                     </table>
                 </c:if>
             </div>
+
+            <div id="my-coupons-content" class="content-panel">
+                <div class="coupon-point-summary">
+                    <div class="summary-item">
+                        <div class="label">보유 쿠폰</div>
+                        <div class="value">${fn:length(userCoupons)}개</div>
+                    </div>
+                </div>
+                <c:if test="${empty userCoupons}">
+                    <p class="no-items">보유하고 있는 쿠폰이 없습니다.</p>
+                </c:if>
+                <c:if test="${not empty userCoupons}">
+                    <c:forEach var="userCoupon" items="${userCoupons}">
+                        <div class="coupon-item">
+                            <div class="coupon-header">
+                                <div class="coupon-name">${userCoupon.couponName}</div>
+                                <c:choose>
+                                    <c:when test="${userCoupon.isUsed == 'Y'}">
+                                        <span class="coupon-status used">사용 완료</span>
+                                    </c:when>
+                                    <c:when test="${userCoupon.expirationDate != null and userCoupon.expirationDate lt now}">
+                                        <span class="coupon-status expired">기간 만료</span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <span class="coupon-status available">사용 가능</span>
+                                    </c:otherwise>
+                                </c:choose>
+                            </div>
+                            <div class="coupon-details">
+                                <p>할인: 
+                                    <c:choose>
+                                        <c:when test="${userCoupon.couponType == 'PERCENT'}">
+                                            <span class="highlight">${userCoupon.discountValue}%</span> 할인
+                                            <c:if test="${userCoupon.maxDiscountAmount != null}"> (최대 <fmt:formatNumber value="${userCoupon.maxDiscountAmount}" pattern="#,###"/>원)</c:if>
+                                        </c:when>
+                                        <c:when test="${userCoupon.couponType == 'AMOUNT'}">
+                                            <span class="highlight"><fmt:formatNumber value="${userCoupon.discountValue}" pattern="#,###"/>원</span> 할인
+                                        </c:when>
+                                    </c:choose>
+                                </p>
+                                <p>최소 주문 금액: <fmt:formatNumber value="${userCoupon.minOrderAmount}" pattern="#,###"/>원</p>
+                                <p>유효 기간: 
+                                    <c:choose>
+                                        <c:when test="${userCoupon.expirationDate != null}">
+                                            <fmt:formatDate value="${userCoupon.expirationDate}" pattern="yyyy-MM-dd"/>까지
+                                        </c:when>
+                                        <c:otherwise>
+                                            제한 없음
+                                        </c:otherwise>
+                                    </c:choose>
+                                </p>
+                                <p>설명: ${userCoupon.description}</p>
+                            </div>
+                        </div>
+                    </c:forEach>
+                </c:if>
+            </div>
+
+            <div id="my-points-content" class="content-panel">
+                <div class="coupon-point-summary">
+                    <div class="summary-item">
+                        <div class="label">현재 포인트</div>
+                        <div class="value"><fmt:formatNumber value="${currentPoint}" pattern="#,###"/> P</div>
+                    </div>
+                </div>
+                <c:if test="${empty pointHistory}">
+                    <p class="no-items">포인트 내역이 없습니다.</p>
+                </c:if>
+                <c:if test="${not empty pointHistory}">
+                    <c:forEach var="history" items="${pointHistory}">
+                        <div class="point-history-item">
+                            <div class="point-info">
+                                <div class="point-description">${history.description}</div>
+                                <div class="point-date"><fmt:formatDate value="${history.changeDate}" pattern="yyyy-MM-dd HH:mm"/></div>
+                            </div>
+                            <div class="point-amount <c:if test="${history.pointType == 'EARN'}">earn</c:if><c:if test="${history.pointType == 'USE'}">use</c:if><c:if test="${history.pointType == 'CANCEL'}">cancel</c:if>">
+                                <c:if test="${history.pointType == 'EARN'}">+</c:if>
+                                <c:if test="${history.pointType == 'USE'}">-</c:if>
+                                <c:if test="${history.pointType == 'CANCEL'}">±</c:if>
+                                <fmt:formatNumber value="${history.amount}" pattern="#,###"/> P
+                            </div>
+                        </div>
+                    </c:forEach>
+                </c:if>
+            </div>
             
         </section>
     </main>
@@ -585,24 +798,19 @@
             const contentPanels = document.querySelectorAll('.content-panel');
             const mainTitle = document.querySelector('.mypage-content-area h2');
 
-            // URL Hash에서 ID를 추출 (예: #wishlist -> wishlist)
-            // 없으면 'member-info'를 기본값으로 설정
             const getHashId = () => window.location.hash.substring(1) || 'member-info';
 
             function activatePanel(targetId) {
                 const panelId = targetId + '-content';
-                // 1. 사이드바 링크 활성화
                 sidebarLinks.forEach(link => {
                     const linkHash = link.getAttribute('href').substring(1);
                     if (linkHash === targetId) {
                         link.classList.add('active');
-                        // 2. 메인 타이틀 업데이트
                         mainTitle.textContent = link.textContent;
                     } else {
                         link.classList.remove('active');
                     }
                 });
-                // 3. 콘텐츠 패널 표시/숨김
                 contentPanels.forEach(panel => {
                     if (panel.id === panelId) {
                         panel.classList.add('active');
@@ -612,21 +820,16 @@
                 });
             }
 
-            // 초기 로드 시 실행 (URL 해시에 따라 페이지 표시)
             activatePanel(getHashId());
-            // 사이드바 링크 클릭 이벤트
             sidebarLinks.forEach(link => {
                 link.addEventListener('click', function(event) {
-                    event.preventDefault(); // 기본 해시 이동 방지
+                    event.preventDefault();
                     const targetHash = this.getAttribute('href').substring(1);
                     activatePanel(targetHash);
-                    
-                    // URL 해시 업데이트 (페이지 새로고침 없음)
                     window.history.pushState(null, null, this.href);
                 });
             });
 
-            // 브라우저 뒤로/앞으로 버튼 처리
             window.addEventListener('popstate', function() {
                 activatePanel(getHashId());
             });

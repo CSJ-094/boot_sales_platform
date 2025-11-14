@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.dao.CouponDAO">
+
+    <resultMap id="couponResultMap" type="com.boot.dto.CouponDTO">
+        <id property="couponId" column="COUPON_ID"/>
+        <result property="couponName" column="COUPON_NAME"/>
+        <result property="couponType" column="COUPON_TYPE"/>
+        <result property="discountValue" column="DISCOUNT_VALUE"/>
+        <result property="minOrderAmount" column="MIN_ORDER_AMOUNT"/>
+        <result property="expirationDate" column="EXPIRATION_DATE"/>
+        <result property="issueDate" column="ISSUE_DATE"/>
+        <result property="maxDiscountAmount" column="MAX_DISCOUNT_AMOUNT"/>
+        <result property="isActive" column="IS_ACTIVE"/>
+        <result property="description" column="DESCRIPTION"/>
+    </resultMap>
+
+    <insert id="insertCoupon" parameterType="com.boot.dto.CouponDTO">
+        <selectKey keyProperty="couponId" resultType="long" order="BEFORE">
+            SELECT COUPON_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO COUPON_DB (
+            COUPON_ID, COUPON_NAME, COUPON_TYPE, DISCOUNT_VALUE, MIN_ORDER_AMOUNT,
+            EXPIRATION_DATE, ISSUE_DATE, MAX_DISCOUNT_AMOUNT, IS_ACTIVE, DESCRIPTION
+        ) VALUES (
+            #{couponId}, #{couponName}, #{couponType}, #{discountValue}, #{minOrderAmount},
+            #{expirationDate}, SYSDATE, 
+            #{maxDiscountAmount, jdbcType=NUMERIC},  <!-- 이 부분을 수정합니다. -->
+            #{isActive}, #{description}
+        )
+    </insert>
+
+    <select id="getCouponById" resultMap="couponResultMap">
+        SELECT * FROM COUPON_DB WHERE COUPON_ID = #{couponId}
+    </select>
+
+    <select id="getCouponByName" resultMap="couponResultMap">
+        SELECT * FROM COUPON_DB WHERE COUPON_NAME = #{couponName}
+    </select>
+
+    <select id="getAllCoupons" resultMap="couponResultMap">
+        SELECT * FROM COUPON_DB ORDER BY COUPON_ID DESC
+    </select>
+
+    <select id="getActiveCoupons" resultMap="couponResultMap">
+        SELECT * FROM COUPON_DB WHERE IS_ACTIVE = 'Y' AND (EXPIRATION_DATE IS NULL OR EXPIRATION_DATE >= SYSDATE) ORDER BY COUPON_ID DESC
+    </select>
+
+    <update id="updateCoupon" parameterType="com.boot.dto.CouponDTO">
+        UPDATE COUPON_DB
+        SET
+            COUPON_NAME = #{couponName},
+            COUPON_TYPE = #{couponType},
+            DISCOUNT_VALUE = #{discountValue},
+            MIN_ORDER_AMOUNT = #{minOrderAmount},
+            EXPIRATION_DATE = #{expirationDate},
+            MAX_DISCOUNT_AMOUNT = #{maxDiscountAmount, jdbcType=NUMERIC}, <!-- 이 부분도 수정합니다. -->
+            IS_ACTIVE = #{isActive},
+            DESCRIPTION = #{description}
+        WHERE COUPON_ID = #{couponId}
+    </update>
+
+    <delete id="deleteCoupon">
+        DELETE FROM COUPON_DB WHERE COUPON_ID = #{couponId}
+    </delete>
+
+</mapper>

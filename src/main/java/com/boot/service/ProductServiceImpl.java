@@ -14,7 +14,8 @@ import com.boot.dao.ProductCategoryDAO;
 import com.boot.dto.ImageDTO;
 import com.boot.dto.ProdDTO;
 import com.boot.dto.ProductCategoryDTO;
-import com.boot.dao.CategoryDAO; // CategoryDAO import 추가
+import com.boot.dto.ProductSearchCondition;
+import com.boot.dao.CategoryDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,8 +35,8 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private final ProdDAO prodDAO;
     private final ProductCategoryDAO productCategoryDAO;
-    private final ImageDAO imageDAO; // @RequiredArgsConstructor를 통해 주입됨
-    private final CategoryDAO categoryDAO; // 상위 카테고리 조회를 위해 추가
+    private final ImageDAO imageDAO;
+    private final CategoryDAO categoryDAO;
 
     @Override
     public List<ProdDTO> selectProductsByCategory(int catId) {
@@ -52,16 +53,21 @@ public class ProductServiceImpl implements ProductService {
     
     // 1. [Read 기능] 상품 상세 조회
     @Override
-    public ProdDTO getProductById(Integer prodId) {
+    public ProdDTO getProductById(Long prodId) { // Integer에서 Long으로 변경
         log.info("Fetching product detail for prodId: {}", prodId);
-        // ⭐️ DAO 호출 메서드명을 getProduct으로 통일
-        return prodDAO.getProduct(prodId.longValue());
+        return prodDAO.getProduct(prodId); // longValue() 제거
+    }
+
+    // 상품 검색 기능 (ProductSearchCondition을 파라미터로 받도록 변경)
+    @Override
+    public List<ProdDTO> searchProducts(ProductSearchCondition condition) {
+        log.info("Searching products with condition: {}", condition);
+        return prodDAO.searchProducts(condition);
     }
 
     // 2. [Admin 기능] 상품 등록
     @Override
     @Transactional
-    // ⭐️ MultipartFile file 매개변수 추가
     public void createProductWithCategories(ProdDTO product, List<Long> catIds, Long mainCatId, MultipartFile file) {
         
         // 1. 상품 등록: MyBatis <selectKey>를 통해 product.getProdId()에 ID가 채워집니다.

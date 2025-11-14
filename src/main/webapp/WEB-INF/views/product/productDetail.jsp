@@ -280,6 +280,31 @@
         .back-link:hover {
             background-color: #5a6268;
         }
+
+        /* 찜하기 버튼 스타일 */
+        .wishlist-btn {
+            background-color: #ffc107; /* 노란색 계열 */
+            color: #333;
+            border: none;
+            padding: 15px 20px; /* 장바구니 버튼과 동일한 패딩 */
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 16px; /* 장바구니 버튼과 동일한 폰트 크기 */
+            font-weight: 600; /* 장바구니 버튼과 동일한 폰트 굵기 */
+            transition: background-color 0.3s ease;
+            margin-top: 15px; /* 장바구니 폼과의 간격 조정 */
+            width: 100%; /* 장바구니 버튼과 동일한 너비 */
+        }
+        .wishlist-btn:hover {
+            background-color: #e0a800;
+        }
+        .wishlist-btn.active { /* 찜한 상태 */
+            background-color: #dc3545; /* 빨간색 계열 */
+            color: white;
+        }
+        .wishlist-btn.active:hover {
+            background-color: #c82333;
+        }
     </style>
 </head>
 <body>
@@ -311,6 +336,14 @@
                         </div>
                         <button type="submit">장바구니에 추가</button>
                     </form>
+                    
+                    <%-- 찜하기 버튼 --%>
+                    <c:if test="${not empty memberId}"> <%-- 로그인한 사용자에게만 찜하기 버튼 표시 --%>
+                        <button type="button" class="wishlist-btn <c:if test="${isWished}">active</c:if>" onclick="toggleWishlist(${product.prodId}, ${isWished})">
+                            <c:if test="${isWished}">찜 해제</c:if>
+                            <c:if test="${!isWished}">찜하기</c:if>
+                        </button>
+                    </c:if>
                 </div>
             </div>
 
@@ -453,6 +486,53 @@
             // 클릭된 탭 콘텐츠를 보여주고, 링크에 'active' 클래스 추가
             document.getElementById(tabName).style.display = "block";
             evt.currentTarget.className += " active";
+        }
+
+        // 찜하기/찜 해제 기능
+        async function toggleWishlist(prodId, isWished) {
+            const wishlistBtn = document.querySelector('.wishlist-btn');
+            const memberId = '${memberId}'; // JSP에서 memberId 가져오기
+
+            if (!memberId) {
+                alert('로그인이 필요합니다.');
+                window.location.href = '${pageContext.request.contextPath}/login'; // 로그인 페이지로 리다이렉트
+                return;
+            }
+
+            const formData = new URLSearchParams();
+            formData.append('prodId', prodId);
+            formData.append('isWished', isWished);
+
+            try {
+                const response = await fetch('${pageContext.request.contextPath}/product/toggleWishlist', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: formData.toString()
+                });
+
+                const data = await response.json(); // 응답을 JSON으로 파싱
+
+                if (response.ok) { // HTTP 상태 코드가 200번대인 경우
+                    alert(data.message);
+                    // 버튼 UI 업데이트
+                    if (data.isWished) { // 찜하기 성공
+                        wishlistBtn.classList.add('active');
+                        wishlistBtn.innerText = '찜 해제';
+                        wishlistBtn.onclick = () => toggleWishlist(prodId, true); // isWished 상태 업데이트
+                    } else { // 찜 해제 성공
+                        wishlistBtn.classList.remove('active');
+                        wishlistBtn.innerText = '찜하기';
+                        wishlistBtn.onclick = () => toggleWishlist(prodId, false); // isWished 상태 업데이트
+                    }
+                } else { // HTTP 상태 코드가 200번대가 아닌 경우 (예: 400, 401, 500)
+                    alert('오류: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('찜목록 처리 중 네트워크 오류가 발생했습니다.');
+            }
         }
     </script>
 </body>

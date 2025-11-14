@@ -19,6 +19,14 @@ public interface CartDAO {
     List<CartDTO> getCartListByMemberId(String memberId);
 
     /**
+     * 특정 cartId 목록에 해당하는 장바구니 상품들을 조회합니다.
+     * @param memberId 회원 ID
+     * @param cartIds 조회할 장바구니 항목 ID 목록
+     * @return 해당 장바구니 상품 목록
+     */
+    List<CartDTO> getCartItemsByCartIds(@Param("memberId") String memberId, @Param("cartIds") List<Long> cartIds);
+
+    /**
      * 장바구니에 상품을 추가합니다.
      * @param cartDTO 추가할 장바구니 정보 (회원 ID, 상품 ID, 수량)
      */
@@ -43,7 +51,7 @@ public interface CartDAO {
      * @param prodId 상품 ID
      * @return 장바구니 항목 DTO (없으면 null)
      */
-    CartDTO getCartItemByMemberIdAndProdId(@Param("memberId") String memberId, @Param("prodId") Integer prodId);
+    CartDTO getCartItemByMemberIdAndProdId(@Param("memberId") String memberId, @Param("prodId") Long prodId); // Integer에서 Long으로 변경
 
     /**
      * 회원의 장바구니를 모두 비웁니다. (주문 완료 후 사용)

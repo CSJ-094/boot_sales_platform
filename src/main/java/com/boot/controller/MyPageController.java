@@ -1,82 +1,159 @@
 package com.boot.controller;
 
-import com.boot.dao.MemDAO;
-import com.boot.dto.MemDTO;
+import com.boot.dto.CouponDTO;
+import com.boot.dto.UserCouponDTO;
+import com.boot.dto.PointHistoryDTO;
+import com.boot.dto.WishlistDTO;
 import com.boot.dto.OrdDTO;
-import com.boot.dto.ProdDTO;
-import com.boot.service.OrderService;
+import com.boot.service.CouponService;
+import com.boot.service.UserCouponService;
+import com.boot.service.PointService;
 import com.boot.service.WishlistService;
-import lombok.extern.slf4j.Slf4j;
+import com.boot.service.OrderService;
+import com.boot.service.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.util.Date;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
-@Slf4j
 @RequestMapping("/mypage")
 public class MyPageController {
 
     @Autowired
-    private MemDAO memDAO;
-
+    private UserCouponService userCouponService;
     @Autowired
-    private PasswordEncoder passwordEncoder;
-
+    private PointService pointService;
+    @Autowired
+    private CouponService couponService;
     @Autowired
     private WishlistService wishlistService;
-
     @Autowired
     private OrderService orderService;
+    @Autowired
+    private LoginService loginService;
+
+    private String getMemberIdOrRedirect(HttpSession session, RedirectAttributes redirectAttributes) {
+        String memberId = (String) session.getAttribute("memberId");
+        if (memberId == null) {
+            redirectAttributes.addFlashAttribute("loginError", "로그인이 필요합니다.");
+            return null;
+        }
+        return memberId;
+    }
 
     @GetMapping
-    public String mypage_view(HttpSession session, Model model) {
-        log.info("@# mypage_view() - 정보 조회 및 리스트 로드");
-
-        String memberId = (String) session.getAttribute("memberId");
-
+    public String myPage(HttpSession session, Model model, RedirectAttributes redirectAttributes) {
+        String memberId = getMemberIdOrRedirect(session, redirectAttributes);
         if (memberId == null) {
-            log.warn("@# mypage_view() - 세션 ID 없음. 로그인 페이지로 리다이렉트.");
             return "redirect:/login";
         }
 
-        // 1. 회원 정보 조회
-        MemDTO memberInfo = memDAO.getMemberInfo(memberId);
-        model.addAttribute("memberInfo", memberInfo);
+        List<UserCouponDTO> userCoupons = userCouponService.getUserCouponsByMemberId(memberId);
+        model.addAttribute("userCoupons", userCoupons);
 
-        // 2. 찜목록 조회
-        List<ProdDTO> wishlist = wishlistService.getWishlistByMemberId(memberId);
+        List<PointHistoryDTO> pointHistory = pointService.getPointHistory(memberId);
+        model.addAttribute("pointHistory", pointHistory);
+
+        Integer currentPoint = pointService.getCurrentPoint(memberId);
+        model.addAttribute("currentPoint", currentPoint);
+
+        model.addAttribute("now", new Date());
+
+        List<CouponDTO> allActiveCoupons = couponService.getActiveCoupons();
+        
+        Set<Long> possessedCouponIds = userCoupons.stream()
+                                                .map(UserCouponDTO::getCouponId)
+                                                .collect(Collectors.toSet());
+        
+        List<CouponDTO> claimableCoupons = allActiveCoupons.stream()
+                                                        .filter(coupon -> !possessedCouponIds.contains(coupon.getCouponId()))
+                                                        .collect(Collectors.toList());
+        model.addAttribute("claimableCoupons", claimableCoupons);
+
+        List<WishlistDTO> wishlist = wishlistService.getWishlistByMemberId(memberId);
         model.addAttribute("wishlist", wishlist);
 
-        // 3. 주문 내역 조회 (주문 상세 포함)
         List<OrdDTO> orderList = orderService.getOrdersWithDetailsByMemberId(memberId);
         model.addAttribute("orderList", orderList);
 
         return "user/mypage";
     }
 
-    @PostMapping("/user_info")
-    public String mypage_update(@ModelAttribute MemDTO member, RedirectAttributes redirectAttributes) {
-        log.info("@# mypage_update() - 정보 수정 요청: {}", member.getMemberId());
-
-        if(member.getMemberPw() != null && !member.getMemberPw().isEmpty()) {
-            String encodePw = passwordEncoder.encode(member.getMemberPw());
-            member.setMemberPw(encodePw);
-            //정보 수정 시 다시 비밀번호 암호화 하기.
-        }
-        else{
-            MemDTO OriginalInfo = memDAO.getMemberInfo(member.getMemberId());
-            member.setMemberPw(OriginalInfo.getMemberPw());
-            //정보 수정 시 비밀번호 란이 비어있으면 기존 비밀번호 유지.
+    @PostMapping("/claimCoupon")
+    public String claimCoupon(@RequestParam("couponId") Long couponId,
+                              HttpSession session,
+                              RedirectAttributes redirectAttributes) {
+        String memberId = getMemberIdOrRedirect(session, redirectAttributes);
+        if (memberId == null) {
+            return "redirect:/login";
         }
 
-        memDAO.modify(member);
-        redirectAttributes.addFlashAttribute("updateSuccess", true);
-        return "redirect:/mypage";
+        try {
+            userCouponService.issueCouponToUser(memberId, couponId);
+            redirectAttributes.addFlashAttribute("couponMessage", "쿠폰이 성공적으로 발급되었습니다!");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("couponError", e.getMessage());
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("couponError", "쿠폰 발급 중 오류가 발생했습니다.");
+        }
+
+        return "redirect:/mypage#my-coupons";
+    }
+
+    @PostMapping("/wishlist/remove")
+    public String removeWishlist(@RequestParam("prodId") Long prodId,
+                                 HttpSession session,
+                                 RedirectAttributes redirectAttributes) {
+        String memberId = (String) session.getAttribute("memberId");
+        if (memberId == null) {
+            redirectAttributes.addFlashAttribute("loginError", "로그인이 필요합니다.");
+            return "redirect:/login";
+        }
+
+        try {
+            wishlistService.removeProductFromWishlist(memberId, prodId);
+            redirectAttributes.addFlashAttribute("message", "찜목록에서 상품이 삭제되었습니다.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("message", "찜목록 삭제 중 오류가 발생했습니다.");
+        }
+
+        return "redirect:/mypage#wishlist";
+    }
+
+    @PostMapping("/withdraw")
+    public String withdrawMember(@RequestParam("memberPw") String memberPw,
+                                 HttpServletRequest request,
+                                 HttpServletResponse response,
+                                 RedirectAttributes redirectAttributes) {
+        String memberId = (String) request.getSession().getAttribute("memberId");
+        if (memberId == null) {
+            return "redirect:/login";
+        }
+
+        boolean success = loginService.withdrawMember(memberId, memberPw);
+
+        if (success) {
+            new SecurityContextLogoutHandler().logout(request, response, SecurityContextHolder.getContext().getAuthentication());
+            redirectAttributes.addFlashAttribute("message", "회원 탈퇴가 완료되었습니다.");
+            return "redirect:/";
+        } else {
+            redirectAttributes.addFlashAttribute("error", "비밀번호가 일치하지 않습니다.");
+            return "redirect:/mypage#member-info";
+        }
     }
 }

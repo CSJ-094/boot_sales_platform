@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.dao.PointHistoryDAO">
+
+    <resultMap id="pointHistoryResultMap" type="com.boot.dto.PointHistoryDTO">
+        <id property="pointId" column="POINT_ID"/>
+        <result property="memberId" column="MEMBER_ID"/>
+        <result property="pointType" column="POINT_TYPE"/>
+        <result property="amount" column="AMOUNT"/>
+        <result property="description" column="DESCRIPTION"/>
+        <result property="changeDate" column="CHANGE_DATE"/>
+    </resultMap>
+
+    <insert id="insertPointHistory" parameterType="com.boot.dto.PointHistoryDTO">
+        <selectKey keyProperty="pointId" resultType="long" order="BEFORE">
+            SELECT POINT_HISTORY_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO POINT_HISTORY_DB (
+            POINT_ID, MEMBER_ID, POINT_TYPE, AMOUNT, DESCRIPTION, CHANGE_DATE
+        ) VALUES (
+            #{pointId}, #{memberId}, #{pointType}, #{amount}, #{description}, SYSDATE
+        )
+    </insert>
+
+    <select id="getPointHistoryByMemberId" resultMap="pointHistoryResultMap">
+        SELECT * FROM POINT_HISTORY_DB WHERE MEMBER_ID = #{memberId} ORDER BY CHANGE_DATE DESC
+    </select>
+
+    <select id="getPointHistoryById" resultMap="pointHistoryResultMap">
+        SELECT * FROM POINT_HISTORY_DB WHERE POINT_ID = #{pointId}
+    </select>
+
+</mapper>

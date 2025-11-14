@@ -1,13 +1,19 @@
 package com.boot.controller;
 
 import java.util.List;
+import java.util.Date; // Date 임포트 추가
+import java.util.Arrays; // Arrays 임포트 추가
+import java.util.stream.Collectors; // Collectors 임포트 추가
 
 import javax.servlet.http.HttpSession;
 
 import com.boot.dto.CartDTO;
 import com.boot.dto.OrdDTO;
+import com.boot.dto.UserCouponDTO; // UserCouponDTO 임포트 추가
 import com.boot.service.CartService;
 import com.boot.service.OrderService;
+import com.boot.service.UserCouponService; // UserCouponService 임포트 추가
+import com.boot.service.PointService; // PointService 임포트 추가
 import com.boot.dao.OrdDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -34,22 +40,39 @@ public class OrderController {
     @Autowired
     private OrdDAO ordDAO; // 주문 정보 조회를 위해 추가
 
+    @Autowired
+    private UserCouponService userCouponService; // 사용자 쿠폰 조회를 위해 추가
+    @Autowired
+    private PointService pointService; // 사용자 포인트 조회를 위해 추가
+
     /**
      * 주문서 작성 페이지를 보여줍니다.
+     * @param cartIds 쉼표로 구분된 cartId 문자열 (선택 상품 주문 시)
      */
     @RequestMapping(value = "/form", method = RequestMethod.GET)
-    public String showOrderForm(HttpSession session, Model model) {
+    public String showOrderForm(HttpSession session, Model model,
+                                @RequestParam(value = "cartIds", required = false) String cartIdsParam) {
         String memberId = (String) session.getAttribute("memberId");
         if (memberId == null) {
             return "redirect:/login"; // 로그인되어 있지 않으면 로그인 페이지로
         }
 
-        // 장바구니에서 주문할 상품 목록을 가져와 모델에 추가
-        List<CartDTO> cartItems = cartService.getCartListByMemberId(memberId);
+        List<CartDTO> cartItems;
+
+        if (cartIdsParam != null && !cartIdsParam.isEmpty()) {
+            // 선택 상품 주문 시
+            List<Long> cartIdList = Arrays.stream(cartIdsParam.split(","))
+                                        .map(Long::parseLong)
+                                        .collect(Collectors.toList());
+            cartItems = cartService.getCartItemsByCartIds(memberId, cartIdList);
+        } else {
+            // 전체 상품 주문 시 (기존 로직)
+            cartItems = cartService.getCartListByMemberId(memberId);
+        }
 
         if (cartItems == null || cartItems.isEmpty()) {
             // 장바구니에 상품이 없으면 주문서로 이동할 수 없음
-            model.addAttribute("error", "장바구니에 상품이 없습니다.");
+            model.addAttribute("error", "주문할 상품이 없습니다.");
             return "redirect:/cart/list"; 
         }
 
@@ -65,6 +88,20 @@ public class OrderController {
         final int SHIPPING_FEE = 3000;
         model.addAttribute("shippingFee", SHIPPING_FEE);
         
+        // ⭐️ 사용자 보유 쿠폰 목록 조회
+        List<UserCouponDTO> availableCoupons = userCouponService.getUserCouponsByMemberId(memberId);
+        // 사용 가능한 쿠폰만 필터링 (사용되지 않았고, 만료되지 않은 쿠폰)
+        // (JSP에서 필터링할 수도 있지만, 컨트롤러에서 미리 처리하는 것이 좋음)
+        // (여기서는 간단히 모든 보유 쿠폰을 전달하고, JSP에서 사용 가능 여부 판단)
+        model.addAttribute("availableCoupons", availableCoupons);
+
+        // ⭐️ 사용자 현재 포인트 잔액 조회
+        Integer currentPoint = pointService.getCurrentPoint(memberId);
+        model.addAttribute("currentPoint", currentPoint);
+
+        // ⭐️ JSP에서 쿠폰 만료 여부 판단을 위한 현재 시간 추가
+        model.addAttribute("now", new Date());
+
         return "order/orderForm"; // order/orderForm.jsp 뷰를 반환
     }
 

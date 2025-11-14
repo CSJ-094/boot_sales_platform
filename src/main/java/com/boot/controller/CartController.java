@@ -38,7 +38,7 @@ public class CartController {
         
         if (memberId == null) {
             // (C) 로그인 페이지 경로를 정확하게 확인하여 수정해야 합니다. 
-            return "redirect:/login/login"; // 예: /login 경로가 로그인 폼을 보여주는 컨트롤러 매핑이라고 가정
+            return "redirect:/login"; // /login으로 수정
         }
 
         // 2. 장바구니 목록 조회 (로그인 상태)
@@ -63,7 +63,7 @@ public class CartController {
     // 장바구니에 상품 추가 (POST /cart/add)
     @PostMapping("/add")
     public String addCart(HttpSession session, 
-                          @RequestParam("prodId") Integer prodId,
+                          @RequestParam("prodId") Long prodId, // Integer에서 Long으로 변경
                           @RequestParam(value = "cartQty", defaultValue = "1") int cartQty,
                           RedirectAttributes redirectAttributes) {
                           
@@ -120,7 +120,7 @@ public class CartController {
         String memberId = getMemberIdOrRedirect(session, redirectAttributes);
         
         if (memberId == null) {
-            return "redirect:/login/login";
+            return "redirect:/login"; // /login으로 수정
         }
 
         // 2. 삭제 로직
@@ -138,7 +138,7 @@ public class CartController {
     // 찜목록 상품을 장바구니로 이동 (POST /cart/moveFromWishlist)
     @PostMapping("/moveFromWishlist")
     public String moveFromWishlist(HttpSession session,
-                                   @RequestParam("prodId") Integer prodId,
+                                   @RequestParam("prodId") Long prodId, // Integer에서 Long으로 변경
                                    @RequestParam(value = "cartQty", defaultValue = "1") int cartQty,
                                    RedirectAttributes redirectAttributes) {
         
@@ -146,7 +146,7 @@ public class CartController {
         
         if (memberId == null) {
             // (C) 로그인 페이지 경로를 정확하게 확인하여 수정해야 합니다.
-            return "redirect:/login/login"; 
+            return "redirect:/login"; // /login으로 수정
         }
         
         // 2. 이동 로직
