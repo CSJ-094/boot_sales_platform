@@ -39,9 +39,19 @@ public class DashboardService {
         return dashboardDAO.selectMonthlySales();
     }
 
-    // 방문자 통계
+ // 방문자 통계 - 일간
     public List<VisitStatDTO> getDailyVisitors() {
         return dashboardDAO.selectDailyVisitors();
+    }
+
+    // 방문자 통계 - 주간
+    public List<VisitStatDTO> getWeeklyVisitors() {
+        return dashboardDAO.selectWeeklyVisitors();
+    }
+
+    // 방문자 통계 - 월간
+    public List<VisitStatDTO> getMonthlyVisitors() {
+        return dashboardDAO.selectMonthlyVisitors();
     }
 	
 }
