@@ -1,11 +1,16 @@
 package com.boot.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.boot.dto.SalesStatDTO;
 import com.boot.service.DashboardService;
 
 @Controller
@@ -25,4 +30,19 @@ public class DashboardController {
 		
 		return "seller/dashboard";
 	}
+	
+	// 매출 그래프 데이터
+		@GetMapping("/dashboard/sales")
+		@ResponseBody
+		public List<SalesStatDTO> getSalesStats(@RequestParam(defaultValue = "day") String period) {
+			switch (period) {
+				case "week":
+					return dashboardService.getWeeklySales();
+				case "month":
+					return dashboardService.getMonthlySales();
+				case "day":
+				default:
+					return dashboardService.getDailySales();
+			}
+		}
 }
