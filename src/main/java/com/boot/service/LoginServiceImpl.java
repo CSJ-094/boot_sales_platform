@@ -7,12 +7,15 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import com.boot.dao.LoginDAO;
+import com.boot.dto.KakaoUserInfo;
 import com.boot.dto.LoginDTO;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -25,12 +28,16 @@ import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 
 @Service
 @Slf4j
 public class LoginServiceImpl implements LoginService {
+
+	@Autowired
+	private SqlSession sqlSession;
 
 	@Autowired
 	private LoginDAO loginDAO;
@@ -162,21 +169,75 @@ public class LoginServiceImpl implements LoginService {
 		String tokenUri = "https://kauth.kakao.com/oauth/token";
 		RestTemplate rt = new RestTemplate();
 		HttpHeaders headers = new HttpHeaders();
-		headers.add("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
+		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
 		MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
 		params.add("grant_type", "authorization_code");
-		params.add("code", code);
-		params.add("redirect_uri", "https://localhost:8484/api/v1/oauth2/kakao"); //Redirect URI 키
-		params.add("response_type", "token");
 		params.add("client_id", "c9021fed6c1ed7e7f03682f69d5f67ca"); //RestApi키
+		params.add("redirect_uri", "http://localhost:8484/api/v1/oauth2/kakao"); //Redirect URI 키
+		params.add("code", code);
 
 		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+		log.info("Requesting access token with code: {}", code);
+		try {
+			ResponseEntity<String> response = rt.postForEntity(tokenUri, request, String.class);
+			log.info("Access token response: {}", response.getBody());
 
-		ResponseEntity<String> response = rt.postForEntity(tokenUri, request, String.class);
+			JsonObject json = JsonParser.parseString(response.getBody()).getAsJsonObject();
+			String accessToken = json.get("access_token").getAsString();
+			log.info("@# LoginImpl - getAccessToken = accessToken: {}", accessToken);
+			return accessToken;
 
-		JsonObject json = JsonParser.parseString(response.getBody()).getAsJsonObject();
-		String accessToken = json.get("access_token").getAsString();
-		log.info("@# LoginImpl - getAccessToken = accessToken: {}", accessToken);
-		return accessToken;
+		} catch (HttpClientErrorException e) {
+			// 401, 400 등 에러가 나도 여기서 로그 확인 가능
+			log.error("Access token request failed with status: {} and body: {}", e.getStatusCode(), e.getResponseBodyAsString());
+			throw new RuntimeException("Failed to get access token from Kakao", e);
+		}
+	}
+
+	@Override
+	public KakaoUserInfo getUserInfo(String accessToken) {
+		String requestUri = "https://kapi.kakao.com/v2/user/me";
+		RestTemplate rt = new RestTemplate();
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Authorization", "Bearer " + accessToken);
+		headers.add("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
+
+		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(headers);
+		ResponseEntity<String> response = rt.postForEntity(requestUri, request, String.class);
+		JsonObject obj = JsonParser.parseString(response.getBody()).getAsJsonObject();
+		KakaoUserInfo user = new KakaoUserInfo();
+		user.setId(obj.get("id").getAsLong());
+		user.setNickname(obj.get("properties").getAsJsonObject().get("nickname").getAsString());
+		user.setEmail(obj.get("kakao_account").getAsJsonObject().get("email").getAsString());
+		return user;
+	}
+
+	@Override
+	public LoginDTO kakaoLoginProcess(KakaoUserInfo userInfo) {
+		LoginDTO exist = loginDAO.findByEmail(userInfo.getEmail());
+
+		if(exist == null) {
+			LoginDTO newUser = new LoginDTO();
+			newUser.setMemberId("kakao_"+userInfo.getId());
+			newUser.setMemberEmail(userInfo.getEmail());
+			newUser.setMemberName(userInfo.getNickname());
+			newUser.setMemberPw("default");
+			newUser.setMemberPhone("default");
+			newUser.setMemberZipcode("default");
+			newUser.setMemberAddr1("default");
+			newUser.setMemberAddr2("default");
+			newUser.setSocialLogin("kakao");
+
+			loginDAO.write(newUser);
+			exist = newUser;
+
+		}
+		return exist;
+	}
+
+	@Override
+	public LoginDTO findByEmail(String email) {
+		return loginDAO.findByEmail(email);
 	}
 }

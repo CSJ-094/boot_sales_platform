@@ -10,9 +10,30 @@
     </select>
         
     <!-- 회원 가입 -->
+<!--    <insert id="write">-->
+<!--	    insert into user_db(member_id, member_pw, member_name, member_email, member_phone, member_zipcode, member_addr1, member_addr2) -->
+<!--        values(#{memberId},#{memberPw},#{memberName},#{memberEmail},#{memberPhone},#{memberZipcode},#{memberAddr1},#{memberAddr2})-->
+<!--    </insert>-->
     <insert id="write">
-	    insert into user_db(member_id, member_pw, member_name, member_email, member_phone, member_zipcode, member_addr1, member_addr2) 
-        values(#{memberId},#{memberPw},#{memberName},#{memberEmail},#{memberPhone},#{memberZipcode},#{memberAddr1},#{memberAddr2})
+        insert into user_db
+            (member_id,
+            member_pw,
+            member_name,
+            member_email,
+            member_phone,
+            member_zipcode,
+            member_addr1, member_addr2,
+            social_login
+        )
+        values(
+            #{memberId},
+            #{memberPw, jdbcType=VARCHAR},
+            #{memberName},#{memberEmail},
+            #{memberPhone, jdbcType=VARCHAR},
+            #{memberZipcode},
+            #{memberAddr1},#{memberAddr2},
+            #{socialLogin}
+        )
     </insert>
     
     <!-- 아이디 중복 확인 (ID: idCheck) -->
@@ -41,5 +62,12 @@
     <update id="updatePw">
         update user_db set member_pw = #{memberPw} where member_id = #{memberId}
     </update>
+
+    <!--   kakao용 이메일 확인-->
+    <select id="findByEmail" resultType="com.boot.dto.LoginDTO">
+        SELECT *
+        FROM user_db
+        WHERE member_email = #{email}
+    </select>
 
 </mapper>
