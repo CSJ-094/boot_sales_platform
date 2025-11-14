@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.boot.dao.ImageDAO">
+    
+    <insert id="insertImage" parameterType="com.boot.dto.ImageDTO">
+        <selectKey keyProperty="imgId" resultType="long" order="BEFORE">
+            SELECT IMG_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+        
+        INSERT INTO IMAGE_DB (
+            IMG_ID, 
+            IMG_PROD_ID, 
+            IMG_PATH, 
+            IMG_MAIN, 
+            IMG_ORDER,
+            IMG_REGDATE
+        ) VALUES (
+            #{imgId},           #{imgProdId},
+            #{imgPath},
+            #{isMain},
+            #{imgOrder},
+            SYSDATE             )
+    </insert>
+    
+<select id="selectByProdId" parameterType="long" resultType="com.boot.dto.ImageDTO">
+        SELECT
+            IMG_ID       AS imgId,
+            IMG_PROD_ID  AS imgProdId,
+            IMG_PATH     AS imgPath,
+            IMG_MAIN     AS isMain,
+            IMG_ORDER    AS imgOrder,
+            IMG_REGDATE  AS imgRegDate
+        FROM IMAGE_DB
+        WHERE IMG_PROD_ID = #{prodId}
+        ORDER BY IMG_MAIN DESC, IMG_ORDER ASC
+    </select>
+
+<delete id="deleteByProdId" parameterType="long">
+        DELETE FROM IMAGE_DB
+        WHERE IMG_PROD_ID = #{prodId}
+    </delete>
+
+</mapper>

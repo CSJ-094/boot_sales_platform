@@ -1,0 +1,12 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+    <mapper namespace="com.boot.dao.SelDAO">
+
+<!-- MemDAO기능 테스트를 위해 넣은거라 지워도 됩니다 -->
+  <update id="test3">
+  	update USER_DB set MEMBER_PW = #{param2}, MEMBER_NAME = #{param3}, MEMBER_EMAIL = #{param4}, MEMBER_PHONE = #{param5} MEMBER_ADDR = #{param6} where MEMBER_ID = #{param1}
+  </update>
+  
+</mapper>

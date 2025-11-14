@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.dao.ProductCategoryDAO">
+
+    <!-- resultMap: DB 컬럼 → ProductCategoryDTO 필드 매핑 -->
+    <resultMap id="ProductCategoryMap" type="com.boot.dto.ProductCategoryDTO">
+        <id column="PROD_ID" property="prodId"/>
+        <result column="CAT_ID" property="catId"/>
+        <result column="IS_MAIN" property="isMain"/>
+        <result column="PC_REG" property="pcReg"/>
+    </resultMap>
+
+    <!-- 상품별 카테고리 목록 -->
+    <select id="selectByProdId" parameterType="long" resultMap="ProductCategoryMap">
+        SELECT PROD_ID, CAT_ID, IS_MAIN, PC_REG
+        FROM PRODUCT_CATEGORY_DB
+        WHERE PROD_ID = #{prodId}
+    </select>
+
+    <!-- 특정 상품의 매핑 전체 삭제 -->
+    <delete id="deleteAllByProdId" parameterType="long">
+        DELETE FROM PRODUCT_CATEGORY_DB
+        WHERE PROD_ID = #{prodId}
+    </delete>
+
+    <!-- 다중 삽입 (Oracle INSERT ALL) -->
+    <insert id="bulkInsert" parameterType="list">
+        INSERT ALL
+        <foreach collection="list" item="m">
+            INTO PRODUCT_CATEGORY_DB (PROD_ID, CAT_ID, IS_MAIN, PC_REG)
+            VALUES (#{m.prodId}, #{m.catId}, #{m.isMain}, SYSDATE)
+        </foreach>
+        SELECT 1 FROM DUAL
+    </insert>
+
+</mapper>
