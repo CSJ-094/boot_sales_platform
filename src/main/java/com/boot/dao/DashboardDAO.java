@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 
 import com.boot.dto.SalesStatDTO;
 import com.boot.dto.SellerDashboardDTO;
+import com.boot.dto.SellerRecentOrderDTO;
 import com.boot.dto.VisitStatDTO;
 
 @Mapper
@@ -17,7 +18,9 @@ public interface DashboardDAO {
 	List<SalesStatDTO> selectWeeklySales(); // 주별 매출 (최근 8주)
 	List<SalesStatDTO> selectMonthlySales(); // 월별 매출 (최근 6개월)
 	
-	 List<VisitStatDTO> selectDailyVisitors();
-	 List<VisitStatDTO> selectWeeklyVisitors();
-	 List<VisitStatDTO> selectMonthlyVisitors();
+	List<VisitStatDTO> selectDailyVisitors();
+	List<VisitStatDTO> selectWeeklyVisitors();
+	List<VisitStatDTO> selectMonthlyVisitors();
+	
+	 List<SellerRecentOrderDTO> selectRecentOrders(); //최근 주문 10건
 }
