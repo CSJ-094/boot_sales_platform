@@ -43,3 +43,50 @@
     font-size: 0.8rem;
     color: #888;
 }
+
+.dash-section{
+    margin-top: 32px;
+}
+
+.dash-card-large{
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(15,23,42,0.08);
+    padding: 20px 24px;
+    max-width: 900px;
+}
+
+.dash-card-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.dash-card-header h3{
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.dash-tabs{
+    display: inline-flex;
+    gap: 4px;
+    padding: 2px;
+    border-radius: 999px;
+    background: #f3f4f6;
+}
+
+.sales-tab{
+    border: none;
+    background: transparent;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    color: #6b7280;
+}
+
+.sales-tab.active{
+    background: #b08d57; /* 너가 쓰는 포인트 컬러로 바꿔도 됨 */
+    color: #ffffff;
+}

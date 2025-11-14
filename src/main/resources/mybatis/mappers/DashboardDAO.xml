@@ -70,4 +70,51 @@
         ]]>
     </select>
 
+	<!--	일별 매출-->
+	 <select id="selectDailySales"
+            resultType="com.boot.dto.SalesStatDTO">
+        <![CDATA[
+        SELECT
+            TO_CHAR(ORD_DATE, 'YYYY-MM-DD') AS label,
+            NVL(SUM(ORD_AMOUNT), 0)         AS salesAmount,
+            COUNT(*)                        AS orderCount
+        FROM ORDER_DB
+        WHERE ORD_DATE >= TRUNC(SYSDATE) - 6
+          AND ORD_DATE <  TRUNC(SYSDATE) + 1
+        GROUP BY TO_CHAR(ORD_DATE, 'YYYY-MM-DD')
+        ORDER BY label
+        ]]>
+    </select>
+    
+<!--    주별 매출-->
+	<select id="selectWeeklySales"
+            resultType="com.boot.dto.SalesStatDTO">
+        <![CDATA[
+        SELECT
+            TO_CHAR(ORD_DATE, 'IYYY') || '년 ' || TO_CHAR(ORD_DATE, 'IW') || '주' AS label,
+            NVL(SUM(ORD_AMOUNT), 0) AS salesAmount,
+            COUNT(*)                AS orderCount
+        FROM ORDER_DB
+        WHERE ORD_DATE >= TRUNC(SYSDATE, 'IW') - (7 * 7)  -- 최근 8주
+          AND ORD_DATE <  TRUNC(SYSDATE, 'IW') + 7
+        GROUP BY TO_CHAR(ORD_DATE, 'IYYY'), TO_CHAR(ORD_DATE, 'IW')
+        ORDER BY MIN(ORD_DATE)
+        ]]>
+    </select>
+    
+<!--    월별 매출-->
+ 	<select id="selectMonthlySales"
+            resultType="com.boot.dto.SalesStatDTO">
+        <![CDATA[
+        SELECT
+            TO_CHAR(ORD_DATE, 'YYYY-MM') AS label,
+            NVL(SUM(ORD_AMOUNT), 0)      AS salesAmount,
+            COUNT(*)                     AS orderCount
+        FROM ORDER_DB
+        WHERE ORD_DATE >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -5)
+          AND ORD_DATE <  ADD_MONTHS(TRUNC(SYSDATE, 'MM'), 1)
+        GROUP BY TO_CHAR(ORD_DATE, 'YYYY-MM')
+        ORDER BY label
+        ]]>
+   	 </select>
 </mapper>

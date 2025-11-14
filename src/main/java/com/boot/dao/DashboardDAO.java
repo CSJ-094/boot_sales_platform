@@ -13,9 +13,9 @@ public interface DashboardDAO {
 	// 요약
 	SellerDashboardDTO selectSummary();
 	
-	List<SalesStatDTO> selectDailySales();
-	List<SalesStatDTO> selectWeeklySales();
-	List<SalesStatDTO> selectMonthlySales();
+	List<SalesStatDTO> selectDailySales(); // 일별 매출 (최근 7일)
+	List<SalesStatDTO> selectWeeklySales(); // 주별 매출 (최근 8주)
+	List<SalesStatDTO> selectMonthlySales(); // 월별 매출 (최근 6개월)
 	
 	List<VisitStatDTO> selectDailyVisitors();
 }
