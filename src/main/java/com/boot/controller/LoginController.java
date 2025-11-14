@@ -142,4 +142,11 @@ public class LoginController {
 		System.out.println("이메일 인증 이메일 : " + email);
 		return service.joinEmail(email);
 	}
+
+//	=================카카오 로그인 구현=================
+
+	@GetMapping("api/v1/oauth2/kakao")
+	public String KakaoCallback(@RequestParam String code, RedirectAttributes redirectAttributes) {
+		return "";
+	}
 }

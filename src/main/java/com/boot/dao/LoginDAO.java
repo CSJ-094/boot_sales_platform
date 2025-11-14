@@ -16,4 +16,6 @@ public interface LoginDAO {
     public ArrayList<LoginDTO> findPw(LoginDTO loginDTO);
     public void updatePw(LoginDTO loginDTO);
     public void sendTempPw(LoginDTO loginDTO);
+    public String getAccessToken(String code);
+    public String getUserInfo(String accessToken);
 }

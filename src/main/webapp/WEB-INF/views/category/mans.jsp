@@ -276,7 +276,7 @@ h2 {
 					<div class="product-grid">
 						<c:forEach var="product" items="${mansList}">
 							<a
-								href="${pageContext.request.contextPath}/product/detail?id=${product.prodId}">
+								href="${pageContext.request.contextPath}/products/detail?prodId=${product.prodId}">
 								<div class="product-card">
 									<div class="product-image">
 										<img

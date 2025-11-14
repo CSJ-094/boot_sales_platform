@@ -15,4 +15,6 @@ public interface LoginService {
     public void makeRandomNumber();
 	public String joinEmail(String email);
 	public void mailSend(String setFrom, String toMail, String title, String content);
+    public String getAccessToken(String code);
+//    public KakaoUserInfo getUserInfo(String accessToken);
 }

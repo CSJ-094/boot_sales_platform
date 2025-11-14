@@ -8,7 +8,12 @@ import javax.mail.internet.MimeMessage;
 
 import com.boot.dao.LoginDAO;
 import com.boot.dto.LoginDTO;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -18,6 +23,9 @@ import org.springframework.stereotype.Service;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 
 @Service
@@ -149,4 +157,26 @@ public class LoginServiceImpl implements LoginService {
 		}
 	}
 
+	@Override
+	public String getAccessToken(String code) {
+		String tokenUri = "https://kauth.kakao.com/oauth/token";
+		RestTemplate rt = new RestTemplate();
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
+		MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+		params.add("grant_type", "authorization_code");
+		params.add("code", code);
+		params.add("redirect_uri", "https://localhost:8484/api/v1/oauth2/kakao"); //Redirect URI 키
+		params.add("response_type", "token");
+		params.add("client_id", "c9021fed6c1ed7e7f03682f69d5f67ca"); //RestApi키
+
+		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+
+		ResponseEntity<String> response = rt.postForEntity(tokenUri, request, String.class);
+
+		JsonObject json = JsonParser.parseString(response.getBody()).getAsJsonObject();
+		String accessToken = json.get("access_token").getAsString();
+		log.info("@# LoginImpl - getAccessToken = accessToken: {}", accessToken);
+		return accessToken;
+	}
 }
