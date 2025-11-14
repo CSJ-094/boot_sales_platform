@@ -104,11 +104,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     chatButton.addEventListener("click", async function () {
-        await loadUser();
-        if (!username) {
-            alert("로그인 후 이용해주세요.");
-            return;
-        }
+       
         chatWindow.style.display = "flex";
         chatButton.style.display = "none";
         appendMessage("system", "환영합니다 고객님, 안녕하세요! 🌙 도움이 필요하시면 도움이라고 말씀해주세요!");
