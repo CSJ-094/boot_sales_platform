@@ -89,7 +89,7 @@ public class SellerController {
 	//마이페이지 메인 (/seller/mypage)
 	@RequestMapping("/mypage")
 	public String mypage() {
-		return "redirect:/seller/products";
+		return "redirect:/seller/dashboard";
 	}
 	
 	//상품 목록 (/seller/products)
