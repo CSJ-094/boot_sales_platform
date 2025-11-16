@@ -154,7 +154,7 @@ public class LoginController {
 
 		session.setAttribute("memberId", loginCheck.getMemberId());
 		session.setAttribute("memberName", loginCheck.getMemberName());
-		session.setAttribute("social", "kakao");
+        session.setAttribute("userType", "kakao");
 
 		return "redirect:/";
 	}

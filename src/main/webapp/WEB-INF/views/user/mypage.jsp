@@ -399,14 +399,17 @@
                             </div>
                             <input type="hidden" name="memberId" value="${memberInfo.memberId}">
                         </div>
-
+                    <c:choose>
+                        <c:when test="${sessionScope.userType != 'kakao'}">
                         <div class="form-group">
                             <div class="form-row">
                                 <label for="MEMBER_PW">새 비밀번호</label>
                                 <input type="password" id="MEMBER_PW" name="memberPw" placeholder="새 비밀번호를 입력해주세요 (변경 시에만 입력)" >
                             </div>
                         </div>
-                        
+                        </c:when>
+                    </c:choose>
+
                         <div class="form-group">
                             <div class="form-row">
                                 <label for="MEMBER_NAME">이름</label>
