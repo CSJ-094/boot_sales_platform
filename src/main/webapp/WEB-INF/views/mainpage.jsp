@@ -88,8 +88,8 @@ ul {
 /* 메인 콘텐츠 영역 (main-content) - 왼쪽 마진 350px로 고정 */
 .main-content {
 	max-width: 1440px;
-	margin-right: auto; /* 오른쪽은 자동 마진 */
-	margin-left: 350px;
+	margin-left: auto;  /* ⭐️ 좌우 마진을 auto로 설정하여 중앙 정렬 */
+	margin-right: auto;
 	padding: 0 20px;
 	flex-grow: 1;
 }
