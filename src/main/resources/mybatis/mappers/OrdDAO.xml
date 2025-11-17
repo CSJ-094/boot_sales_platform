@@ -47,5 +47,69 @@
             ORD_PAYMENT_KEY = #{paymentKey}
         WHERE ORD_ID = #{orderId}
     </update>
-  
+    
+    <!-- 주문 상태 업데이트 -->
+    <update id="updateStatus">
+        UPDATE ORDER_DB
+        SET ORD_STATUS = #{status}
+        WHERE ORD_ID = #{orderId}
+    </update>
+
+    <select id="getOrderById" resultType="com.boot.dto.OrdDTO">
+        SELECT
+            ORD_ID as ordId,
+            ORD_MEMID as ordMemId,
+            ORD_DATE as ordDate,
+            ORD_AMOUNT as ordAmount,
+            ORD_DFEE as ordDfee,
+            ORD_DISCOUNT as ordDiscount,
+            ORD_STATUS as ordStatus,
+            
+            -- DB 컬럼에 이 두 컬럼이 존재해야 합니다.
+            DELIVERY_COMPANY as deliveryCompany, 
+            TRACKING_NUMBER as trackingNumber     
+            
+        FROM ORDER_DB
+        WHERE ORD_ID = #{ordId}
+    </select>
+
+    <!-- 판매자 ID로 주문 요약 조회 -->
+    <select id="getOrdersBySellerId" resultType="com.boot.dto.SellerOrderSummaryDTO">
+        SELECT
+            o.ORD_ID       AS orderId,
+            o.ORD_MEMID    AS buyerId,
+            u.MEMBER_NAME  AS buyerName,
+            o.ORD_DATE     AS orderDate,
+            o.ORD_STATUS   AS orderStatus,
+            SUM(od.QUANTITY)                 AS totalQuantity,
+            SUM(od.PRICE * od.QUANTITY)      AS totalAmount,
+            o.TRACKING_NUMBER                AS trackingNumber,
+            o.DELIVERY_COMPANY                AS deliveryCompany
+        FROM ORDER_DB o
+                 JOIN ORDER_DETAILS od ON o.ORD_ID = od.ORDERID
+                 JOIN PRODUCT_DB p ON od.PRODUCTID = p.PROD_ID
+                 LEFT JOIN USER_DB u ON o.ORD_MEMID = u.MEMBER_ID
+        WHERE p.PROD_SELLER = #{sellerId}
+        GROUP BY o.ORD_ID, o.ORD_MEMID, u.MEMBER_NAME, o.ORD_DATE, o.ORD_STATUS, o.TRACKING_NUMBER, o.DELIVERY_COMPANY
+        ORDER BY o.ORD_DATE DESC
+    </select>
+
+    <!-- 기존 송장번호 업데이트 쿼리 (새로운 쿼리로 대체되므로 주석 처리 또는 삭제 가능) -->
+    <update id="updateTrackingNumber">
+        UPDATE ORDER_DB
+        SET TRACKING_NUMBER = #{trackingNumber},
+            DELIVERY_COMPANY = #{deliveryCompany}
+        WHERE ORD_ID = #{orderId}
+    </update>
+
+    <!-- 송장번호, 택배사, 주문 상태를 한 번에 업데이트 -->
+    <update id="updateTrackingAndStatus">
+        UPDATE ORDER_DB
+        SET TRACKING_NUMBER = #{trackingNumber},
+            DELIVERY_COMPANY = #{deliveryCompany},
+            ORD_STATUS = #{status}
+        WHERE ORD_ID = #{orderId}
+    </update>
+
 </mapper>
+
