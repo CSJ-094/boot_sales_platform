@@ -82,16 +82,23 @@
               <pre class="prod-desc">${product.prodDesc}</pre>
             </div>
 
-            <!-- 버튼 -->
-            <div class="detail-actions">
-              <a class="btn blue" href="${pageContext.request.contextPath}/seller/products/${product.prodId}/edit">수정</a>
-              <a class="btn blue" href="${pageContext.request.contextPath}/seller/products">목록으로</a>
-              <form action="${pageContext.request.contextPath}/seller/products/${product.prodId}/delete"
-                    method="post" class="inline-form"
-                    onsubmit="return confirm('정말 삭제하시겠습니까? 삭제 후 복구할 수 없습니다.');">
-                <button type="submit" class="btn red">삭제</button>
-              </form>
-            </div>
+			            <div class="detail-actions">
+			              <a class="btn btn-primary"
+			                 href="${pageContext.request.contextPath}/seller/products/${product.prodId}/edit">
+			                수정
+			              </a>
+
+			              <a class="btn btn-outline"
+			                 href="${pageContext.request.contextPath}/seller/products">
+			                목록으로
+			              </a>
+			              <form action="${pageContext.request.contextPath}/seller/products/${product.prodId}/delete"
+			                    method="post"
+			                    class="inline-form"
+			                    onsubmit="return confirm('정말 삭제하시겠습니까? 삭제 후 복구할 수 없습니다.');">
+			                <button type="submit" class="btn red">삭제</button>
+			              </form>
+			            </div>
 
           </c:otherwise>
         </c:choose>
