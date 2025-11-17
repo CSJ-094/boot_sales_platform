@@ -334,12 +334,14 @@ table tbody tr:nth-child(even) { background-color: #f9f9f9; }
 
 /* ===== Product Detail : 버튼 영역 (가운데 정렬) ===== */
 .detail-actions {
-  margin-top: 18px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-}
+	margin-top: 22px;
+	  padding-top: 16px;
+	  border-top: 1px dashed #e6e8ec;
+	  display: flex;
+	  justify-content: center;
+	  align-items: center;
+	  gap: 10px;
+	}
 .detail-actions .inline-form { display: inline-block; }
 .detail-actions .inline-form button { vertical-align: middle; }
 
@@ -953,3 +955,12 @@ main.mypage-body {
   justify-content: center;
   gap: 8px;
 }
+/* ===== 문의 답변 작성 : 버튼 가운데 정렬 ===== */
+.reply-form-actions {
+  margin-top: 16px;
+  padding-top: 14px;
+  display: flex;
+  justify-content: center;   /* 가운데 정렬 */
+  gap: 10px;
+}
+
