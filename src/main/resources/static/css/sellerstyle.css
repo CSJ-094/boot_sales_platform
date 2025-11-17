@@ -334,12 +334,14 @@ table tbody tr:nth-child(even) { background-color: #f9f9f9; }
 
 /* ===== Product Detail : 버튼 영역 (가운데 정렬) ===== */
 .detail-actions {
-  margin-top: 18px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-}
+	margin-top: 22px;
+	  padding-top: 16px;
+	  border-top: 1px dashed #e6e8ec;
+	  display: flex;
+	  justify-content: center;
+	  align-items: center;
+	  gap: 10px;
+	}
 .detail-actions .inline-form { display: inline-block; }
 .detail-actions .inline-form button { vertical-align: middle; }
 
@@ -841,3 +843,124 @@ main.mypage-body {
     min-height: calc(100vh - 180px); 
     /* ↑ 헤더 + 푸터 높이를 빼준 값 (사이트마다 다름) */
 }
+/* ===== 회원 상세 : 회원 정보 카드 ===== */
+.member-info-card {
+  margin-top: 16px;
+  padding: 18px 22px;
+  border-radius: 12px;
+  border: 1px solid #e4e4e4;
+  background: #fafafa;
+  width: 100%;          /* 테이블이랑 폭 맞추기 */
+}
+
+/* 기존 info-form 구조는 그대로 사용 (1열) */
+.info-form {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* 회원 상세에서만 레이블 폭 넉넉하게 */
+.member-info-card .info-form label {
+  width: 90px;          /* 레이블 열 고정해서 줄 정렬 */
+}
+
+/* 혹시 전에 넣어둔 2열 그리드 있으면 주석 처리하거나 지워도 됨
+.member-info-grid { ... }
+.member-info-grid .form-group-full { ... }
+*/
+
+/* ===== 회원 상세 : 주문 상품 리스트 (그대로 써도 됨) ===== */
+.order-id-text {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.order-prod-list {
+  margin-top: 2px;
+  padding-left: 0;
+  list-style: none;
+  font-size: 12px;
+  color: #666;
+}
+
+.order-prod-list li {
+  margin-top: 2px;
+}
+
+.order-prod-list li::before {
+  content: '• ';
+  color: #b08d57;
+  margin-right: 2px;
+}
+/* ===== 공지 등록/수정 : 카드 + 폼 정리 ===== */
+
+.notice-form-card {
+  margin-top: 16px;
+  padding: 20px 24px;
+  border-radius: 12px;
+  border: 1px solid #e4e4e4;
+  background: #fafafa;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+}
+
+.notice-form .form-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.notice-form .form-group.textarea-group {
+  align-items: flex-start;
+}
+
+.notice-form label {
+  width: 80px;        /* 레이블 열 고정해서 줄 맞추기 */
+  flex-shrink: 0;
+  font-weight: 700;
+  color: #555;
+}
+
+.notice-form input[type="text"],
+.notice-form textarea {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.notice-form textarea {
+  min-height: 260px;
+  resize: vertical;
+}
+
+.notice-form input:focus,
+.notice-form textarea:focus {
+  border-color: #b08d57;
+  outline: none;
+  box-shadow: 0 0 0 1px rgba(176,141,87,0.2);
+}
+
+/* 버튼 영역 – 오른쪽 정렬 */
+.notice-form-actions {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #e5e5e5;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+/* ===== 문의 답변 작성 : 버튼 가운데 정렬 ===== */
+.reply-form-actions {
+  margin-top: 16px;
+  padding-top: 14px;
+  display: flex;
+  justify-content: center;   /* 가운데 정렬 */
+  gap: 10px;
+}
+

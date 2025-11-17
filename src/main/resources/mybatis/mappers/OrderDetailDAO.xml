@@ -19,9 +19,11 @@
             od.PRODUCTID as productId,
             od.QUANTITY as quantity,
             od.PRICE as price,
-            p.PROD_NAME as prodName  <!-- 상품명도 함께 조회 -->
+            p.PROD_NAME as prodName,
+            img.IMG_PATH as prodImage
         FROM ORDER_DETAILS od
         JOIN PRODUCT_DB p ON od.PRODUCTID = p.PROD_ID
+        LEFT JOIN IMAGE_DB img ON p.PROD_ID = img.IMG_PROD_ID AND img.IMG_MAIN = 'Y'
         WHERE od.ORDERID = #{orderId}
     </select>
 

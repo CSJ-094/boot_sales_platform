@@ -152,16 +152,16 @@
 		        </section>
 
 		        <!-- 최근 주문 섹션 -->
-		        <section class="dash-panel dash-recent">
-		            <div class="dash-panel-header">
-		                <h3>최근 주문</h3>
-		                <div class="dash-filter">
-		                    <button type="button" class="filter-btn is-active" data-status="ALL">전체</button>
-		                    <button type="button" class="filter-btn" data-status="결제완료">결제완료</button>
-		                    <button type="button" class="filter-btn" data-status="배송중">배송중</button>
-		                    <button type="button" class="filter-btn" data-status="취소">취소</button>
-		                </div>
-		            </div>
+				<section class="dash-panel dash-recent dash-recent-orders">
+				    <div class="dash-panel-header">
+				        <h3>최근 주문</h3>
+				        <div class="dash-filter">
+				            <button type="button" class="filter-btn order-filter-btn is-active" data-status="ALL">전체</button>
+				            <button type="button" class="filter-btn order-filter-btn" data-status="결제완료">결제완료</button>
+				            <button type="button" class="filter-btn order-filter-btn" data-status="배송중">배송중</button>
+				            <button type="button" class="filter-btn order-filter-btn" data-status="취소">취소</button>
+				        </div>
+				    </div>
 
 		            <c:if test="${empty recentOrders}">
 		                <p class="dash-empty">최근 주문이 없습니다.</p>
