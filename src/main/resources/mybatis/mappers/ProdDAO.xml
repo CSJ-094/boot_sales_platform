@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.dao.ProdDAO">
+
+    <!-- 상품 검색 쿼리 (고급 검색 및 필터링/정렬) -->
+    <select id="searchProducts" parameterType="com.boot.dto.ProductSearchCondition" resultType="com.boot.dto.ProdDTO">
+        SELECT
+            p.PROD_ID          AS prodId,
+            p.PROD_NAME        AS prodName,
+            p.PROD_PRICE       AS prodPrice,
+            p.PROD_STOCK       AS prodStock,
+            p.PROD_DESC        AS prodDesc,
+            p.PROD_SELLER      AS prodSeller,
+            p.PROD_REG         AS prodReg,
+            p.PROD_UPD         AS prodUpd,
+            i.IMG_PATH         AS prodImgPath  -- 이미지 경로 추가
+        FROM
+            PRODUCT_DB p
+        LEFT JOIN (SELECT IMG_PROD_ID, IMG_PATH FROM IMAGE_DB WHERE IS_MAIN = 'Y') i
+            ON p.PROD_ID = i.IMG_PROD_ID
+        <if test="category != null and category != ''">
+            JOIN PRODUCT_CATEGORY pc ON p.PROD_ID = pc.PROD_ID
+        </if>
+        <where>
+            <if test="keyword != null and keyword != ''">
+                (p.PROD_NAME LIKE '%' || #{keyword} || '%' OR p.PROD_DESC LIKE '%' || #{keyword} || '%')
+            </if>
+            <if test="minPrice != null">
+                AND p.PROD_PRICE >= #{minPrice}
+            </if>
+            <if test="maxPrice != null">
+                AND p.PROD_PRICE &lt;= #{maxPrice}
+            </if>
+            <if test="category != null and category != ''">
+                AND pc.CAT_ID = #{category}
+            </if>
+        </where>
+        ORDER BY
+        <choose>
+            <when test="sortBy == 'prodName'">
+                p.PROD_NAME
+            </when>
+            <when test="sortBy == 'prodPrice'">
+                p.PROD_PRICE
+            </when>
+            <when test="sortBy == 'prodReg'">
+                p.PROD_REG
+            </when>
+            <otherwise>
+                p.PROD_ID
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="sortOrder == 'asc'">
+                ASC
+            </when>
+            <otherwise>
+                DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="selectProductsByCategory" resultType="com.boot.dto.ProdDTO">
+        SELECT
+            p.PROD_ID          AS prodId,
+            p.PROD_NAME        AS prodName,
+            p.PROD_PRICE       AS prodPrice,
+            p.PROD_DESC        AS prodDesc,
+            p.PROD_SELLER      AS prodSeller,
+            i.IMG_PATH         AS prodImgPath  -- 이미지 경로 추가
+        FROM
+            PRODUCT_DB p
+        LEFT JOIN (SELECT IMG_PROD_ID, IMG_PATH FROM IMAGE_DB WHERE IS_MAIN = 'Y') i
+            ON p.PROD_ID = i.IMG_PROD_ID
+        JOIN
+            PRODUCT_CATEGORY pc ON p.PROD_ID = pc.PROD_ID
+        WHERE
+            pc.CAT_ID = #{catId}
+        ORDER BY
+            p.PROD_ID DESC
+    </select>
+
+    <select id="getAllProdsByCatId" resultType="com.boot.dto.ProdDTO">
+        SELECT
+            p.PROD_ID          AS prodId,
+            p.PROD_NAME        AS prodName,
+            p.PROD_PRICE       AS prodPrice,
+            p.PROD_DESC        AS prodDesc,
+            p.PROD_SELLER      AS prodSeller,
+            i.IMG_PATH         AS prodImgPath  -- 이미지 경로 추가
+        FROM
+            PRODUCT_DB p
+        LEFT JOIN (SELECT IMG_PROD_ID, IMG_PATH FROM IMAGE_DB WHERE IS_MAIN = 'Y') i
+            ON p.PROD_ID = i.IMG_PROD_ID
+        JOIN
+            PRODUCT_CATEGORY pc ON p.PROD_ID = pc.PROD_ID
+        WHERE
+            pc.CAT_ID = #{catId}
+        ORDER BY
+            p.PROD_ID DESC
+    </select>
+
+    <!-- 상품 상세 조회 (getProduct) -->
+    <select id="getProduct" parameterType="long" resultType="com.boot.dto.ProdDTO">
+        SELECT
+            p.PROD_ID             AS prodId,
+            p.PROD_NAME           AS prodName,
+            p.PROD_PRICE          AS prodPrice,
+            p.PROD_STOCK          AS prodStock,
+            p.PROD_DESC           AS prodDesc,
+            p.PROD_SELLER         AS prodSeller,
+            p.PROD_REG            AS prodReg,
+            p.PROD_UPD            AS prodUpd,
+            i.IMG_PATH            AS prodImgPath  -- 이미지 경로 추가
+        FROM
+            PRODUCT_DB p
+        LEFT JOIN (SELECT IMG_PROD_ID, IMG_PATH FROM IMAGE_DB WHERE IS_MAIN = 'Y') i
+            ON p.PROD_ID = i.IMG_PROD_ID
+        WHERE
+            p.PROD_ID = #{prodId}
+    </select>
+
+    <!-- 상품 등록 (insertProduct) -->
+    <insert id="insertProduct" parameterType="com.boot.dto.ProdDTO">
+        <selectKey keyProperty="prodId" resultType="long" order="BEFORE">
+            SELECT PRODUCT_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO PRODUCT_DB (PROD_ID, PROD_SELLER, PROD_NAME, PROD_PRICE, PROD_STOCK, PROD_DESC, PROD_REG)
+        VALUES (#{prodId}, #{prodSeller}, #{prodName}, #{prodPrice}, #{prodStock}, #{prodDesc}, SYSDATE)
+    </insert>
+
+    <!-- 상품 수정 (updateProduct) -->
+    <update id="updateProduct" parameterType="com.boot.dto.ProdDTO">
+        UPDATE PRODUCT_DB
+        SET
+            PROD_NAME = #{prodName},
+            PROD_PRICE = #{prodPrice},
+            PROD_STOCK = #{prodStock},
+            PROD_DESC = #{prodDesc},
+            PROD_UPD = SYSDATE
+        WHERE
+            PROD_ID = #{prodId}
+    </update>
+
+</mapper>

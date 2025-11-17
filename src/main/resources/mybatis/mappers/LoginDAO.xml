@@ -1,0 +1,94 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.boot.dao.LoginDAO">
+
+    <!-- 로그인 여부 확인 (구매자) -->
+    <select id="loginYn" parameterType="string" resultType="com.boot.dto.LoginDTO">
+    	select member_pw AS memberPw, member_id AS memberId, member_name AS memberName, member_point AS memberPoint, member_status AS memberStatus from user_db where member_id=#{memberId}
+    </select>
+    
+    <!-- 로그인 여부 확인 (판매자) -->
+    <select id="sellerLoginYn" parameterType="string" resultType="com.boot.dto.LoginDTO">
+        select sel_pw AS selPw, sel_id AS selId, sel_name AS selName from seller_db where sel_id=#{selId}
+    </select>
+        
+    <!-- 회원 가입 (구매자) -->
+    <insert id="write">
+	    insert into user_db(member_id, member_pw, member_name, member_email, member_phone, member_zipcode, member_addr1, member_addr2, member_point, member_status) 
+        values(#{memberId},#{memberPw},#{memberName},#{memberEmail},#{memberPhone},#{memberZipcode},#{memberAddr1},#{memberAddr2}, 0, 'ACTIVE')
+    </insert>
+
+    <!-- 회원 가입 (판매자) -->
+    <insert id="writeSeller">
+        insert into seller_db(sel_id, sel_pw, sel_name, sel_cname, sel_email, sel_phone, sel_zipcode, sel_addr1, sel_addr2)
+        values(#{selId},#{selPw},#{selName},#{selCName},#{selEmail},#{selPhone},#{selZipcode},#{selAddr1},#{selAddr2})
+    </insert>
+    
+    <!-- 아이디 중복 확인 (ID: idCheck) -->
+    <select id="idCheck" parameterType="string" resultType="com.boot.dto.LoginDTO">
+    	select member_id AS memberId from user_db where member_id=#{memberId} AND MEMBER_STATUS = 'ACTIVE'
+    </select>
+    
+    <!-- 이메일 중복 확인 (ID: emailCheck) -->
+    <select id="emailCheck" parameterType="string" resultType="com.boot.dto.LoginDTO">
+    	select member_email AS memberEmail from user_db where member_email=#{memberEmail} AND MEMBER_STATUS = 'ACTIVE'
+    </select>
+    
+    <!-- 아이디 찾기 (추가: 이름과 이메일로 검색) -->
+    <select id="findId" resultType="com.boot.dto.LoginDTO">
+        select member_id AS memberId, member_email AS memberEmail from user_db 
+        where member_name = #{memberName} and member_email = #{memberEmail}
+    </select>
+    
+    <!-- 비밀번호 찾기 (추가: 아이디, 이름, 이메일로 검색) -->
+    <select id="findPw" resultType="com.boot.dto.LoginDTO">
+        select member_id AS memberId, member_name AS memberName, member_pw AS memberPw, member_email AS memberEmail from user_db 
+        where member_id = #{memberId} and member_name = #{memberName} and member_email = #{memberEmail}
+    </select>
+    
+    <!-- 비밀번호 업데이트 (임시 비밀번호 발급 시 사용) -->
+    <update id="updatePw">
+        update user_db set member_pw = #{memberPw} where member_id = #{memberId}
+    </update>
+
+    <!-- 회원 포인트 조회 -->
+    <select id="getMemberPoint" resultType="java.lang.Integer">
+        SELECT MEMBER_POINT FROM USER_DB WHERE MEMBER_ID = #{memberId}
+    </select>
+
+    <!-- 회원 포인트 업데이트 -->
+    <update id="updateMemberPoint">
+        UPDATE USER_DB SET MEMBER_POINT = #{point} WHERE MEMBER_ID = #{memberId}
+    </update>
+
+    <!-- 회원 탈퇴 (비활성화) -->
+    <update id="deactivateMember">
+        UPDATE USER_DB
+        SET MEMBER_STATUS = 'WITHDRAWN'
+        WHERE MEMBER_ID = #{memberId}
+    </update>
+
+    <!-- 탈퇴한 회원 정보 조회 -->
+    <select id="findWithdrawnMember" resultType="com.boot.dto.LoginDTO">
+        SELECT * FROM USER_DB WHERE MEMBER_ID = #{memberId} AND MEMBER_STATUS = 'WITHDRAWN'
+    </select>
+
+    <!-- 탈퇴한 회원 정보 업데이트 (재가입) -->
+    <update id="rejoinMember" parameterType="com.boot.dto.LoginDTO">
+        UPDATE USER_DB
+        SET
+            MEMBER_PW = #{memberPw},
+            MEMBER_NAME = #{memberName},
+            MEMBER_EMAIL = #{memberEmail},
+            MEMBER_PHONE = #{memberPhone},
+            MEMBER_ZIPCODE = #{memberZipcode},
+            MEMBER_ADDR1 = #{memberAddr1},
+            MEMBER_ADDR2 = #{memberAddr2},
+            MEMBER_POINT = 0,
+            MEMBER_STATUS = 'ACTIVE'
+        WHERE MEMBER_ID = #{memberId}
+    </update>
+
+</mapper>

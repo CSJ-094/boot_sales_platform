@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.dao.WishlistDAO">
+
+    <resultMap id="wishlistResultMap" type="com.boot.dto.WishlistDTO">
+        <id property="wishlistId" column="WISH_ID"/>
+        <result property="memberId" column="MEMBER_ID"/>
+        <result property="prodId" column="PROD_ID"/>
+        <result property="prodName" column="PROD_NAME"/>
+        <result property="prodPrice" column="PROD_PRICE"/>
+        <result property="prodSeller" column="PROD_SELLER"/>
+        <result property="prodStock" column="PROD_STOCK"/>
+        <result property="prodImgPath" column="PROD_IMG_PATH"/>
+    </resultMap>
+
+    <select id="getWishlistByMemberId" resultMap="wishlistResultMap">
+        SELECT
+            W.WISH_ID,
+            W.MEMBER_ID,
+            W.PROD_ID,
+            P.PROD_NAME,
+            P.PROD_PRICE,
+            P.PROD_SELLER,
+            P.PROD_STOCK,
+            I.IMG_PATH AS PROD_IMG_PATH
+        FROM WISHLIST_DB W
+        JOIN PRODUCT_DB P ON W.PROD_ID = P.PROD_ID
+        LEFT JOIN IMAGE_DB I ON P.PROD_ID = I.IMG_PROD_ID AND I.IS_MAIN = 'Y'
+        WHERE W.MEMBER_ID = #{memberId}
+        ORDER BY W.WISH_DATE DESC
+    </select>
+
+    <!-- 특정 상품이 회원의 찜목록에 있는지 확인 -->
+    <select id="countWishlist" resultType="int">
+        SELECT COUNT(*)
+        FROM WISHLIST_DB
+        WHERE MEMBER_ID = #{memberId} AND PROD_ID = #{prodId}
+    </select>
+
+    <insert id="insertWishlist">
+        INSERT INTO WISHLIST_DB (WISH_ID, MEMBER_ID, PROD_ID, WISH_DATE)
+        VALUES (WISHLIST_SEQ.NEXTVAL, #{memberId}, #{prodId}, SYSDATE)
+    </insert>
+
+    <delete id="deleteWishlist">
+        DELETE FROM WISHLIST_DB
+        WHERE MEMBER_ID = #{memberId} AND PROD_ID = #{prodId}
+    </delete>
+
+    <!-- 회원 탈퇴 시 찜 목록 전체 삭제 -->
+    <delete id="clearWishlistByMemberId">
+        DELETE FROM WISHLIST_DB WHERE MEMBER_ID = #{memberId}
+    </delete>
+
+</mapper>

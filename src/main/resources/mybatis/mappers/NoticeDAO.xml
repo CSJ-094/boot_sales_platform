@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.boot.dao.NoticeDAO">
+
+    <!-- 1. ResultMap (결과 매핑) -->
+    <resultMap id="noticeResultMap" type="com.boot.dto.NoticeDTO">
+        <id property="NOT_NO" column="NOT_NO"/>
+        <result property="NOT_TITLE" column="NOT_TITLE"/>
+        <result property="NOT_CONTENT" column="NOT_CONTENT"/>
+        <result property="NOT_NAME" column="NOT_NAME"/>
+        <result property="NOT_TIME" column="NOT_TIME"/>
+    </resultMap>
+<!--/-->
+    <!-- 2. Select: 목록 조회 (list) -->
+    <select id="list" resultMap="noticeResultMap">
+        SELECT 
+            NOT_NO, NOT_TITLE, NOT_CONTENT, NOT_NAME, NOT_TIME 
+        FROM NOTICE_DB 
+        ORDER BY NOT_NO DESC
+    </select>
+
+    <!-- 3. Select: 상세 내용 조회 (contentView) -->
+    <select id="contentView" resultMap="noticeResultMap">
+        SELECT
+            NOT_NO, NOT_TITLE, NOT_CONTENT, NOT_NAME, NOT_TIME
+        FROM NOTICE_DB
+        WHERE NOT_NO = #{notNo}
+    </select>
+    
+    <!-- 4. Insert: 등록 (write) -->
+    <!-- NOT_NO는 시퀀스, NOT_TIME은 DB 기본값을 사용한다고 가정 -->
+    <insert id="write" parameterType="com.boot.dto.NoticeDTO">
+        INSERT INTO NOTICE_DB (NOT_NO, NOT_NAME, NOT_TITLE, NOT_CONTENT)
+        VALUES (NOTICE_SEQ.NEXTVAL, #{NOT_NAME}, #{NOT_TITLE}, #{NOT_CONTENT})
+    </insert>
+
+    <!-- 5. Update: 수정 (modify) -->
+    <update id="modify" parameterType="com.boot.dto.NoticeDTO">
+        UPDATE NOTICE_DB
+        SET 
+            NOT_TITLE = #{NOT_TITLE}, 
+            NOT_CONTENT = #{NOT_CONTENT}
+        WHERE NOT_NO = #{NOT_NO}
+    </update>
+
+    <!-- 6. Delete: 삭제 (delete) -->
+    <delete id="delete">
+        DELETE FROM NOTICE_DB
+        WHERE NOT_NO = #{notNo}
+    </delete>
+
+</mapper>

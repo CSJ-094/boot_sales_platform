@@ -1,0 +1,73 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+    <mapper namespace="com.boot.dao.MemDAO">
+
+<select id="getMemberInfo" resultType="MemDTO">
+    SELECT 
+        MEMBER_ID    AS memberId, 
+        MEMBER_PW    AS memberPw,
+        MEMBER_NAME  AS memberName,
+        MEMBER_EMAIL AS memberEmail,
+        MEMBER_PHONE AS memberPhone,
+        MEMBER_ZIPCODE  AS memberZipcode,
+        MEMBER_ADDR1  AS memberAddr1,
+        MEMBER_ADDR2  AS memberAddr2
+    FROM USER_DB 
+    WHERE MEMBER_ID = #{memberId}
+</select>
+
+<update id="modify" parameterType="MemDTO">
+    UPDATE USER_DB 
+    SET 
+        MEMBER_PW    = #{memberPw, jdbcType=VARCHAR},     MEMBER_NAME  = #{memberName, jdbcType=VARCHAR},
+        MEMBER_EMAIL = #{memberEmail, jdbcType=VARCHAR},
+        MEMBER_PHONE = #{memberPhone, jdbcType=VARCHAR},
+        MEMBER_ZIPCODE  = #{memberZipcode, jdbcType=VARCHAR},
+        MEMBER_ADDR1 = #{memberAddr1, jdbcType=VARCHAR},
+        MEMBER_ADDR2 = #{memberAddr2, jdbcType=VARCHAR}
+    WHERE 
+        MEMBER_ID = #{memberId, jdbcType=VARCHAR}       </update>
+        
+ <select id="getUserById" resultType="com.boot.dto.MemDTO">
+        SELECT
+            MEMBER_ID as memberId,
+            MEMBER_PW as memberPw,
+            MEMBER_NAME as memberName,
+            MEMBER_EMAIL as memberEmail,
+            MEMBER_PHONE as memberPhone,
+            MEMBER_ZIPCODE  AS memberZipcode,
+        	MEMBER_ADDR1  AS memberAddr1,
+        	MEMBER_ADDR2  AS memberAddr2
+        FROM USER_DB
+        WHERE MEMBER_ID = #{memberId}
+</select>
+ 
+ <!-- resultMap: DB 컬럼 → UserDto 필드 매핑 -->
+    <resultMap id="UserMap" type="com.boot.dto.MemDTO">
+        <result column="MEMBER_ID" property="memberId"/>
+        <result column="MEMBER_PW" property="memberPw"/>
+        <result column="MEMBER_NAME" property="memberName"/>
+        <result column="MEMBER_EMAIL" property="memberEmail"/>
+        <result column="MEMBER_PHONE" property="memberPhone"/>
+        <result column="MEMBER_ZIPCODE" property="memberZipcode"/>
+        <result column="MEMBER_ADDR1" property="memberAddr1"/>
+        <result column="MEMBER_ADDR2" property="memberAddr2"/>
+    </resultMap>
+
+    <!-- 전체 회원 조회 -->
+    <select id="getUserList" resultMap="UserMap">
+        SELECT MEMBER_ID, MEMBER_PW, MEMBER_NAME, MEMBER_EMAIL, MEMBER_PHONE, MEMBER_ZIPCODE, MEMBER_ADDR1, MEMBER_ADDR2
+        FROM USER_DB
+        ORDER BY MEMBER_ID
+    </select>
+
+    <!-- 회원 상세 -->
+    <select id="getUser" parameterType="string" resultMap="UserMap">
+        SELECT MEMBER_ID, MEMBER_PW, MEMBER_NAME, MEMBER_EMAIL, MEMBER_PHONE, MEMBER_ZIPCODE, MEMBER_ADDR1, MEMBER_ADDR2
+        FROM USER_DB
+        WHERE MEMBER_ID = #{memberId}
+    </select>
+  
+</mapper>

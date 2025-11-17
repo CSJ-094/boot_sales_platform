@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.dao.CategoryDAO">
+
+	<!-- resultMap: DB 컬럼 → CategoryDTO 필드 매핑 -->
+    <resultMap id="CategoryMap" type="com.boot.dto.CategoryDTO">
+        <id 	column="CAT_ID" property="catId"/>
+        <result column="CAT_PARENT" property="catParent"/>
+        <result column="CAT_CODE" property="catCode"/>
+        <result column="CAT_NAME" property="catName"/>
+        <result column="CAT_SORT" property="catSort"/>
+        <result column="CAT_USEYN" property="catUseyn"/>
+        <result column="CAT_REG" property="catReg"/>
+        <result column="CAT_UPD" property="catUpd"/>
+        <!-- LEVEL(깊이) 컬럼은 계층 쿼리 전용 -->
+        <result column="LEVEL" property="depth"/>
+    </resultMap>
+
+    <!-- 전체 카테고리(계층 구조로 조회) -->
+	<select id="selectTreeFlat" resultMap="CategoryMap">
+  		SELECT c.CAT_ID, c.CAT_PARENT, c.CAT_CODE, c.CAT_NAME,
+         	c.CAT_SORT, c.CAT_USEYN, c.CAT_REG, c.CAT_UPD, LEVEL
+  		FROM   CATEGORY_DB c
+  		START WITH c.CAT_PARENT IS NULL
+  		CONNECT BY PRIOR c.CAT_ID = c.CAT_PARENT
+  		ORDER SIBLINGS BY c.CAT_SORT, c.CAT_NAME
+	</select>
+
+	<!-- 주어진 카테고리 ID 목록의 모든 상위 카테고리 ID를 재귀적으로 조회 -->
+	<select id="selectAllParentIds" resultType="long">
+		SELECT DISTINCT CAT_PARENT
+		FROM CATEGORY_DB
+		WHERE CAT_PARENT IS NOT NULL
+		START WITH CAT_ID IN
+		<foreach item="catId" collection="list" open="(" separator="," close=")">
+			#{catId}
+		</foreach>
+		CONNECT BY PRIOR CAT_PARENT = CAT_ID
+	</select>
+
+</mapper>
