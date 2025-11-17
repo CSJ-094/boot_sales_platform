@@ -246,7 +246,31 @@ public class LoginServiceImpl implements LoginService {
 		return exist;
 	}
 
-	@Override
+    //카카오 회원 탈퇴 구현
+    @Override
+    public void kakaoUnlink(String accessToken){
+        //로그인 시 accessToken 세션이 남아 있기 때문에 바로 호출 가능.
+        String unlinkUri = "https://kapi.kakao.com/v1/user/unlink";
+        RestTemplate rt = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + accessToken);
+
+        HttpEntity<String> request = new HttpEntity<>(headers);
+        try{
+            ResponseEntity<String> response = rt.postForEntity(unlinkUri, request, String.class);
+                log.info("회원 탈퇴 성공: {}",response.getBody());
+        }catch(HttpClientErrorException e){
+            log.error("회원 탈퇴 실패 및 오류메시지 로그 확인용: {}",e.getResponseBodyAsString());
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void deleteUser(String memberId) {
+        loginDAO.deleteUser(memberId);
+    }
+
+    @Override
 	public LoginDTO findByEmail(String email) {
 		return loginDAO.findByEmail(email);
 	}

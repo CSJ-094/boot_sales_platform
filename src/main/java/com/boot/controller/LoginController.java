@@ -11,6 +11,7 @@ import com.boot.service.LoginService;
 import com.boot.service.OrderService;
 import com.boot.service.WishlistService;
 import org.apache.ibatis.session.SqlSession;
+import org.apache.tomcat.util.http.parser.HttpParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -155,7 +156,36 @@ public class LoginController {
 		session.setAttribute("memberId", loginCheck.getMemberId());
 		session.setAttribute("memberName", loginCheck.getMemberName());
         session.setAttribute("userType", "kakao");
+        session.setAttribute("kakaoAccessToken", accessToken);
+
+        //카카오 로그인 시 주소가 초기값이면 정보 수정 페이지로 넘어가게 하기.
+        if("default".equals(loginCheck.getMemberAddr1())){
+            redirectAttributes.addFlashAttribute("msg", "주소를 입력해주세요!");
+            return "redirect:/mypage#member-info";
+        }
 
 		return "redirect:/";
 	}
+    //카카오 회원 탈퇴
+    @PostMapping("/mypage/deleteUser")
+    public String deleteUser(HttpSession session) {
+
+        String userType = (String) session.getAttribute("userType");
+        String accessToken = (String) session.getAttribute("kakaoAccessToken");
+        String memberId = (String) session.getAttribute("memberId");
+
+        if("kakao".equals(userType)) {
+            if(accessToken != null) {
+                service.kakaoUnlink(accessToken);
+            }
+            service.deleteUser(memberId);
+        }else {
+            service.deleteUser(memberId);
+        }
+
+        session.invalidate();
+
+        return "redirect:/";
+
+    }
 }

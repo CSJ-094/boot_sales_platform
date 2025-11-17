@@ -1,3 +1,4 @@
+
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
@@ -385,6 +386,29 @@
         .remove-btn:hover {
             background-color: #c82333;
         }
+        .mypage-sidebar a.withdraw {
+            color: #d9534f;
+            font-weight: 700;
+        }
+
+        .mypage-sidebar a.withdraw:hover {
+            background-color: #ffe5e5;
+            color: #c9302c;
+        }
+
+        .withdraw-warning{
+            color:#666;
+            margin-bottom:20px;
+        }
+        .withdraw-btn{
+            background:#d9534f;
+            color:#fff;
+            padding:12px 25px;
+            border:none;
+            border-radius:6px;
+            font-size:16px;
+            cursor:pointer;
+        }
         /* ⭐️ End of Wishlist Styles ⭐️ */
 		/* ... 기존 스타일 ... */
 		        
@@ -412,6 +436,11 @@
     </style>
 </head>
 <body>
+<c:if test="${not empty msg}">
+    <script>
+        alert("${msg}");
+    </script>
+</c:if>
 
 <jsp:include page="/WEB-INF/views/fragments/header.jsp" />
 
@@ -424,6 +453,8 @@
                     <li><a href="#member-info" class="active">회원 정보 수정</a></li>
                     <li><a href="#wishlist">찜목록 (Wishlist)</a></li>
                     <li><a href="#order-history">주문 내역</a></li>
+                    <li class="separator"></li>
+                    <li><a href="#deleteUser" class="withdraw">회원 탈퇴</a></li>
                 </ul>
             </nav>
         </aside>
@@ -617,6 +648,21 @@
                         </tbody>
                     </table>
                 </c:if>
+            </div>
+            <div id="deleteUser-content" class="content-panel">
+
+                <p class="withdraw-warning">
+                    탈퇴 시 모든 회원 정보가 삭제되며 복구가 불가능합니다.
+                </p>
+
+                <form action="${pageContext.request.contextPath}/mypage/deleteUser"
+                      method="post"
+                      onsubmit="return confirm('정말 탈퇴하시겠습니까?');">
+
+                    <button type="submit" class="withdraw-btn">
+                        회원 탈퇴
+                    </button>
+                </form>
             </div>
             
         </section>

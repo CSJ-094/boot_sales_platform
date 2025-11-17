@@ -20,4 +20,6 @@ public interface LoginService {
     public KakaoUserInfo getUserInfo(String accessToken);
     public LoginDTO kakaoLoginProcess(KakaoUserInfo userInfo);
     public LoginDTO findByEmail(String email);
+    public void kakaoUnlink(String accessToken);
+    public void deleteUser(String memberId);
 }
