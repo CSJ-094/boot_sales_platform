@@ -953,3 +953,12 @@ main.mypage-body {
   justify-content: center;
   gap: 8px;
 }
+/* ===== 문의 답변 작성 : 버튼 가운데 정렬 ===== */
+.reply-form-actions {
+  margin-top: 16px;
+  padding-top: 14px;
+  display: flex;
+  justify-content: center;   /* 가운데 정렬 */
+  gap: 10px;
+}
+
