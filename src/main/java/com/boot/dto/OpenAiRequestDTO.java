@@ -3,10 +3,12 @@ package com.boot.dto;
 import java.util.List;
 
 import lombok.AccessLevel;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Getter
+@Data
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OpenAiRequestDTO {
     private String model;
