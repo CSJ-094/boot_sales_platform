@@ -3,10 +3,11 @@ package com.boot.dto;
 import java.util.List;
 
 import lombok.AccessLevel;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
+@Data
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OpenAiResponseDTO {
     private List<Choice> choices;

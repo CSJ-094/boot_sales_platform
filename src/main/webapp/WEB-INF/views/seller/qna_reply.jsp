@@ -65,6 +65,31 @@
                     </tr>
                 </table>
 
+                <%-- ⭐️ 기존 답변 내역 표시 --%>
+                <c:if test="${not empty replies}">
+                    <h3 style="margin-top: 30px;">기존 답변 내역</h3>
+                    <div class="reply-history" style="margin-top: 15px;">
+                        <c:forEach var="reply" items="${replies}">
+                            <div class="reply-item" style="border: 1px solid #e9e9e9; padding: 15px; border-radius: 5px; margin-bottom: 10px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                    <span style="font-weight: 600;">판매자</span>
+                                    <span style="font-size: 13px; color: #888;">
+                                        <fmt:formatDate value="${reply.qnaRegDate}" pattern="yyyy-MM-dd HH:mm"/>
+                                    </span>
+                                </div>
+                                <div style="white-space: pre-wrap;">${reply.qnaContent}</div>
+                                <%-- 답변 삭제 버튼 (필요 시) --%>
+                                <%--
+                                <form action="<c:url value='/seller/qna/reply/delete'/>" method="post" style="text-align: right; margin-top: 10px;">
+                                    <input type="hidden" name="qnaId" value="${reply.qnaId}">
+                                    <button type="submit" class="btn-delete-small">삭제</button>
+                                </form>
+                                --%>
+                            </div>
+                        </c:forEach>
+                    </div>
+                </c:if>
+
                 <h3>답변 작성</h3>
                 <form action="<c:url value='/seller/qna/reply'/>" method="post" style="margin-top:15px;">
                     <input type="hidden" name="qnaParentId" value="${question.qnaId}">

@@ -14,6 +14,7 @@ public class QnaDTO {
     private String qnaContent;
     private String qnaIsSecret;
     private Long qnaParentId;
+    private String qnaStatus; // '답변대기', '답변완료' 등 상태 저장
     private Date qnaRegDate;
     private String memberName; // 작성자 이름 표시용
     private List<QnaDTO> replies; // 답변 목록

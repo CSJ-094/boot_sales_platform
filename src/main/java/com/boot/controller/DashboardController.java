@@ -26,6 +26,7 @@ public class DashboardController {
 		model.addAttribute("summary", dashboardService.getSummary());
 		model.addAttribute("menu", "dashboard");
 		model.addAttribute("recentOrders", dashboardService.getRecentOrders());
+		 model.addAttribute("recentQna", dashboardService.getRecentQna());
 		
 		return "seller/dashboard";
 	}
@@ -57,5 +58,5 @@ public class DashboardController {
             default:
                 return dashboardService.getDailyVisitors();
         }
-		}
+	}
 }
