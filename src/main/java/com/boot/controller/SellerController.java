@@ -21,6 +21,7 @@ import com.boot.dto.QnaDTO;
 import com.boot.service.ProductService;
 import com.boot.service.ReviewService;
 import com.boot.service.SellerService;
+import com.boot.service.UserService;
 import com.boot.service.QnaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -48,6 +49,7 @@ public class SellerController {
 	@Autowired private SellerService sellerService;
 	@Autowired private QnaService qnaService;
 	@Autowired private ReviewService reviewService;
+	@Autowired private UserService userService;
 	
 	// 1. 판매자 로그인 페이지 이동 
 	@GetMapping("/login")
@@ -209,6 +211,9 @@ public class SellerController {
 	//회원 목록(/seller/members)
 	@GetMapping("/members")
 	public String memberList(Model model) {
+		// ⭐️ 주입된 UserService를 사용하여 모든 회원 정보를 조회합니다.
+		List<MemDTO> users = userService.getUserList();
+		model.addAttribute("users", users);
 		model.addAttribute("activeMenu", "member");
 		return "seller/members";
 	}
