@@ -841,3 +841,54 @@ main.mypage-body {
     min-height: calc(100vh - 180px); 
     /* ↑ 헤더 + 푸터 높이를 빼준 값 (사이트마다 다름) */
 }
+/* ===== 회원 상세 : 회원 정보 카드 ===== */
+.member-info-card {
+  margin-top: 16px;
+  padding: 18px 22px;
+  border-radius: 12px;
+  border: 1px solid #e4e4e4;
+  background: #fafafa;
+  width: 100%;          /* 테이블이랑 폭 맞추기 */
+}
+
+/* 기존 info-form 구조는 그대로 사용 (1열) */
+.info-form {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* 회원 상세에서만 레이블 폭 넉넉하게 */
+.member-info-card .info-form label {
+  width: 90px;          /* 레이블 열 고정해서 줄 정렬 */
+}
+
+/* 혹시 전에 넣어둔 2열 그리드 있으면 주석 처리하거나 지워도 됨
+.member-info-grid { ... }
+.member-info-grid .form-group-full { ... }
+*/
+
+/* ===== 회원 상세 : 주문 상품 리스트 (그대로 써도 됨) ===== */
+.order-id-text {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.order-prod-list {
+  margin-top: 2px;
+  padding-left: 0;
+  list-style: none;
+  font-size: 12px;
+  color: #666;
+}
+
+.order-prod-list li {
+  margin-top: 2px;
+}
+
+.order-prod-list li::before {
+  content: '• ';
+  color: #b08d57;
+  margin-right: 2px;
+}
