@@ -1,11 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
 <title>비밀번호 찾기</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="<c:url value='/css/header.css' />">
 <style>
 /* ==================== mainpage.jsp 스타일에서 가져옴 ==================== */
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -20,39 +22,6 @@ body {
 }
 a { text-decoration: none; color: inherit; transition: color 0.3s ease; }
 a:hover { color: #886030; }
-
-/* ==================== 1. 헤더 (mainpage.jsp 기반) ==================== */
-.main-header { 
-    width: 100%; 
-    background-color: #2c2c2c;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); 
-    padding: 10px 0 5px 0; 
-    position: sticky; 
-    top: 0;
-    z-index: 100;
-}
-
-.header-top { 
-    max-width: 1200px; 
-    margin: 0 auto; 
-    display: flex; 
-    justify-content: flex-start;
-    align-items: center; 
-    padding: 0 20px 5px; 
-}
-
-.logo a { 
-    font-family: 'Montserrat', sans-serif; 
-    font-size: 18px; 
-    font-weight: 800; 
-    color: #ffffff; 
-    letter-spacing: 1px;
-    transition: color 0.3s ease;
-}
-.logo a:hover {
-    color: #b08d57; 
-}
-
 /* ==================== 2. 콘텐츠 영역 스타일 ==================== */
 .content-wrapper {
     flex-grow: 1;
@@ -142,13 +111,7 @@ a:hover { color: #886030; }
 </style>
 </head>
 <body>
-    <header class="main-header">
-        <div class="header-top">
-            <div class="logo">
-                <a href="/">MY MODERN SHOP</a>
-            </div>
-        </div>
-    </header>
+<jsp:include page="/WEB-INF/views/fragments/header.jsp" />
     <div class="content-wrapper">
         <div class="container">
             <h2 class="form-title">비밀번호 찾기</h2>

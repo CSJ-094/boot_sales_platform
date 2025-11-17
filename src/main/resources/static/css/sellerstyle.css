@@ -1,273 +1,966 @@
 /* ==================== sellerstyle.css (MY MODERN SHOP - Dark/Gold Theme) ==================== */
 
-/* 기본 스타일 및 초기화 (mainpage.jsp 스타일 적용) */
-* { box-sizing: border-box; margin: 0; padding: 0; } /* */
+/* 공통 레이아웃 기준값 */
+:root {
+  --layout-width: 1200px;   /* 화면 안쪽 공통 폭 */
+  --layout-padding-x: 20px; /* 좌우 여백 */
+}
+
+/* 기본 스타일 및 초기화 */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 body {
-    font-family: 'Noto Sans KR', 'Montserrat', sans-serif; /* */
-    color: #333;
-    line-height: 1.6;
-    background-color: #f9f9f9;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column; /* */
+  font-family: 'Noto Sans KR', 'Montserrat', sans-serif;
+  color: #333;
+  line-height: 1.6;
+  background-color: #f9f9f9;
+  min-height: 100vh;
+  
 }
-a { text-decoration: none; color: inherit; transition: color 0.3s ease; } /* */
-a:hover { color: #b08d57; } /* 메인 테마 색상: Gold/Brown */
-ul { list-style: none; } /* */
 
-/* 1. 헤더 스타일 (mainpage.jsp dark theme) */
-.main-header {
-    width: 100%;
-    max-width: 1440px;
-    margin: 0 auto;
-    background-color: #2c2c2c; /* Dark Background */
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* */
-    padding: 10px 0 5px 0;
-    position: sticky;
-    top: 0;
-    z-index: 100; /* */
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: color 0.3s ease;
 }
-.header-top { 
-    max-width: 1440px; 
-    margin: 0 auto; 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    padding: 0 20px 5px; 
-    position: relative; /* */
-}
-.logo a { 
-    font-family: 'Montserrat', sans-serif; 
-    font-size: 18px; 
-    font-weight: 800; 
-    color: #ffffff; 
-    letter-spacing: 1px; /* */
-}
-.logo a:hover { color: #b08d57; }
+a:hover { color: #b08d57; }   /* 메인 테마 색상: Gold/Brown */
 
-.user-auth { display: flex; gap: 5px; align-items: center; } /* */
-.auth-welcome { font-size: 13px; color: #ddd; padding-right: 5px; } /* */
-.auth-btn { 
-    padding: 4px 10px; border: 1px solid #555; border-radius: 3px; 
-    font-size: 12px; color: #ccc !important;
-    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease; /* */
-}
-.auth-btn:hover { background-color: #b08d57; border-color: #b08d57; color: #2c2c2c !important; } /* */
+ul { list-style: none; }
 
-
-/* 2. 대시보드 본문 레이아웃 및 테마 색상 적용 */
+/* 2. 판매자 마이페이지 레이아웃 */
 .mypage-body {
-    display: flex; max-width: 1200px; width: 100%; margin: 30px auto; padding: 0 20px; flex-grow: 1; gap: 20px;
+  display: flex;
+  max-width: var(--layout-width);       /* 헤더 안쪽이랑 같은 폭 */
+  margin: 40px auto 56px;               /* 가운데 정렬 */
+  padding: 0 var(--layout-padding-x);   /* 헤더/카테고리와 같은 좌우 여백 */
+  gap: 24px;
 }
 
 /* 사이드바 스타일 */
 .mypage-sidebar {
-    width: 200px; flex-shrink: 0; background-color: #ffffff; border: 1px solid #e0e0e0; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); height: fit-content;
+  width: 200px;
+  flex-shrink: 0;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  height: fit-content;
 }
-.sidebar-title { font-size: 1.1em; font-weight: 700; color: #343a40; padding: 15px 20px 10px; border-bottom: 1px solid #eee; margin-bottom: 5px; }
-.mypage-sidebar nav ul li a { display: block; padding: 10px 20px; color: #495057; font-size: 0.95em; transition: background-color 0.2s, color 0.2s; }
-.mypage-sidebar nav ul li a:hover { background-color: #e9ecef; color: #b08d57; }
-.mypage-sidebar nav ul li a.active { background-color: #b08d57; color: #ffffff; font-weight: 500; }
 
-/* 콘텐츠 영역 스타일 */
+.sidebar-title {
+  font-size: 1.1em;
+  font-weight: 700;
+  color: #343a40;
+  padding: 15px 20px 10px;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 5px;
+}
+
+.mypage-sidebar nav ul li a {
+  display: block;
+  padding: 10px 20px;
+  color: #495057;
+  font-size: 0.95em;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.mypage-sidebar nav ul li a:hover {
+  background-color: #e9ecef;
+  color: #b08d57;
+}
+
+.mypage-sidebar nav ul li a.active {
+  background-color: #b08d57;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+/* 콘텐츠 영역 – 오른쪽 카드 */
 .mypage-content-area {
-    flex-grow: 1; background-color: #ffffff; padding: 30px; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid #e0e0e0;
+  flex: 1 1 0;                 /* 남는 공간 전부 차지하게 강제 */
+  min-width: 0;                /* 내용 길어져도 줄바꿈되게 */
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 6px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  border: 1px solid #e0e0e0;
 }
-.content-panel { margin-bottom: 20px; display: none; }
-.content-panel.active { display: block; }
 
-/* 제목 스타일 */
+.content-panel {
+  margin-bottom: 20px;
+  display: none;
+}
+.content-panel.active {
+  display: block;
+}
+
+/* 제목 스타일 (기본) */
 .mypage-content-area h2 {
-    font-size: 1.8em; color: #343a40; border-bottom: 2px solid #b08d57; /* Gold Accent */
-    padding-bottom: 10px; margin-bottom: 25px;
+  font-size: 1.8em;
+  color: #343a40;
+  border-bottom: 2px solid #b08d57; /* Gold Accent */
+  padding-bottom: 10px;
+  margin-bottom: 25px;
 }
 .mypage-content-area h3 {
-    font-size: 1.3em; color: #495057; margin-top: 20px; margin-bottom: 15px; padding-left: 5px; border-left: 3px solid #b08d57; /* Gold Accent */
+  font-size: 1.3em;
+  color: #495057;
+  margin-top: 20px;
+  margin-bottom: 15px;
+  padding-left: 5px;
+  border-left: 3px solid #b08d57; /* Gold Accent */
 }
 
 /* 3. 폼 및 버튼 스타일 */
-.product-form input, .product-form textarea, .notice-form input, .notice-form textarea {
-    width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;
+.product-form input,
+.product-form textarea,
+.notice-form input,
+.notice-form textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
+
 .form-button-group button {
-    padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;
-    font-weight: 600; transition: background-color 0.3s; margin-right: 5px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s;
+  margin-right: 5px;
 }
-.btn-submit { 
-    background-color: #b08d57; 
-    color: white;
-    width: 50px; 
-    text-align: center;
-    padding: 5px 0;
+
+.btn-submit {
+  background-color: #b08d57;
+  color: white;
+  width: 50px;
+  text-align: center;
+  padding: 5px 0;
 }
-.btn-submit:hover { 
-    background-color: #886030; 
+.btn-submit:hover { background-color: #886030; }
+
+.reset-btn {
+  background-color: #6c757d;
+  color: white;
+  display: inline-block;
+  width: 80px;
+  text-align: center;
+  padding: 1px 0;
+  text-decoration: none;
+  border: 2px solid black;
 }
-.reset-btn { 
-    background-color: #6c757d; 
-    color: white;
-    display: inline-block; 
-    width: 80px; 
-    text-align: center;
-    padding: 1px 0; 
-    text-decoration: none;
-    border: 2px solid black;
-}
-.reset-btn:hover { 
-    background-color: #5a6268; 
-}
+.reset-btn:hover { background-color: #5a6268; }
 
 /* 4. 테이블 스타일 */
-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.95em; }
-table th, table td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-table th { background-color: #f1f1f1; font-weight: 600; color: #333; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  font-size: 0.95em;
+}
+table th,
+table td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+}
+table th {
+  background-color: #f1f1f1;
+  font-weight: 600;
+  color: #333;
+}
 table tbody tr:nth-child(even) { background-color: #f9f9f9; }
 
-.table-actions button { padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; margin-right: 5px; }
+.table-actions button {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 5px;
+}
 .btn-modify { background-color: #ffc107; }
 .btn-delete { background-color: #dc3545; color: white; }
 
 /* Notice List Style */
 #notice-board-content ul { list-style: disc; padding-left: 20px; }
 #notice-board-content ul li a { color: #b08d57; }
-#notice-board-content ul li span { font-size: 0.85em; color: #999; }
-
-/* ==================== 카테고리 및 폼 세부 조정 (최종 수정) ==================== */
-
-/* cat-group (details 태그)의 기본 동작은 유지하고 테두리만 설정 */
-.cat-accordion {
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    overflow: hidden;
+#notice-board-content ul li span {
+  font-size: 0.85em;
+  color: #999;
 }
+
+/* ==================== 카테고리 및 폼 세부 조정 ==================== */
+
+.cat-accordion {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
 .cat-group {
-    border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #eee;
 }
 .cat-group:last-child {
-    border-bottom: none;
+  border-bottom: none;
 }
 
-/* cat-summary (대분류 이름) 정렬 및 스타일링 */
 .cat-summary {
-    display: flex; /* MANS, 체크박스, 대표 라디오 버튼을 가로로 정렬 */
-    justify-content: space-between; /* 양 끝 정렬 */
-    align-items: center;
-    padding: 12px 15px;
-    background-color: #f7f7f7;
-    font-weight: 500;
-    cursor: pointer;
-    /* ! 중요: details 태그의 기본 화살표 제거 및 커스텀 화살표 설정 */
-    list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 15px;
+  background-color: #f7f7f7;
+  font-weight: 500;
+  cursor: pointer;
+  list-style: none;
 }
-.cat-summary::-webkit-details-marker {
-    display: none;
-}
+.cat-summary::-webkit-details-marker { display: none; }
 
-/* 커스텀 화살표 (▼) */
 .cat-group summary::after {
-    content: '▼';
-    font-size: 10px;
-    color: #666;
-    margin-left: 10px;
-    transition: transform 0.2s;
+  content: '▼';
+  font-size: 10px;
+  color: #666;
+  margin-left: 10px;
+  transition: transform 0.2s;
 }
 .cat-group[open] summary::after {
-    transform: rotate(180deg);
+  transform: rotate(180deg);
 }
 
-/* 카테고리 라벨 (체크박스와 이름) */
 .cat-label {
-    display: flex; /* 체크박스와 이름이 한 줄에 오도록 설정 */
-    align-items: center;
-    cursor: pointer;
-    margin-right: 15px;
-    white-space: nowrap;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin-right: 15px;
+  white-space: nowrap;
 }
 
-/* 하위 카테고리 목록 (ul) */
 .cat-sublist {
-    /* 기존 CSS에서 display: block; 설정이 아코디언 동작을 방해할 수 있으므로 제거하거나 확실히 재정의 */
-    display: block; /* 기본값 유지 */
-    padding: 5px 0 5px 15px;
-    background-color: #ffffff;
-}
-
-/* 하위 카테고리 개별 항목 (li) */
-.cat-subitem {
-    padding: 8px 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px dashed #f0f0f0;
-}
-.cat-subitem:last-child {
-    border-bottom: none;
-}
-
-/* 체크박스 및 라디오 버튼 크기/마진 조정 */
-.cat-check, .cat-main {
-    width: 16px;
-    height: 16px;
-    margin-right: 5px;
-}
-
-.main-radio {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-/* 5. 푸터 스타일 (mainpage.jsp style) */
-.main-footer { 
-	background-color: #e0e0e0; 
-	color: #666; 
-	padding: 25px 0; 
-	margin-top: auto; 
-	font-size: 13px; 
-	border-top: 1px solid #d0d0d0; /* */
-	box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05); /* */
-}
-.footer-content { 
-	max-width: 1200px; 
-	margin: 0 auto; 
-	padding: 0 20px; 
-	text-align: center; /* */
-}
-.footer-content p { margin-bottom: 4px; }
-.footer-content p:last-child { margin-bottom: 0; }
-
-/* 카테고리 */
-.cat-sublist {
-  padding: 10px 0 10px 10px;
   display: block;
+  padding: 10px 0 10px 10px;
+  background-color: #ffffff;
 }
+
 .cat-subitem {
-  padding: 4px 10px 4px 10px;
+  padding: 4px 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px dashed #f0f0f0;
 }
-.cat-subitem:last-child {
-    border-bottom: none;
+.cat-subitem:last-child { border-bottom: none; }
+
+.cat-check,
+.cat-main {
+  width: 16px;
+  height: 16px;
+  margin-right: 5px;
 }
 
-.custom-file-input {
-    display: none;
+.main-radio {
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
+.custom-file-input { display: none; }
 .custom-file-label {
-    display: inline-block;
-    padding: 8px 15px; 
-    background-color: #f8f9fa; /* 버튼 배경색 */
-    color: #212529; /* 글자색 */
-    border: 1px solid #ced4da; /* 테두리 */
-    border-radius: .25rem; 
-    cursor: pointer; 
+  display: inline-block;
+  padding: 8px 15px;
+  background-color: #f8f9fa;
+  color: #212529;
+  border: 1px solid #ced4da;
+  border-radius: .25rem;
+  cursor: pointer;
+}
+.file-name-display {
+  margin-left: 10px;
+  vertical-align: middle;
+  color: #6c757d;
 }
 
-.file-name-display {
-    margin-left: 10px;
-    vertical-align: middle;
-    color: #6c757d;
+/* 5. 푸터 스타일 */
+.main-footer {
+  background-color: #e0e0e0;
+  color: #666;
+  padding: 25px 0;
+  margin-top: auto;
+  font-size: 13px;
+  border-top: 1px solid #d0d0d0;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.05);
 }
+
+.footer-content {
+  max-width: var(--layout-width);
+  margin: 0 auto;
+  padding: 0 var(--layout-padding-x);
+  text-align: center;
+}
+.footer-content p { margin-bottom: 4px; }
+.footer-content p:last-child { margin-bottom: 0; }
+
+/* ===== Product Detail : 정보 레이아웃 ===== */
+
+.info-form {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.info-form .form-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+}
+.info-form label {
+  width: 70px;
+  flex-shrink: 0;
+  font-weight: 700;
+  color: #555;
+}
+.info-form .desc-group { align-items: flex-start; }
+.prod-desc {
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: 'Noto Sans KR', 'Montserrat', sans-serif;
+}
+
+/* ===== Product Detail : 버튼 영역 (가운데 정렬) ===== */
+.detail-actions {
+	margin-top: 22px;
+	  padding-top: 16px;
+	  border-top: 1px dashed #e6e8ec;
+	  display: flex;
+	  justify-content: center;
+	  align-items: center;
+	  gap: 10px;
+	}
+.detail-actions .inline-form { display: inline-block; }
+.detail-actions .inline-form button { vertical-align: middle; }
+
+/* ===== 공통 버튼 ===== */
+.btn {
+  display: inline-block;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+  text-decoration: none;
+  border: none;
+  transition: all 0.25s ease;
+}
+
+/* 회색 계열(상품 상세 등에서 사용) */
+.btn.blue {
+  background-color: #444;
+  color: #fff;
+  border: 1px solid #444;
+}
+.btn.blue:hover {
+  background-color: #333;
+  border-color: #333;
+}
+
+/* 삭제 버튼 (붉은 계열) */
+.btn.red {
+  background-color: #c0392b;
+  color: #fff;
+  border: 1px solid #c0392b;
+}
+.btn.red:hover {
+  background-color: #a93226;
+  border-color: #a93226;
+}
+
+/* 목록 버튼: 테두리만 골드 */
+.btn-outline {
+  background-color: #fff;
+  color: #b08d57;
+  border: 1px solid #b08d57;
+}
+.btn-outline:hover {
+  background-color: #f8f1e5;
+  color: #9c7743;
+}
+
+/* 수정 버튼: 골드 채움 */
+.btn-primary {
+  background-color: #b08d57;
+  color: #fff;
+}
+.btn-primary:hover {
+  background-color: #9c7743;
+}
+
+/* 삭제 버튼: 연한 회색 */
+.btn-ghost {
+  background-color: #f4f4f4;
+  color: #555;
+  border: 1px solid #e6e8ec;
+}
+.btn-ghost:hover {
+  background-color: #e9e9e9;
+  color: #2b2f36;
+}
+
+/* ===== Notice Detail : 내용 박스형 ===== */
+
+.notice-detail {
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.notice-header {
+  padding-bottom: 8px;
+  margin-bottom: 10px;
+  border: none;
+}
+
+.mypage-content-area h2.notice-title {
+  border-bottom: 2px solid #b08d57;
+  padding-bottom: 10px;
+  margin-bottom: 6px;
+}
+
+.notice-meta {
+  font-size: 14px;
+  color: #777;
+}
+.notice-meta .divider {
+  margin: 0 8px;
+  color: #ccc;
+}
+
+.notice-content-box {
+  margin-top: 18px;
+  background: #fafafa;
+  border: 1px solid #e1e4ea;
+  border-radius: 12px;
+  padding: 30px 34px;
+  line-height: 1.8;
+  color: #2b2f36;
+  font-size: 15px;
+  min-height: 260px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+}
+.notice-content-box pre {
+  margin: 0;
+  font-family: 'Noto Sans KR', sans-serif;
+  white-space: pre-wrap;
+  background: none;
+  border: none;
+}
+
+.notice-buttons {
+  border-top: 1px dashed #e6e8ec;
+  padding-top: 22px;
+  margin-top: 28px;
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+/* 반응형 – 공지 상세에서 여백만 조금 줄이기 */
+@media (max-width: 640px) {
+  .mypage-content-area {
+    padding: 20px 16px;
+  }
+  .notice-content-box {
+    padding: 20px;
+    min-height: 220px;
+  }
+}
+
+/* ================== Seller Product Detail (관리자용) ================== */
+
+.product-detail-admin .product-detail-wrapper {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 32px;
+  align-items: flex-start;
+}
+
+/* 왼쪽 이미지 카드 */
+.product-detail-left {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.product-image-main {
+  background: #f7f7f7;
+  border-radius: 18px;
+  border: 1px solid #e4e4e4;
+  padding: 28px 24px;
+  min-height: 360px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-image-main img {
+  max-width: 100%;
+  max-height: 420px;
+  object-fit: contain;
+  display: block;
+}
+
+.product-image-placeholder {
+  font-size: 14px;
+  color: #999;
+}
+
+/* 썸네일 리스트 */
+.product-thumb-list {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+.product-thumb {
+  width: 60px;
+  height: 60px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  cursor: pointer;
+  background: #f1f1f1;
+}
+.product-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.product-thumb.active {
+  border-color: #b08d57;
+}
+
+/* 오른쪽 정보 영역 */
+.product-detail-right {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.product-basic .prod-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: #222;
+}
+
+.product-basic .prod-meta {
+  font-size: 0.9rem;
+  color: #777;
+  margin-bottom: 10px;
+}
+
+.prod-seller-label {
+  display: inline-block;
+  margin-right: 6px;
+  font-weight: 500;
+  color: #999;
+}
+
+.product-basic .prod-price {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #b08d57;
+  margin-bottom: 14px;
+}
+
+.prod-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 20px;
+  margin-bottom: 4px;
+}
+
+.meta-label {
+  display: block;
+  font-size: 0.8rem;
+  color: #999;
+  margin-bottom: 2px;
+}
+
+.meta-value {
+  font-size: 0.95rem;
+  color: #333;
+}
+
+/* 상세 설명 박스 */
+.product-desc-box {
+  margin-top: 8px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  border: 1px solid #ececec;
+  background: #fafafa;
+}
+.product-desc-box h4 {
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+  color: #555;
+}
+.product-desc-box .prod-desc {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+/* 반응형 조정 */
+@media (max-width: 900px) {
+  .product-detail-admin .product-detail-wrapper {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 이미지 + 정보 2단 구조 (기존 상세) */
+.prod-detail-layout {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 30px;
+  margin-top: 25px;
+}
+
+.prod-img-box {
+  background: #fafafa;
+  padding: 25px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 350px;
+}
+.prod-img-box img {
+  max-width: 100%;
+  max-height: 420px;
+  object-fit: contain;
+}
+.prod-img-placeholder {
+  color: #777;
+  font-size: 14px;
+}
+
+/* 오른쪽 정보 영역 (기존 상세) */
+.prod-info-box {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 10px;
+}
+.prod-info-box h3 {
+  font-size: 22px;
+  margin-bottom: 5px;
+}
+.prod-price {
+  font-size: 26px;
+  font-weight: 700;
+  color: #b08d57;
+  margin-bottom: 12px;
+}
+
+/* 상세 설명 카드 */
+.prod-desc-card {
+  margin-top: 20px;
+  background: #f7f7f7;
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+}
+
+/* ===== 상품 수정: 상단 레이아웃 ===== */
+
+.product-edit-form {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.prod-edit-grid {
+  display: grid;
+  grid-template-columns: 360px minmax(0, 1fr); /* 왼쪽 이미지 고정, 오른쪽 가변 */
+  gap: 32px;
+}
+
+/* 공통 섹션 제목 */
+.prod-image-edit h3,
+.prod-basic-edit h3,
+.prod-category-edit h3 {
+  font-size: 1.1rem;
+  margin-bottom: 12px;
+  border-left: 3px solid #b08d57;
+  padding-left: 8px;
+  color: #343a40;
+}
+
+/* === 이미지 쪽 === */
+
+.prod-image-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.current-image-box {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: 12px;
+  border: 1px solid #e2e2e2;
+  background: #fafafa;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+}
+
+.current-image-box img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.current-image-box .no-image {
+  font-size: 13px;
+  color: #999;
+}
+
+/* X 삭제 버튼 */
+.img-delete-btn {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.img-delete-btn.active {
+  background: #c0392b;
+}
+
+/* 이미지 하단 작은 버튼 */
+.image-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.image-upload-small {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid #d0d4da;
+  background: #f8f9fb;
+  cursor: pointer;
+  font-size: 13px;
+}
+.image-upload-small input[type="file"] {
+  display: none;
+}
+
+.file-name-small {
+  color: #6b7280;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* === 기본 정보: 한 줄에 하나씩 === */
+
+.product-form-column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.product-form-column .form-group label {
+  display: block;
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+  color: #555;
+}
+
+.product-form-column .form-group input,
+.product-form-column .form-group textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+/* 카테고리 쪽 안내문 */
+.prod-category-edit .cat-hint {
+  font-size: 0.8rem;
+  color: #888;
+  margin-bottom: 6px;
+}
+
+/* 반응형 */
+@media (max-width: 900px) {
+  .prod-edit-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+html, body {
+    height: 100%;
+}
+
+main.mypage-body {
+    min-height: calc(100vh - 180px); 
+    /* ↑ 헤더 + 푸터 높이를 빼준 값 (사이트마다 다름) */
+}
+/* ===== 회원 상세 : 회원 정보 카드 ===== */
+.member-info-card {
+  margin-top: 16px;
+  padding: 18px 22px;
+  border-radius: 12px;
+  border: 1px solid #e4e4e4;
+  background: #fafafa;
+  width: 100%;          /* 테이블이랑 폭 맞추기 */
+}
+
+/* 기존 info-form 구조는 그대로 사용 (1열) */
+.info-form {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* 회원 상세에서만 레이블 폭 넉넉하게 */
+.member-info-card .info-form label {
+  width: 90px;          /* 레이블 열 고정해서 줄 정렬 */
+}
+
+/* 혹시 전에 넣어둔 2열 그리드 있으면 주석 처리하거나 지워도 됨
+.member-info-grid { ... }
+.member-info-grid .form-group-full { ... }
+*/
+
+/* ===== 회원 상세 : 주문 상품 리스트 (그대로 써도 됨) ===== */
+.order-id-text {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.order-prod-list {
+  margin-top: 2px;
+  padding-left: 0;
+  list-style: none;
+  font-size: 12px;
+  color: #666;
+}
+
+.order-prod-list li {
+  margin-top: 2px;
+}
+
+.order-prod-list li::before {
+  content: '• ';
+  color: #b08d57;
+  margin-right: 2px;
+}
+/* ===== 공지 등록/수정 : 카드 + 폼 정리 ===== */
+
+.notice-form-card {
+  margin-top: 16px;
+  padding: 20px 24px;
+  border-radius: 12px;
+  border: 1px solid #e4e4e4;
+  background: #fafafa;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+}
+
+.notice-form .form-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.notice-form .form-group.textarea-group {
+  align-items: flex-start;
+}
+
+.notice-form label {
+  width: 80px;        /* 레이블 열 고정해서 줄 맞추기 */
+  flex-shrink: 0;
+  font-weight: 700;
+  color: #555;
+}
+
+.notice-form input[type="text"],
+.notice-form textarea {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.notice-form textarea {
+  min-height: 260px;
+  resize: vertical;
+}
+
+.notice-form input:focus,
+.notice-form textarea:focus {
+  border-color: #b08d57;
+  outline: none;
+  box-shadow: 0 0 0 1px rgba(176,141,87,0.2);
+}
+
+/* 버튼 영역 – 오른쪽 정렬 */
+.notice-form-actions {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #e5e5e5;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+/* ===== 문의 답변 작성 : 버튼 가운데 정렬 ===== */
+.reply-form-actions {
+  margin-top: 16px;
+  padding-top: 14px;
+  display: flex;
+  justify-content: center;   /* 가운데 정렬 */
+  gap: 10px;
+}
+

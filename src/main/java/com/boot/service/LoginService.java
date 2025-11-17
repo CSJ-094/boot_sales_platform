@@ -1,5 +1,6 @@
 package com.boot.service;
 
+import com.boot.dto.KakaoUserInfo;
 import com.boot.dto.LoginDTO;
 
 import java.util.ArrayList;
@@ -11,7 +12,12 @@ public interface LoginService {
     public ArrayList<LoginDTO> emailCheck(LoginDTO loginDTO);
     public ArrayList<LoginDTO> findId(LoginDTO loginDTO);
     public ArrayList<LoginDTO> findPw(LoginDTO loginDTO);
+    public void sendTempPw(LoginDTO loginDTO);
     public void makeRandomNumber();
 	public String joinEmail(String email);
 	public void mailSend(String setFrom, String toMail, String title, String content);
+    public String getAccessToken(String code);
+    public KakaoUserInfo getUserInfo(String accessToken);
+    public LoginDTO kakaoLoginProcess(KakaoUserInfo userInfo);
+    public LoginDTO findByEmail(String email);
 }
