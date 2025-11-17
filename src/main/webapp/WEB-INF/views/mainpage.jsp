@@ -88,8 +88,8 @@ ul {
 /* 메인 콘텐츠 영역 (main-content) - 왼쪽 마진 350px로 고정 */
 .main-content {
 	max-width: 1440px;
-	margin-right: auto; /* 오른쪽은 자동 마진 */
-	margin-left: 350px;
+	margin-left: auto;  /* ⭐️ 좌우 마진을 auto로 설정하여 중앙 정렬 */
+	margin-right: auto;
 	padding: 0 20px;
 	flex-grow: 1;
 }
@@ -184,6 +184,50 @@ ul {
 .footer-content p:last-child {
 	margin-bottom: 0;
 }
+.main-notice-section {
+    max-width: 1440px;
+    margin: 0 0 40px 0;
+}
+
+.main-notice-section h4 {
+    font-size: 20px;
+    border-bottom: 2px solid #b08d57;
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+}
+
+.notice-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.notice-more {
+    font-size: 14px;
+    color: #666;
+}
+
+.notice-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.notice-table tr {
+    border-bottom: 1px solid #eee;
+}
+
+.notice-title-cell {
+    padding: 8px 4px;
+}
+
+.notice-date-cell {
+    width: 110px;
+    text-align: right;
+    padding: 8px 4px;
+    color: #999;
+}
+
 </style>
 </head>
 <body>
@@ -202,6 +246,39 @@ ul {
 	</section>
 
 	<main class="main-content">
+		<section class="main-notice-section">
+		    <div class="notice-header-row">
+		        <h4>공지사항</h4>
+		    </div>
+
+		    <table class="notice-table">
+		        <tbody>
+		        <c:choose>
+		            <c:when test="${not empty recentNotices}">
+		                <c:forEach var="notice" items="${recentNotices}">
+		                    <tr>
+		                        <td class="notice-title-cell">
+		                            <a href="${pageContext.request.contextPath}/notices/view?notNo=${notice.NOT_NO}">
+		                                ${notice.NOT_TITLE}
+		                            </a>
+		                        </td>
+		                        <td class="notice-date-cell">
+		                            <fmt:formatDate value="${notice.NOT_TIME}" pattern="yyyy-MM-dd"/>
+		                        </td>
+		                    </tr>
+		                </c:forEach>
+		            </c:when>
+		            <c:otherwise>
+		                <tr>
+		                    <td colspan="2" style="text-align:center; padding:10px; color:#777;">
+		                        등록된 공지사항이 없습니다.
+		                    </td>
+		                </tr>
+		            </c:otherwise>
+		        </c:choose>
+		        </tbody>
+		    </table>
+		</section>
 		<section class="recommend-section">
 
 			<h4>MANS 추천 상품</h4>

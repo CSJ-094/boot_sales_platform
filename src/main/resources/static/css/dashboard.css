@@ -75,23 +75,36 @@
     width: 100%;
 }
 
-/* 헤더 영역 */
+/* ================= 그래프 카드 헤더 ================ */
+
+/* 전체 헤더: 세로 정렬 (1줄: 제목+탭 / 2줄: 전일 대비) */
 .dash-card-header {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+}
+
+/* 1줄: 제목 + 탭 버튼 */
+.dash-card-header-top {
+    display: flex;
+    width: 100%;
     align-items: center;
-    margin-bottom: 16px;
+    justify-content: space-between;
 }
 
 .dash-card-header h3 {
     font-size: 1.1rem;
     font-weight: 600;
+    margin: 0;
+    white-space: nowrap;
 }
 
+/* (이제 안 쓰지만 혹시 다른 데 썼으면 안 깨지게 유지) */
 .dash-card-header-right {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
 }
 
 /* 탭 영역 공통 */
@@ -122,13 +135,15 @@
     color: #fff;
 }
 
-/* 증감 텍스트 */
+/* 2줄: 전일 대비 영역 */
 .dash-trend {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
+    margin-top: 2px;
     font-size: 0.85rem;
     color: #6b7280;
+    align-self: flex-end;  /* 오른쪽 정렬 원하면 사용, 왼쪽 정렬 원하면 이 줄 삭제 */
 }
 
 .dash-trend-label {
@@ -148,7 +163,8 @@
 .dash-trend-value.neutral {
     color: #6b7280;  /* 회색 */
 }
-/* 최근 주문 패널 */
+
+/* ============= 최근 주문 / 문의 패널 ============= */
 .dash-recent {
     margin-top: 24px;
     background: #ffffff;

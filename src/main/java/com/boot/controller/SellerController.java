@@ -11,6 +11,7 @@ import javax.servlet.http.HttpSession;
 import com.boot.dao.CategoryDAO;
 import com.boot.dao.ProdDAO;
 import com.boot.dao.ProductCategoryDAO;
+import com.boot.dto.MemDTO;
 import com.boot.dto.ProdDTO;
 import com.boot.dto.ProductCategoryDTO;
 import com.boot.dto.ReviewDTO;
@@ -19,8 +20,13 @@ import com.boot.dto.SellerOrderSummaryDTO;
 import com.boot.dto.QnaDTO;
 import com.boot.service.ProductService;
 import com.boot.service.ReviewService;
-import com.boot.service.SellerService;
 import com.boot.service.OrderService;
+import com.boot.service.SellerService;
+<<<<<<< HEAD
+import com.boot.service.OrderService;
+=======
+import com.boot.service.UserService;
+>>>>>>> 21b708c78049d618abb3b33e0f00a69972bb5f1e
 import com.boot.service.QnaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -50,6 +56,10 @@ public class SellerController {
 	@Autowired private SellerService sellerService;
 	@Autowired private QnaService qnaService;
 	@Autowired private ReviewService reviewService;
+<<<<<<< HEAD
+=======
+	@Autowired private UserService userService;
+>>>>>>> 21b708c78049d618abb3b33e0f00a69972bb5f1e
 	@Autowired private OrderService orderService;
 	
 	// 1. 판매자 로그인 페이지 이동 
@@ -92,7 +102,7 @@ public class SellerController {
 	//마이페이지 메인 (/seller/mypage)
 	@RequestMapping("/mypage")
 	public String mypage() {
-		return "redirect:/seller/products";
+		return "redirect:/seller/dashboard";
 	}
 	
 	//상품 목록 (/seller/products)
@@ -214,6 +224,9 @@ public class SellerController {
 	//회원 목록(/seller/members)
 	@GetMapping("/members")
 	public String memberList(Model model) {
+		// ⭐️ 주입된 UserService를 사용하여 모든 회원 정보를 조회합니다.
+		List<MemDTO> users = userService.getUserList();
+		model.addAttribute("users", users);
 		model.addAttribute("activeMenu", "member");
 		return "seller/members";
 	}
@@ -280,9 +293,19 @@ public class SellerController {
 	//회원 상세(/seller/members/{memberId})
 	@GetMapping("/members/{memberId}")
 	public String memberDetail(@PathVariable("memberId") String memberId ,Model model) {
-		// ⭐️ MemDTO는 import 추가
+		// 1. 회원 정보 조회
+		MemDTO member = userService.getUserById(memberId);
+		if (member == null) {
+			// 회원이 존재하지 않을 경우 목록으로 리다이렉트
+			return "redirect:/seller/members";
+		}
+
+		// 2. 회원의 주문 내역 조회 (주문 상세 포함)
+		List<OrdDTO> orders = orderService.getOrdersWithDetailsByMemberId(memberId);
+
+		model.addAttribute("member", member);
+		model.addAttribute("orders", orders);
 		model.addAttribute("activeMenu", "member");
-		// TODO: 이후 구매내역 orders도 같이 model에 넣을 예정
 		return "seller/memberDetail";
 	}
 
@@ -310,6 +333,11 @@ public class SellerController {
 
 		QnaDTO question = qnaService.getQnaById(qnaId);
 		model.addAttribute("question", question);
+
+		// ⭐️ 기존 답변 목록을 조회하여 모델에 추가
+		List<QnaDTO> replies = qnaService.getRepliesByParentId(qnaId);
+		model.addAttribute("replies", replies);
+
 		model.addAttribute("activeMenu", "qna");
 		return "seller/qna_reply";
 	}

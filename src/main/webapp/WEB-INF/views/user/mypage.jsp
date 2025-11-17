@@ -328,6 +328,26 @@
             text-transform: uppercase;
             font-size: 0.9em;
         }
+        th { text-align: center; } /* ⭐️ 헤더 텍스트 가운데 정렬 */
+
+        /* 주문 내역 테이블 셀 가운데 정렬 (상품정보 제외) */
+        #order-history-content td {
+            text-align: center;
+            vertical-align: middle; /* 세로 정렬도 중앙으로 */
+        }
+        #order-history-content td:nth-child(2) { /* 2번째 열(상품정보)만 왼쪽 정렬 */
+            text-align: left;
+        }
+
+        /* 찜목록 테이블 셀 가운데 정렬 (상품명 제외) */
+        #wishlist-content td {
+            text-align: center;
+            vertical-align: middle;
+        }
+        #wishlist-content td:nth-child(2) { /* 2번째 열(상품명)만 왼쪽 정렬 */
+            text-align: left;
+        }
+
         tr:nth-child(even) {
             background-color: #f9f9f9;
         }
@@ -547,8 +567,9 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>주문정보</th>
-                                <th>주문상품</th>
+                                <th style="width: 150px;">주문날짜</th>
+                                <th>상품정보</th>
+                                <th style="width: 120px;">금액</th>
                                 <th style="width: 120px;">주문 상태</th>
                                 <th style="width: 120px;">관리</th>
 								<th style="width: 120px;">배송조회</th>
@@ -558,25 +579,18 @@
                             <c:forEach var="order" items="${orderList}">
                                 <tr>
                                     <td>
-                                        <strong>주문번호:</strong> ${order.ordId}<br>
-                                        <strong>주문일:</strong> <fmt:formatDate value="${order.ordDate}" pattern="yyyy-MM-dd" /><br>
-                                        <strong>결제금액:</strong> <fmt:formatNumber value="${order.ordAmount}" pattern="#,###" />원
+                                        <fmt:formatDate value="${order.ordDate}" pattern="yyyy-MM-dd" />
                                     </td>
                                     <td>
-                                        <ul style="list-style: none; padding: 0;">
+                                        <ul style="list-style: none; padding: 0; max-height: 150px; overflow-y: auto;">
                                             <c:forEach var="detail" items="${order.orderDetails}">
-                                                <li style="margin-bottom: 5px;">
-                                                    <a href="<c:url value='/products/detail?prodId=${detail.productId}'/>">${detail.prodName}</a> - ${detail.quantity}개
-                                                    
-                                                    <%-- '구매확정' 상태일 때만 상품별로 '리뷰쓰기' 버튼 표시 --%>
-                                                    <c:if test="${order.ordStatus == '구매확정'}">
-                                                        <a href="<c:url value='/reviews/write?productId=${detail.productId}&orderId=${order.ordId}'/>" class="action-btn" style="margin-left: 10px; background-color: #b08d57;">리뷰쓰기</a>
-                                                    </c:if>
+                                                <li style="display: flex; align-items: center; margin-bottom: 10px;">
+                                                    <img src="<c:url value='${detail.prodImage}'/>" alt="${detail.prodName}" style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px; border-radius: 4px;">
+                                                    <a href="<c:url value='/products/detail?prodId=${detail.productId}'/>">${detail.prodName}</a>
                                                 </li>
                                             </c:forEach>
                                         </ul>
                                     </td>
-									
                                     <td>${order.ordStatus}</td>
                                     <td>
                                         <%-- 상태에 따라 다른 버튼 표시 --%>
@@ -595,21 +609,6 @@
                                             </c:otherwise>
                                         </c:choose>
                                     </td>
-									<td>
-									                            <c:choose>
-									                                <c:when test="${not empty order.deliveryCompany and not empty order.trackingNumber}">
-									                                    <button class="action-btn delivery-track-btn" 
-									                                            data-code="${order.deliveryCompany}" 
-									                                            data-invoice="${order.trackingNumber}"
-									                                            style="background-color: #17a2b8;">
-									                                        🚚 조회
-									                                    </button>
-									                                </c:when>
-									                                <c:otherwise>
-									                                    <span style="color: #777; font-size: 0.9em;">준비 중</span>
-									                                </c:otherwise>
-									                            </c:choose>
-									                        </td>
                                 </tr>
                             </c:forEach>
                         </tbody>
