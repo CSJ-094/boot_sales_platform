@@ -114,7 +114,11 @@
                         <span>총 결제 금액</span>
                         <span><fmt:formatNumber value="${order.ordAmount + order.ordDfee - order.ordDiscount}" pattern="#,###" />원</span>
                     </div>
-                </div>
+					
+				</div>
+				
+
+             </div>
 
                 <div class="button-group">
                     <a href="${pageContext.request.contextPath}/" class="btn btn-secondary">쇼핑 계속하기</a>
@@ -123,7 +127,7 @@
             </div>
         </section>
     </main>
-
+	
     <jsp:include page="/WEB-INF/views/fragments/footer.jsp" />
 </body>
 </html>
