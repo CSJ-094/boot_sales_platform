@@ -271,20 +271,7 @@ public class OrderService {
 
     /**
      * 송장번호와 택배사 코드를 입력하고 주문 상태를 배송중으로 변경합니다.
-     * 배송 추적 API로 유효<%-- '배송중' 상태일 때만 '배송완료 처리' 버튼이 나타납니다. --%>
-     <c:if test="${order.orderStatus == '배송중'}">
-     
-       <%-- 버튼을 누르면 확인 창이 뜨고, 확인을 누르면 form이 제출됩니다. --%>
-       <form action="/seller/orders/complete" method="post" style="display: inline-block;" onsubmit="return confirm('해당 주문을 배송완료 처리하시겠습니까?');">
-         
-         <%-- 컨트롤러에 주문 ID를 전달하기 위한 hidden input --%>
-         <input type="hidden" name="orderId" value="${order.orderId}">
-         
-         <button type="submit" class="btn btn-success btn-sm">배송완료 처리</button>
-       </form>
-       
-     </c:if>
-     성 검증을 수행하고, 배송 완료 여부에 따라 상태를 자동 업데이트합니다.
+     * 배송 추적 API로 유효성 검증을 수행하고, 배송 완료 여부에 따라 상태를 자동 업데이트합니다.
      * @param orderId 주문 ID
      * @param trackingNumber 송장번호
      * @param deliveryCompany 택배사 코드

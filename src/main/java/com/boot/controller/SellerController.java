@@ -12,6 +12,7 @@ import com.boot.dao.CategoryDAO;
 import com.boot.dao.ProdDAO;
 import com.boot.dao.ProductCategoryDAO;
 import com.boot.dto.MemDTO;
+import com.boot.dto.OrdDTO;
 import com.boot.dto.ProdDTO;
 import com.boot.dto.ProductCategoryDTO;
 import com.boot.dto.ReviewDTO;
@@ -22,11 +23,8 @@ import com.boot.service.ProductService;
 import com.boot.service.ReviewService;
 import com.boot.service.OrderService;
 import com.boot.service.SellerService;
-<<<<<<< HEAD
 import com.boot.service.OrderService;
-=======
 import com.boot.service.UserService;
->>>>>>> 21b708c78049d618abb3b33e0f00a69972bb5f1e
 import com.boot.service.QnaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -56,10 +54,7 @@ public class SellerController {
 	@Autowired private SellerService sellerService;
 	@Autowired private QnaService qnaService;
 	@Autowired private ReviewService reviewService;
-<<<<<<< HEAD
-=======
 	@Autowired private UserService userService;
->>>>>>> 21b708c78049d618abb3b33e0f00a69972bb5f1e
 	@Autowired private OrderService orderService;
 	
 	// 1. 판매자 로그인 페이지 이동 
