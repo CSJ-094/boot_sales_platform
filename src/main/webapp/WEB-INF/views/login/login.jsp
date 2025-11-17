@@ -326,6 +326,10 @@
                 </div>
                 
                 <button type="submit" class="btn btn-login">로그인</button>
+                <button type="button" class="btn btn-login"
+                        onclick="location.href='https://kauth.kakao.com/oauth/authorize?client_id=c9021fed6c1ed7e7f03682f69d5f67ca&redirect_uri=http://localhost:8484/api/v1/oauth2/kakao&response_type=code'">
+                    <i class="fab fa-kakao"></i> 카카오로 로그인
+                </button>
                 <button type="button" class="btn btn-signup" onclick="location.href='register'">회원가입</button>
             </form>
         </div>

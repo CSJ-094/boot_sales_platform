@@ -66,6 +66,13 @@
                    AND o.ORD_DATE <  TRUNC(SYSDATE)
             ) AS yesterdaySalesAmount
 
+            0 AS todayOrderCount,
+            0 AS todaySalesAmount,
+            0 AS todayNewMembers,
+            0 AS todayVisitors,
+            0 AS pendingQnaCount,
+            0 AS yesterdayOrderCount,
+            0 AS yesterdaySalesAmount
         FROM DUAL
         ]]>
     </select>
@@ -84,6 +91,7 @@
         GROUP BY TO_CHAR(ORD_DATE, 'YYYY-MM-DD')
         ORDER BY label
         ]]>
+        SELECT 'nodata' AS label, 0 AS salesAmount, 0 AS orderCount FROM DUAL WHERE 1=0
     </select>
     
 <!--    주별 매출-->
@@ -100,6 +108,7 @@
         GROUP BY TO_CHAR(ORD_DATE, 'IYYY'), TO_CHAR(ORD_DATE, 'IW')
         ORDER BY MIN(ORD_DATE)
         ]]>
+        SELECT 'nodata' AS label, 0 AS salesAmount, 0 AS orderCount FROM DUAL WHERE 1=0
     </select>
     
 <!--    월별 매출-->
@@ -116,6 +125,7 @@
         GROUP BY TO_CHAR(ORD_DATE, 'YYYY-MM')
         ORDER BY label
         ]]>
+        SELECT 'nodata' AS label, 0 AS salesAmount, 0 AS orderCount FROM DUAL WHERE 1=0
    	 </select>
    	 
 	<!-- 일별 방문자 -->
@@ -131,6 +141,7 @@
         GROUP BY TO_CHAR(VISIT_DATE, 'YYYY-MM-DD')
         ORDER BY label
         ]]>
+        SELECT 'nodata' AS label, 0 AS visitor_count FROM DUAL WHERE 1=0
     </select>
 
     <!-- 주별 방문자 -->
@@ -146,6 +157,7 @@
         GROUP BY TO_CHAR(VISIT_DATE, 'IYYY'), TO_CHAR(VISIT_DATE, 'IW')
         ORDER BY MIN(VISIT_DATE)
         ]]>
+        SELECT 'nodata' AS label, 0 AS visitor_count FROM DUAL WHERE 1=0
     </select>
 
     <!-- 월별 방문자 -->
@@ -161,6 +173,7 @@
         GROUP BY TO_CHAR(VISIT_DATE, 'YYYY-MM')
         ORDER BY label
         ]]>
+        SELECT 'nodata' AS label, 0 AS visitor_count FROM DUAL WHERE 1=0
     </select>
     
     <!-- 최근 주문 10건 -->
@@ -181,6 +194,7 @@
 	    )
 	    WHERE ROWNUM <= 10
 	    ]]>
+        SELECT SYSDATE AS ordDate, 'nodata' AS ordId, 'nodata' AS buyerName, 0 AS ordAmount, 'nodata' AS ordStatus FROM DUAL WHERE 1=0
 	</select>
 
 <!-- 최근 문의 10건 -->
@@ -203,5 +217,6 @@
         )
         WHERE ROWNUM <= 10
         ]]>
+        SELECT SYSDATE AS qnaDate, 0 AS qnaId, 'nodata' AS prodName, 'nodata' AS memberId, 'nodata' AS title, 'nodata' AS status FROM DUAL WHERE 1=0
     </select>
 </mapper>

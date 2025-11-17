@@ -16,4 +16,5 @@ public class LoginDTO {
 	private String memberZipcode;
 	private String memberAddr1;
 	private String memberAddr2;
+	private String socialLogin = "default";
 }
