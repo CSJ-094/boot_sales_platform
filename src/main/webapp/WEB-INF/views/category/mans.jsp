@@ -63,6 +63,5 @@
 	</main>
 
 	<footer> © 2025 MY MODERN SHOP. All Rights Reserved. </footer>
-
 </body>
 </html>
