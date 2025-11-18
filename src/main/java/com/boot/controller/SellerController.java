@@ -18,6 +18,7 @@ import com.boot.dto.ProdDTO;
 import com.boot.dto.ProductCategoryDTO;
 import com.boot.dto.ReviewDTO;
 import com.boot.dto.SellerDTO;
+import com.boot.dto.SellerOrderSummaryDTO;
 import com.boot.dto.QnaDTO;
 import com.boot.service.ProductService;
 import com.boot.service.ReviewService;
@@ -220,6 +221,64 @@ public class SellerController {
 		model.addAttribute("activeMenu", "member");
 		return "seller/members";
 	}
+	//주문 내역(/seller/orders)
+		@GetMapping("/orders")
+		public String orderList(HttpSession session, Model model) {
+			SellerDTO seller = (SellerDTO) session.getAttribute("seller");
+			if (seller == null) {
+				return "redirect:/seller/login";
+			}
+			List<SellerOrderSummaryDTO> orders = orderService.getSellerOrderSummaries(seller.getSelId());
+			model.addAttribute("orders", orders);
+			model.addAttribute("activeMenu", "orders");
+			return "seller/orders";
+		}
+
+		//송장번호 입력 및 배송중 상태 변경(/seller/orders/{orderId}/tracking)
+		@PostMapping("/orders/{orderId}/tracking")
+		public String updateTrackingNumber(@PathVariable("orderId") String orderId,
+		                                   @RequestParam("trackingNumber") String trackingNumber,
+		                                   @RequestParam("deliveryCompany") String deliveryCompany,
+		                                   RedirectAttributes redirectAttributes) {
+			
+			if (trackingNumber == null || trackingNumber.trim().isEmpty()) {
+				redirectAttributes.addFlashAttribute("error", "송장번호를 입력해주세요.");
+				return "redirect:/seller/orders";
+			}
+
+			if (deliveryCompany == null || deliveryCompany.trim().isEmpty()) {
+				redirectAttributes.addFlashAttribute("error", "택배사를 선택해주세요.");
+				return "redirect:/seller/orders";
+			}
+
+			try {
+				String message = orderService.updateTrackingNumber(orderId, trackingNumber.trim(), deliveryCompany.trim());
+				// message가 있으면 경고/오류, 없으면 성공
+				redirectAttributes.addFlashAttribute(message != null ? "error" : "msg", 
+				                                     message != null ? message : "송장번호가 성공적으로 등록되었습니다.");
+			} catch (Exception e) {
+				log.error("Error updating tracking number", e);
+				redirectAttributes.addFlashAttribute("error", "송장번호 등록 중 오류가 발생했습니다: " + e.getMessage());
+			}
+
+			return "redirect:/seller/orders";
+		}
+
+		/**
+		 * 주문 상태를 '배송완료'로 수동 변경합니다.
+		 */
+		@PostMapping("/orders/complete")
+		public String completeOrder(@RequestParam("orderId") String orderId, RedirectAttributes redirectAttributes) {
+			try {
+				orderService.manuallyCompleteOrder(orderId);
+				redirectAttributes.addFlashAttribute("msg", "주문 상태를 '배송완료'로 성공적으로 변경했습니다.");
+			} catch (Exception e) {
+				log.error("Error manually completing order: {}", orderId, e);
+				redirectAttributes.addFlashAttribute("error", "상태 변경 중 오류가 발생했습니다.");
+			}
+			// 판매자 주문 목록 페이지로 리다이렉트
+			return "redirect:/seller/orders";
+		}
 
 	//회원 상세(/seller/members/{memberId})
 	@GetMapping("/members/{memberId}")
