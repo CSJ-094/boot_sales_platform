@@ -50,6 +50,10 @@ function check_ok(){
 		alert("이메일 중복 체크를 해주세요.");
 		return;
 	}
+	if (!reg_frm.mail_check_input.readOnly) { //테스트 시 인증 번거로우면 이부분 주석처리 하시면 됩니다.
+		alert("이메일 인증을 해주세요");
+		return;
+	}
 	reg_frm.submit();
 }
 
@@ -128,3 +132,45 @@ function fn_emailCheck(){
 	 	});
 	 }
 }
+var code = "";
+
+function fn_emailNumCheck() {
+	if($("#member_email").val() == ""){
+		alert("이메일이 공백입니다.");
+	}else{
+		var email = {
+			email : $("#member_email").val()
+		}
+	}
+
+	// jQuery ajax 사용
+	$.ajax({
+		type: "post",
+		url: "mailCheck",
+		data: email,
+		success: function(data) {
+			console.log("인증번호 받아옴: " + data);
+			code = data.trim(); // 혹시 공백 있을까봐 trim
+			$("#mail_check_input").prop("disabled", false);
+			alert("인증번호가 전송되었습니다.");
+		},
+		error: function(xhr, status, error) {
+			alert("인증번호 전송 실패: " + error);
+		}
+	});
+}
+$(document).ready(function() {
+	$('#mail_check_input').blur(function () {
+		const inputCode = $(this).val();
+		const $resultMsg = $('#mail_check_warn');
+
+
+		if (inputCode === code) {
+			$resultMsg.text('인증번호가 일치합니다.').css('color', 'green');
+			$('#mail_check_input').prop('readonly', true);
+			$('#member_email').prop('readonly', true);
+		} else {
+			$resultMsg.text('인증번호가 불일치 합니다. 다시 확인해주세요!').css('color', 'red');
+		}
+	});
+});

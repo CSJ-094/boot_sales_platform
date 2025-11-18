@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 
@@ -26,7 +25,7 @@ public class CategoryController {
     @GetMapping("/mans")
     public String mansCategoryPage(Model model) {
         
-        final int MANS_CAT_ID = 5; // 실제 MANS 카테고리 ID
+        final int MANS_CAT_ID = 200; // DB에 맞게 수정
         
         try {
             // ⭐️ 전체 상품을 가져오는 메서드 호출

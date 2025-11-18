@@ -1,56 +1,71 @@
 package com.boot.controller;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
-import com.boot.dto.LoginDTO;
+import com.boot.dao.MemDAO;
+import com.boot.dto.*;
 import com.boot.service.LoginService;
+<<<<<<< HEAD
 
 import jakarta.servlet.http.HttpSession;
 
+=======
+import com.boot.service.OrderService;
+import com.boot.service.WishlistService;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.tomcat.util.http.parser.HttpParser;
+>>>>>>> 4b716ac1f5fc4df6d2edc3f19a30ac64f02cd9e1
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @Slf4j
 public class LoginController {
-	
+
+
+	@Autowired
+	private MemDAO memDAO;
+
 	@Autowired
 	private LoginService service;
 
-	// ===================================================================
-	// 1. 로그인/회원가입 기능
-	// ===================================================================
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
-	// 로그인 화면 이동
 	@RequestMapping("login")
 	public String login() {
 		log.info("@# login()");
 		return "login/login";
 	}
 
+
 	// 로그인 여부 판단
 	@RequestMapping(value = "login_yn", method = RequestMethod.POST)
 	public String login_yn(LoginDTO loginDTO, HttpSession session, Model model) {
 	    log.info("@# login_yn() - ID: {}", loginDTO.getMemberId());
-	    
+
+		//1. DB에서 아이디 조회
 	    LoginDTO resultDTO = service.loginYn(loginDTO);
-	    
+
+
 	    if (resultDTO != null) {
-	        String db_pw = resultDTO.getMemberPw();
-	        String in_pw = loginDTO.getMemberPw();
-	        
-	        if (db_pw.equals(in_pw)) {
+	        String db_pw = resultDTO.getMemberPw(); // Security를 이용해 암호화 된 비밀번호
+	        String in_pw = loginDTO.getMemberPw(); // 페이지에서 입력한 비밀번호
+
+	        if (passwordEncoder.matches(in_pw, db_pw)) { //matches를 이용해 값 비교. in_pw가 항상 앞에
 	            session.setAttribute("memberId", loginDTO.getMemberId());
 	            session.setAttribute("memberName", resultDTO.getMemberName());
-	            
+				session.setAttribute("userType", "customer");
 	            log.info("@# 로그인 성공");
 	            return "redirect:/"; // 메인 페이지로 리다이렉트
 	        } else {
@@ -69,15 +84,13 @@ public class LoginController {
 	@RequestMapping("/logout")
 	public String logout(HttpSession session) {
 		log.info("@# logout() - 세션 무효화 및 로그아웃 처리");
-		
 		// 세션 무효화
-		session.invalidate(); 
-		
+		session.invalidate();
 		// 메인 페이지로 리다이렉트
-		return "redirect:/"; 
+		return "redirect:/";
 	}
-	
-	
+
+
 	// 등록 화면 이동
 	@RequestMapping("register")
 	public String register() {
@@ -98,10 +111,10 @@ public class LoginController {
 	@ResponseBody
 	public Boolean idCheck(LoginDTO loginDTO) {
 		log.info("@# idCheck() - 아이디: {}", loginDTO.getMemberId());
-		
+
 		Boolean result = true; // 기본값: 사용 가능 (중복 아님)
 		ArrayList<LoginDTO> dtos = service.idCheck(loginDTO);
-		
+
 		if (dtos != null && !dtos.isEmpty()) {
 			// 아이디가 존재함 -> 사용 불가능 (false)
 			result = false;
@@ -124,4 +137,60 @@ public class LoginController {
 		}
 		return result;
 	}
+
+	@PostMapping("/mailCheck")
+	@ResponseBody
+	public String mailCheck(@RequestParam String email) {
+		System.out.println("이메일 인증 요청이 들어옴!");
+		System.out.println("이메일 인증 이메일 : " + email);
+		return service.joinEmail(email);
+	}
+
+//	=================카카오 로그인 구현=================
+
+	@GetMapping("api/v1/oauth2/kakao")
+	public String KakaoCallback(@RequestParam String code, HttpSession session, RedirectAttributes redirectAttributes) {
+		log.info("@# 카카오 인증 확인용 로그 = " + code);
+
+		String accessToken = service.getAccessToken(code);
+
+		KakaoUserInfo userInfo= service.getUserInfo(accessToken);
+
+		LoginDTO loginCheck = service.kakaoLoginProcess(userInfo);
+
+		session.setAttribute("memberId", loginCheck.getMemberId());
+		session.setAttribute("memberName", loginCheck.getMemberName());
+        session.setAttribute("userType", "kakao");
+        session.setAttribute("kakaoAccessToken", accessToken);
+
+        //카카오 로그인 시 주소가 초기값이면 정보 수정 페이지로 넘어가게 하기.
+        if("default".equals(loginCheck.getMemberAddr1())){
+            redirectAttributes.addFlashAttribute("msg", "주소를 입력해주세요!");
+            return "redirect:/mypage#member-info";
+        }
+
+		return "redirect:/";
+	}
+    //카카오 회원 탈퇴
+    @PostMapping("/mypage/deleteUser")
+    public String deleteUser(HttpSession session) {
+
+        String userType = (String) session.getAttribute("userType");
+        String accessToken = (String) session.getAttribute("kakaoAccessToken");
+        String memberId = (String) session.getAttribute("memberId");
+
+        if("kakao".equals(userType)) {
+            if(accessToken != null) {
+                service.kakaoUnlink(accessToken);
+            }
+            service.deleteUser(memberId);
+        }else {
+            service.deleteUser(memberId);
+        }
+
+        session.invalidate();
+
+        return "redirect:/";
+
+    }
 }

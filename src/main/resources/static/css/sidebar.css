@@ -1,0 +1,11 @@
+/* 판매자 마이페이지 사이드바 기본 스타일 (필요하면 css 파일로 빼도 됨) */
+   .mypage-sidebar ul {
+       list-style: none;
+       margin: 0;
+       padding: 0;
+   }
+
+   .mypage-sidebar .sidebar-title {
+       font-weight: 700;
+       margin-bottom: 12px;
+   }

@@ -24,9 +24,15 @@
         VALUES (WISHLIST_SEQ.NEXTVAL, #{memberId}, #{prodId}, SYSDATE)
     </insert>
 
-    <delete id="removeWishlist">
+    <delete id="delete">
         DELETE FROM WISHLIST_DB
         WHERE MEMBER_ID = #{memberId} AND PROD_ID = #{prodId}
     </delete>
+
+    <!-- 찜 목록에 상품이 있는지 확인 -->
+    <select id="countByMemberIdAndProdId" resultType="int">
+        SELECT COUNT(*) FROM WISHLIST_DB
+        WHERE MEMBER_ID = #{memberId} AND PROD_ID = #{prodId}
+    </select>
 
 </mapper>

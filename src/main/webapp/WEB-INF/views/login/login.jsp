@@ -276,6 +276,19 @@
         transform: translateY(-2px);
         box-shadow: 0 8px 20px var(--primary-shadow-color);
     }
+    /*카카오*/
+    .btn-kakao {
+        background-color: #FEE500;
+        color: #000;
+        margin-bottom: 15px;
+        box-shadow: 0 5px 15px var(--primary-shadow-color);
+    }
+
+    .btn-kakao:hover {
+        background-color: #FDD835;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px var(--primary-shadow-color);
+    }
 
     .btn-signup {
         background-color: var(--background-color);
@@ -326,6 +339,10 @@
                 </div>
                 
                 <button type="submit" class="btn btn-login">로그인</button>
+                <button type="button" class="btn btn-kakao"
+                        onclick="location.href='https://kauth.kakao.com/oauth/authorize?client_id=c9021fed6c1ed7e7f03682f69d5f67ca&redirect_uri=http://localhost:8484/api/v1/oauth2/kakao&response_type=code'">
+                    <i class="fab fa-kakao"></i> 카카오로 로그인
+                </button>
                 <button type="button" class="btn btn-signup" onclick="location.href='register'">회원가입</button>
             </form>
         </div>

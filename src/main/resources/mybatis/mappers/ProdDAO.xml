@@ -4,19 +4,15 @@
     
     <mapper namespace="com.boot.dao.ProdDAO">
 
- <select id="getProductById" resultType="com.boot.dto.ProdDTO">
+ <select id="getProductById" resultMap="ProductMap">
         SELECT
-            PROD_ID as prodId,
-            PROD_SELLER as prodSeller,
-            PROD_NAME as prodName,
-            PROD_PRICE as prodPrice,
-            PROD_STOCK as prodStock,
-            PROD_DESC as prodDesc,
-            PROD_CODE as prodCode,
-            PROD_REG as prodReg,
-            PROD_UPD as prodUpd
-        FROM PRODUCT_DB
-        WHERE PROD_ID = #{prodId}
+            P.PROD_ID, P.PROD_SELLER, P.PROD_NAME, P.PROD_PRICE, P.PROD_STOCK, P.PROD_DESC, P.PROD_CODE, P.PROD_REG, P.PROD_UPD,
+            I.IMG_PATH AS PROD_IMG_PATH
+        FROM 
+            PRODUCT_DB P
+        LEFT JOIN 
+            IMAGE_DB I ON P.PROD_ID = I.IMG_PROD_ID AND I.IMG_MAIN = 'Y'
+        WHERE P.PROD_ID = #{prodId}
     </select>
   
   <!-- resultMap: DB 컬럼 → ProdDTO 필드 매핑 -->
@@ -45,10 +41,12 @@
 	<!-- 상세 -->
 	<select id="getProduct" parameterType="long"
 		resultMap="ProductMap">
-		SELECT PROD_ID, PROD_SELLER, PROD_NAME, PROD_PRICE, PROD_STOCK,
-		PROD_DESC, PROD_CODE, PROD_REG, PROD_UPD
-		FROM PRODUCT_DB
-		WHERE PROD_ID = #{prodId}
+		SELECT
+            P.PROD_ID, P.PROD_SELLER, P.PROD_NAME, P.PROD_PRICE, P.PROD_STOCK, P.PROD_DESC, P.PROD_CODE, P.PROD_REG, P.PROD_UPD,
+            I.IMG_PATH AS PROD_IMG_PATH
+        FROM PRODUCT_DB P
+        LEFT JOIN IMAGE_DB I ON P.PROD_ID = I.IMG_PROD_ID AND I.IMG_MAIN = 'Y'
+        WHERE P.PROD_ID = #{prodId}
 	</select>
 
 <!-- 	등록 (PROD_ID: 시퀀스 사용) -->

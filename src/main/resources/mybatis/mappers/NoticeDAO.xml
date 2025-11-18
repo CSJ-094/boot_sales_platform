@@ -11,7 +11,7 @@
         <result property="NOT_NAME" column="NOT_NAME"/>
         <result property="NOT_TIME" column="NOT_TIME"/>
     </resultMap>
-<!--/-->
+
     <!-- 2. Select: 목록 조회 (list) -->
     <select id="list" resultMap="noticeResultMap">
         SELECT 
@@ -49,5 +49,19 @@
         DELETE FROM NOTICE_DB
         WHERE NOT_NO = #{notNo}
     </delete>
+    
+    <!-- 메인페이지용: 최근 공지 n개 -->
+        <!-- 메인페이지용: 최근 공지 n개 -->
+    <select id="findRecent" resultMap="noticeResultMap">
+        SELECT *
+        FROM (
+            SELECT 
+                NOT_NO, NOT_TITLE, NOT_CONTENT, NOT_NAME, NOT_TIME
+            FROM NOTICE_DB
+            ORDER BY NOT_NO DESC
+        )
+        WHERE ROWNUM &lt;= #{limit}
+    </select>
+
 
 </mapper>

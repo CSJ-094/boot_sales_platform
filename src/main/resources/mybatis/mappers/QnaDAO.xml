@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.boot.dao.QnaDAO">
+
+    <insert id="insertQuestion" parameterType="com.boot.dto.QnaDTO">
+        INSERT INTO QNA_DB (
+            QNA_ID,
+            PROD_ID,
+            MEMBER_ID,
+            QNA_TITLE,
+            QNA_CONTENT,
+            QNA_IS_SECRET
+        ) VALUES (
+            QNA_SEQ.NEXTVAL,
+            #{prodId},
+            #{memberId},
+            #{qnaTitle},
+            #{qnaContent},
+            #{qnaIsSecret}
+        )
+    </insert>
+
+    <select id="findByProdId" resultType="com.boot.dto.QnaDTO">
+        SELECT
+            q.QNA_ID as qnaId, q.PROD_ID as prodId, q.MEMBER_ID as memberId,
+            u.MEMBER_NAME as memberName, q.QNA_TITLE as qnaTitle, q.QNA_CONTENT as qnaContent,
+            q.QNA_IS_SECRET as qnaIsSecret, q.QNA_PARENT_ID as qnaParentId, q.QNA_REG_DATE as qnaRegDate
+        FROM QNA_DB q
+        JOIN USER_DB u ON q.MEMBER_ID = u.MEMBER_ID
+        WHERE q.PROD_ID = #{prodId}
+        ORDER BY NVL(q.QNA_PARENT_ID, q.QNA_ID) DESC, q.QNA_REG_DATE ASC
+    </select>
+
+    <insert id="insertReply" parameterType="com.boot.dto.QnaDTO">
+        INSERT INTO QNA_DB (
+            QNA_ID,
+            PROD_ID,
+            MEMBER_ID,
+            QNA_TITLE,
+            QNA_CONTENT,
+            QNA_PARENT_ID,
+            QNA_STATUS
+        ) VALUES (
+            QNA_SEQ.NEXTVAL,
+            #{prodId},
+            #{memberId},
+            #{qnaTitle},
+            #{qnaContent},
+            #{qnaParentId},
+            '답변'
+        )
+    </insert>
+
+    <select id="findBySellerId" resultType="com.boot.dto.QnaDTO">
+        SELECT
+            q.QNA_ID as qnaId, q.PROD_ID as prodId, p.PROD_NAME as prodName,
+            q.MEMBER_ID as memberId, u.MEMBER_NAME as memberName,
+            q.QNA_TITLE as qnaTitle, q.QNA_IS_SECRET as qnaIsSecret,
+            q.QNA_REG_DATE as qnaRegDate,
+            CASE WHEN EXISTS (SELECT 1 FROM QNA_DB qr WHERE qr.QNA_PARENT_ID = q.QNA_ID)
+                 THEN 'Y' ELSE 'N' END as replied
+        FROM QNA_DB q
+        JOIN PRODUCT_DB p ON q.PROD_ID = p.PROD_ID
+        JOIN USER_DB u ON q.MEMBER_ID = u.MEMBER_ID
+        WHERE p.PROD_SELLER = #{sellerId}
+          AND q.QNA_PARENT_ID IS NULL
+        ORDER BY q.QNA_REG_DATE DESC
+    </select>
+
+    <select id="findById" resultType="com.boot.dto.QnaDTO">
+        SELECT
+            q.QNA_ID as qnaId, q.PROD_ID as prodId, p.PROD_NAME as prodName,
+            q.MEMBER_ID as memberId, u.MEMBER_NAME as memberName,
+            q.QNA_TITLE as qnaTitle, q.QNA_CONTENT as qnaContent,
+            q.QNA_IS_SECRET as qnaIsSecret, q.QNA_REG_DATE as qnaRegDate
+        FROM QNA_DB q
+        JOIN PRODUCT_DB p ON q.PROD_ID = p.PROD_ID
+        JOIN USER_DB u ON q.MEMBER_ID = u.MEMBER_ID
+        WHERE q.QNA_ID = #{qnaId}
+    </select>
+
+    <!-- 답변 상태 업데이트 -->
+    <update id="updateStatus">
+        UPDATE QNA_DB
+        SET QNA_STATUS = #{status}
+        WHERE QNA_ID = #{qnaId}
+    </update>
+
+    <!-- 부모 ID로 답변 목록 조회 -->
+    <select id="findByParentId" resultType="com.boot.dto.QnaDTO">
+        SELECT
+            QNA_ID as qnaId,
+            PROD_ID as prodId,
+            MEMBER_ID as memberId,
+            QNA_TITLE as qnaTitle,
+            QNA_CONTENT as qnaContent,
+            QNA_IS_SECRET as qnaIsSecret,
+            QNA_PARENT_ID as qnaParentId,
+            QNA_STATUS as qnaStatus,
+            QNA_REG_DATE as qnaRegDate
+        FROM QNA_DB
+        WHERE QNA_PARENT_ID = #{parentId}
+        ORDER BY QNA_REG_DATE ASC
+    </select>
+</mapper>

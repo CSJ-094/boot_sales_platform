@@ -1,11 +1,21 @@
 package com.boot.controller;
 
 import com.boot.dto.ProdDTO;
+import com.boot.dto.QnaDTO;
+import com.boot.dto.ReviewDTO;
+import com.boot.service.OrderService;
 import com.boot.service.ProductService;
+<<<<<<< HEAD
 
 import jakarta.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+=======
+import com.boot.service.QnaService;
+import com.boot.service.ReviewService;
+import com.boot.service.WishlistService;
+import lombok.RequiredArgsConstructor;
+>>>>>>> 4b716ac1f5fc4df6d2edc3f19a30ac64f02cd9e1
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,12 +23,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 
+<<<<<<< HEAD
+=======
+import javax.servlet.http.HttpSession;
+import java.util.List;
+
+>>>>>>> 4b716ac1f5fc4df6d2edc3f19a30ac64f02cd9e1
 @Controller
-@RequestMapping("/product/product")
+@RequestMapping("/products")
+@RequiredArgsConstructor
 public class ProductController {
 
-    @Autowired
-    private ProductService productService;
+    private final ProductService productService;
+    private final OrderService orderService;
+    private final ReviewService reviewService;
+    private final QnaService qnaService;
+    private final WishlistService wishlistService;
 
     // 상품 상세 페이지 조회
     @GetMapping("/detail")
@@ -26,9 +46,27 @@ public class ProductController {
         ProdDTO product = productService.getProductById(prodId);
         model.addAttribute("product", product);
 
-        // ⭐️ 실제 로그인 세션에서 memberId를 가져옴 (없으면 null)
         String memberId = (String) session.getAttribute("memberId");
-        model.addAttribute("memberId", memberId); // memberId가 null이면 로그아웃 상태
+        model.addAttribute("memberId", memberId);
+
+        boolean hasPurchased = false;
+        boolean isWished = false;
+        if (memberId != null) {
+            // '구매확정' 상태인 주문에 이 상품이 포함되어 있는지 확인
+            hasPurchased = orderService.hasUserPurchasedProduct(memberId, prodId.longValue());
+            // 찜 목록에 있는지 확인
+            isWished = wishlistService.isProductInWishlist(memberId, prodId);
+        }
+        model.addAttribute("hasPurchased", hasPurchased);
+        model.addAttribute("isWished", isWished); // ⭐️ 찜 상태를 모델에 추가
+
+        // 리뷰 목록 조회
+        List<ReviewDTO> reviewList = reviewService.getReviewsByProductId(prodId.longValue());
+        model.addAttribute("reviewList", reviewList);
+
+        // 상품 문의 목록 조회
+        List<QnaDTO> qnaList = qnaService.getQnaByProductId(prodId.longValue());
+        model.addAttribute("qnaList", qnaList);
 
         return "product/productDetail";
     }

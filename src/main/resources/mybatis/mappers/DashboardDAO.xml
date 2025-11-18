@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.boot.dao.DashboardDAO">
+
+    <!-- 요약 조회 -->
+    <select id="selectSummary"
+            resultType="com.boot.dto.SellerDashboardDTO">
+        <![CDATA[
+        SELECT
+            /* 오늘 주문 건수 */
+            (
+                SELECT COUNT(*)
+                FROM ORDER_DB o
+                WHERE o.ORD_DATE >= TRUNC(SYSDATE)
+                  AND o.ORD_DATE <  TRUNC(SYSDATE) + 1
+            ) AS todayOrderCount,
+
+            /* 오늘 매출액 */
+            (
+                SELECT NVL(SUM(o.ORD_AMOUNT), 0)
+                FROM ORDER_DB o
+                WHERE o.ORD_DATE >= TRUNC(SYSDATE)
+                  AND o.ORD_DATE <  TRUNC(SYSDATE) + 1
+            ) AS todaySalesAmount,
+
+            /* 오늘 신규 가입자 */
+            (
+                SELECT COUNT(*)
+                FROM USER_DB u
+                WHERE u.MEMBER_REGDATE >= TRUNC(SYSDATE)
+                  AND u.MEMBER_REGDATE <  TRUNC(SYSDATE) + 1
+            ) AS todayNewMembers,
+
+            /* 오늘 방문자 수 */
+            (
+                SELECT COUNT(DISTINCT NVL(v.MEMBER_ID, v.IP))
+                FROM VISIT_LOG_DB v
+                WHERE v.VISIT_DATE >= TRUNC(SYSDATE)
+                  AND v.VISIT_DATE <  TRUNC(SYSDATE) + 1
+            ) AS todayVisitors,
+
+            /* 미처리 문의 수 */
+            (
+                SELECT COUNT(*)
+                FROM QNA_DB q
+                WHERE q.QNA_PARENT_ID IS NULL
+                  AND q.QNA_STATUS = '답변대기'
+            ) AS pendingQnaCount,
+
+            /* 어제 주문 건수 */
+            (
+                SELECT COUNT(*)
+                FROM ORDER_DB o
+                WHERE o.ORD_DATE >= TRUNC(SYSDATE) - 1
+                  AND o.ORD_DATE <  TRUNC(SYSDATE)
+            ) AS yesterdayOrderCount,
+
+            /* 어제 매출액 */
+            (
+                SELECT NVL(SUM(o.ORD_AMOUNT), 0)
+                FROM ORDER_DB o
+                WHERE o.ORD_DATE >= TRUNC(SYSDATE) - 1
+                  AND o.ORD_DATE <  TRUNC(SYSDATE)
+            ) AS yesterdaySalesAmount
+
+        FROM DUAL
+        ]]>
+    </select>
+
+    <!--	일별 매출-->
+    <select id="selectDailySales"
+            resultType="com.boot.dto.SalesStatDTO">
+        <![CDATA[
+        SELECT
+            TO_CHAR(ORD_DATE, 'YYYY-MM-DD') AS label,
+            NVL(SUM(ORD_AMOUNT), 0)         AS salesAmount,
+            COUNT(*)                        AS orderCount
+        FROM ORDER_DB
+        WHERE ORD_DATE >= TRUNC(SYSDATE) - 6
+          AND ORD_DATE <  TRUNC(SYSDATE) + 1
+        GROUP BY TO_CHAR(ORD_DATE, 'YYYY-MM-DD')
+        ORDER BY label
+        ]]>
+    </select>
+
+    <!--    주별 매출-->
+    <select id="selectWeeklySales"
+            resultType="com.boot.dto.SalesStatDTO">
+        <![CDATA[
+        SELECT
+            TO_CHAR(ORD_DATE, 'IYYY') || '년 ' || TO_CHAR(ORD_DATE, 'IW') || '주' AS label,
+            NVL(SUM(ORD_AMOUNT), 0) AS salesAmount,
+            COUNT(*)                AS orderCount
+        FROM ORDER_DB
+        WHERE ORD_DATE >= TRUNC(SYSDATE, 'IW') - (7 * 7)  -- 최근 8주
+          AND ORD_DATE <  TRUNC(SYSDATE, 'IW') + 7
+        GROUP BY TO_CHAR(ORD_DATE, 'IYYY'), TO_CHAR(ORD_DATE, 'IW')
+        ORDER BY MIN(ORD_DATE)
+        ]]>
+    </select>
+
+    <!--    월별 매출-->
+    <select id="selectMonthlySales"
+            resultType="com.boot.dto.SalesStatDTO">
+        <![CDATA[
+        SELECT
+            TO_CHAR(ORD_DATE, 'YYYY-MM') AS label,
+            NVL(SUM(ORD_AMOUNT), 0)      AS salesAmount,
+            COUNT(*)                     AS orderCount
+        FROM ORDER_DB
+        WHERE ORD_DATE >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -5)
+          AND ORD_DATE <  ADD_MONTHS(TRUNC(SYSDATE, 'MM'), 1)
+        GROUP BY TO_CHAR(ORD_DATE, 'YYYY-MM')
+        ORDER BY label
+        ]]>
+   	 </select>
+
+    <!-- 일별 방문자 -->
+    <select id="selectDailyVisitors"
+            resultType="com.boot.dto.VisitStatDTO">
+        <![CDATA[
+        SELECT
+            TO_CHAR(VISIT_DATE, 'YYYY-MM-DD')              AS label,
+            COUNT(DISTINCT NVL(MEMBER_ID, IP))             AS visitor_count
+        FROM VISIT_LOG_DB
+        WHERE VISIT_DATE >= TRUNC(SYSDATE) - 6
+          AND VISIT_DATE <  TRUNC(SYSDATE) + 1
+        GROUP BY TO_CHAR(VISIT_DATE, 'YYYY-MM-DD')
+        ORDER BY label
+        ]]>
+    </select>
+
+    <!-- 주별 방문자 -->
+    <select id="selectWeeklyVisitors"
+            resultType="com.boot.dto.VisitStatDTO">
+        <![CDATA[
+        SELECT
+            TO_CHAR(VISIT_DATE, 'IYYY') || '년 ' || TO_CHAR(VISIT_DATE, 'IW') || '주' AS label,
+            COUNT(DISTINCT NVL(MEMBER_ID, IP))                                     AS visitor_count
+        FROM VISIT_LOG_DB
+        WHERE VISIT_DATE >= TRUNC(SYSDATE, 'IW') - (7 * 7)  -- 최근 8주
+          AND VISIT_DATE <  TRUNC(SYSDATE, 'IW') + 7
+        GROUP BY TO_CHAR(VISIT_DATE, 'IYYY'), TO_CHAR(VISIT_DATE, 'IW')
+        ORDER BY MIN(VISIT_DATE)
+        ]]>
+    </select>
+
+    <!-- 월별 방문자 -->
+    <select id="selectMonthlyVisitors"
+            resultType="com.boot.dto.VisitStatDTO">
+        <![CDATA[
+        SELECT
+            TO_CHAR(VISIT_DATE, 'YYYY-MM')                 AS label,
+            COUNT(DISTINCT NVL(MEMBER_ID, IP))             AS visitor_count
+        FROM VISIT_LOG_DB
+        WHERE VISIT_DATE >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -5)
+          AND VISIT_DATE <  ADD_MONTHS(TRUNC(SYSDATE, 'MM'), 1)
+        GROUP BY TO_CHAR(VISIT_DATE, 'YYYY-MM')
+        ORDER BY label
+        ]]>
+    </select>
+
+    <!-- 최근 주문 10건 -->
+    <select id="selectRecentOrders"
+            resultType="com.boot.dto.SellerRecentOrderDTO">
+	    <![CDATA[
+        SELECT *
+        FROM (
+                 SELECT
+                     o.ORD_DATE    AS ordDate,
+                     o.ORD_ID      AS ordId,
+                     u.MEMBER_NAME AS buyerName,
+                     o.ORD_AMOUNT  AS ordAmount,
+                     o.ORD_STATUS  AS ordStatus
+                 FROM ORDER_DB o
+                          JOIN USER_DB u ON o.ORD_MEMID = u.MEMBER_ID
+                 ORDER BY o.ORD_DATE DESC
+             )
+        WHERE ROWNUM <= 10
+        ]]>
+	</select>
+
+    <!-- 최근 문의 10건 -->
+    <select id="selectRecentQna"
+            resultType="com.boot.dto.SellerRecentQnaDTO">
+        <![CDATA[
+        SELECT *
+        FROM (
+                 SELECT
+                     q.QNA_REG_DATE AS qnaDate,
+                     q.QNA_ID       AS qnaId,
+                     p.PROD_NAME    AS prodName,
+                     q.MEMBER_ID    AS memberId,
+                     q.QNA_TITLE    AS title,
+                     q.QNA_STATUS   AS status
+                 FROM QNA_DB q
+                          JOIN PRODUCT_DB p ON q.PROD_ID = p.PROD_ID
+                 WHERE q.QNA_PARENT_ID IS NULL   -- 원글만
+                 ORDER BY q.QNA_REG_DATE DESC
+             )
+        WHERE ROWNUM <= 10
+        ]]>
+    </select>
+</mapper>

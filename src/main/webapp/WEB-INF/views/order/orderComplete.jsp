@@ -6,6 +6,8 @@
 <head>
 <meta charset="UTF-8">
 <title>주문 완료</title>
+<link rel="stylesheet" href="<c:url value='/css/header.css' />">
+<link rel="stylesheet" href="<c:url value='/css/sellerstyle.css' />">
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
     body {
@@ -16,15 +18,10 @@
         margin: 0;
         padding: 20px;
     }
-    .container {
-        max-width: 800px;
-        margin: 60px auto;
-        padding: 40px;
-        background-color: #fff;
-        border-radius: 10px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    .complete-container {
         text-align: center;
     }
+
     .icon-success {
         font-size: 60px;
         color: #28a745;
@@ -93,32 +90,44 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="container">
-        <div class="icon-success">
-            <i class="fas fa-check-circle"></i>
-        </div>
-        <h1>주문이 성공적으로 완료되었습니다.</h1>
-        <p>저희 플랫폼을 이용해주셔서 감사합니다.</p>
+    <jsp:include page="/WEB-INF/views/fragments/header.jsp" />
 
-        <div class="order-summary">
-            <div class="summary-item">
-                <span>주문 번호</span>
-                <span>${order.ordId}</span>
-            </div>
-            <div class="summary-item">
-                <span>주문 일자</span>
-                <span><fmt:formatDate value="${order.ordDate}" pattern="yyyy-MM-dd HH:mm:ss" /></span>
-            </div>
-            <div class="summary-item">
-                <span>총 결제 금액</span>
-                <span><fmt:formatNumber value="${order.ordAmount + order.ordDfee - order.ordDiscount}" pattern="#,###" />원</span>
-            </div>
-        </div>
+    <main class="mypage-body">
+        <section class="mypage-content-area">
+            <div class="complete-container">
+                <div class="icon-success">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h1>주문이 성공적으로 완료되었습니다.</h1>
+                <p>저희 플랫폼을 이용해주셔서 감사합니다.</p>
 
-        <div class="button-group">
-            <a href="${pageContext.request.contextPath}/" class="btn btn-secondary">쇼핑 계속하기</a>
-            <a href="${pageContext.request.contextPath}/mypage#order-history" class="btn btn-primary">주문 내역 확인</a>
-        </div>
-    </div>
+                <div class="order-summary">
+                    <div class="summary-item">
+                        <span>주문 번호</span>
+                        <span>${order.ordId}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>주문 일자</span>
+                        <span><fmt:formatDate value="${order.ordDate}" pattern="yyyy-MM-dd HH:mm:ss" /></span>
+                    </div>
+                    <div class="summary-item">
+                        <span>총 결제 금액</span>
+                        <span><fmt:formatNumber value="${order.ordAmount + order.ordDfee - order.ordDiscount}" pattern="#,###" />원</span>
+                    </div>
+					
+				</div>
+				
+
+             </div>
+
+                <div class="button-group">
+                    <a href="${pageContext.request.contextPath}/" class="btn btn-secondary">쇼핑 계속하기</a>
+                    <a href="${pageContext.request.contextPath}/mypage#order-history" class="btn btn-primary">주문 내역 확인</a>
+                </div>
+            </div>
+        </section>
+    </main>
+	
+    <jsp:include page="/WEB-INF/views/fragments/footer.jsp" />
 </body>
 </html>

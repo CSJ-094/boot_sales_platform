@@ -14,7 +14,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.List;
 
 @Controller
-@RequestMapping("cart") // (A) 기본 경로를 절대 경로로 명시하는 것이 좋습니다.
+@RequestMapping("/cart")
 public class CartController {
 
     @Autowired
@@ -32,8 +32,8 @@ public class CartController {
         return memberId;
     }
 
-    // 장바구니 목록 조회 (GET /cart/cart)
-    @GetMapping
+    // 장바구니 목록 조회 (GET /cart/list)
+    @GetMapping("/list")
     public String getCartList(HttpSession session, Model model, RedirectAttributes redirectAttributes) {
         // 1. 세션에서 memberId를 가져오고 로그인 여부 확인
         String memberId = getMemberIdOrRedirect(session, redirectAttributes);
@@ -45,14 +45,24 @@ public class CartController {
 
         // 2. 장바구니 목록 조회 (로그인 상태)
         List<CartDTO> cartList = cartService.getCartListByMemberId(memberId);
+
+        // 3. 총 장바구니 금액 계산
+        int totalCartPrice = 0;
+        if (cartList != null) {
+            for (CartDTO cartItem : cartList) {
+                totalCartPrice += cartItem.getProdPrice() * cartItem.getCartQty();
+            }
+        }
+
         model.addAttribute("cartList", cartList);
         model.addAttribute("memberId", memberId);
-        
+        model.addAttribute("totalCartPrice", totalCartPrice); // ⭐️ 총 금액을 모델에 추가
+
         // (D) View 이름 수정: 'cart' 폴더 안의 'cartList.jsp'를 의도했다면
         return "cart/cartList"; 
     }
 
-    // 장바구니에 상품 추가 (POST /cart/cart/add)
+    // 장바구니에 상품 추가 (POST /cart/add)
     @PostMapping("/add")
     public String addCart(HttpSession session, 
                           @RequestParam("prodId") Integer prodId,
@@ -75,11 +85,11 @@ public class CartController {
             redirectAttributes.addFlashAttribute("errorMessage", "장바구니 추가 중 오류가 발생했습니다: " + e.getMessage());
         }
         
-        // 3. 장바구니 목록 페이지로 리다이렉트 (절대 경로 사용)
-        return "redirect:/cart/cart"; 
+        // 3. 장바구니 목록 페이지로 리다이렉트
+        return "redirect:/cart/list"; 
     }
 
-    // 장바구니 상품 수량 변경 (POST /cart/cart/update)
+    // 장바구니 상품 수량 변경 (POST /cart/update)
     @PostMapping("/update")
     public String updateCart(@RequestParam("cartId") int cartId,
                              HttpSession session,
@@ -100,10 +110,10 @@ public class CartController {
             redirectAttributes.addFlashAttribute("errorMessage", "수량 변경 중 오류가 발생했습니다: " + e.getMessage());
         }
 
-        return "redirect:/cart/cart";
+        return "redirect:/cart/list";
     }
 
-    // 장바구니 상품 삭제 (POST /cart/cart/remove)
+    // 장바구니 상품 삭제 (POST /cart/remove)
     @PostMapping("/remove")
     public String removeCart(@RequestParam("cartId") int cartId,
                              HttpSession session,
@@ -123,11 +133,11 @@ public class CartController {
             redirectAttributes.addFlashAttribute("errorMessage", "상품 삭제 중 오류가 발생했습니다: " + e.getMessage());
         }
         
-        // 리다이렉트 경로 수정 (절대 경로 사용)
-        return "redirect:/cart/cart";
+        // 장바구니 목록 페이지로 리다이렉트
+        return "redirect:/cart/list";
     }
 
-    // 찜목록 상품을 장바구니로 이동 (POST /cart/cart/moveFromWishlist)
+    // 찜목록 상품을 장바구니로 이동 (POST /cart/moveFromWishlist)
     @PostMapping("/moveFromWishlist")
     public String moveFromWishlist(HttpSession session,
                                    @RequestParam("prodId") Integer prodId,
@@ -149,7 +159,7 @@ public class CartController {
             redirectAttributes.addFlashAttribute("errorMessage", "상품 이동 중 오류가 발생했습니다: " + e.getMessage());
         }
         
-        // 리다이렉트 경로 수정 (절대 경로 사용)
-        return "redirect:/cart/cart";
+        // 장바구니 목록 페이지로 리다이렉트
+        return "redirect:/cart/list";
     }
 }
