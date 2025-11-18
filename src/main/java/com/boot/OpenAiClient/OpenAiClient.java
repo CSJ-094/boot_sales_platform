@@ -27,11 +27,11 @@ public class OpenAiClient {
  
     public OpenAiResponseDTO getChatCompletion(String prompt) {
         OpenAiRequestDTO openAiRequest = getOpenAiRequest(prompt);
- 
         ResponseEntity<OpenAiResponseDTO> chatResponse = restTemplate.postForEntity(
                 apiUrl,
                 openAiRequest,
                 OpenAiResponseDTO.class
+                
         );
  
         if (!chatResponse.getStatusCode().is2xxSuccessful() || chatResponse.getBody() == null) {
