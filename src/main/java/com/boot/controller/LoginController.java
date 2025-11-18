@@ -59,7 +59,7 @@ public class LoginController {
 
 	// 로그인 여부 판단
 	@RequestMapping(value = "login_yn", method = RequestMethod.POST)
-	public String login_yn(LoginDTO loginDTO, HttpSession session, Model model) { // rememberMe, HttpServletResponse 파라미터 제거
+	public String login_yn(LoginDTO loginDTO, HttpSession session, Model model, RedirectAttributes redirectAttributes) { // rememberMe, HttpServletResponse 파라미터 제거
 	    log.info("@# login_yn() - ID: {}", loginDTO.getMemberId());
 
 		//1. DB에서 아이디 조회
@@ -74,6 +74,8 @@ public class LoginController {
 	            session.setAttribute("memberId", loginDTO.getMemberId());
 	            session.setAttribute("memberName", resultDTO.getMemberName());
 				session.setAttribute("userType", "customer");
+				// 룰렛 이벤트 플래그를 FlashAttribute에 추가 (리다이렉트 후 1회만 유효)
+				redirectAttributes.addFlashAttribute("showRouletteEvent", true);
 	            log.info("@# 로그인 성공");
 
 				// 자동 로그인 처리 로직 제거
@@ -206,6 +208,9 @@ public class LoginController {
 		session.setAttribute("memberName", loginCheck.getMemberName());
         session.setAttribute("userType", "kakao");
         session.setAttribute("kakaoAccessToken", accessToken);
+
+		// 카카오 로그인 시에도 룰렛 이벤트를 FlashAttribute에 추가
+		redirectAttributes.addFlashAttribute("showRouletteEvent", true);
 
         //카카오 로그인 시 주소가 초기값이면 정보 수정 페이지로 넘어가게 하기.
         if("default".equals(loginCheck.getMemberAddr1())){

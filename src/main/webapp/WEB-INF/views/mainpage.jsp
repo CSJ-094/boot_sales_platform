@@ -225,5 +225,8 @@
     });
 </script>
 
+<%-- 룰렛 팝업을 페이지에 포함시킵니다. --%>
+<jsp:include page="/WEB-INF/views/roulette.jsp" />
+
 </body>
 </html>

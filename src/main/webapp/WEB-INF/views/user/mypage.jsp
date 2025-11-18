@@ -504,6 +504,7 @@
 </c:if>
 
 <jsp:include page="/WEB-INF/views/fragments/header.jsp" />
+<%-- 룰렛 팝업을 페이지에 포함시킵니다. --%>
 
     <main class="mypage-body">
         
