@@ -140,30 +140,6 @@ main {
 	color: #b08d57;
 }
 
-/* ======= 네비 스타일 ======= */
-.mypage-nav {
-	margin-bottom: 30px;
-}
-
-.mypage-nav ul {
-	list-style: none;
-	display: flex;
-	gap: 25px;
-	padding: 0;
-	border-bottom: 2px solid #444;
-}
-
-.mypage-nav li a {
-	display: block;
-	padding: 10px 15px;
-	font-weight: 600;
-	color: #333;
-	border-bottom: 3px solid transparent;
-	transition: border-color 0.3s ease, background-color 0.3s ease,
-		box-shadow 0.3s ease;
-	border-radius: 4px;
-}
-
 .mypage-nav li a:hover, .mypage-nav li a.active {
 	border-color: #444;
 	color: #444;
@@ -194,10 +170,11 @@ h2 {
 }
 
 .product-grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
-	gap: 0px;
-	justify-content: center;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* 카드 유동 배치 */
+    gap: 24px;                          /* 카드 사이 여백 */
+    justify-items: center;              /* 카드 가운데 정렬 */
+    padding-top: 10px;
 }
 
 .product-card {
