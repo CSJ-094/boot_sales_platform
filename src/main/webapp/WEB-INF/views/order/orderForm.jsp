@@ -411,11 +411,12 @@
                     orderName: orderName,
                     successUrl: window.location.origin + "${pageContext.request.contextPath}/toss/success",
                     failUrl: window.location.origin + "${pageContext.request.contextPath}/toss/fail",
-                    customerName: "${sessionScope.memberName}",
-                    metadata: {
-                        selectedUserCouponId: selectedUserCouponId,
+                    customerName: "${sessionScope.memberName}"
+                    // ⭐️ metadata의 값이 null인 경우 오류가 발생하므로, 빈 문자열로 대체합니다.
+                    , metadata: {
+                        selectedUserCouponId: selectedUserCouponId || '',
                         usedPoint: appliedPointUsage
-                    }
+                    } 
                 }).catch(function (error) {
                     console.error("결제 요청 실패:", error);
                     if (error.code === 'USER_CANCEL') {
