@@ -233,7 +233,7 @@ public class LoginController {
             if(accessToken != null) {
                 service.kakaoUnlink(accessToken);
             }
-            service.deleteUser(memberId);
+            service.deleteKakaoUser(memberId);
         }else {
             service.deleteUser(memberId);
         }

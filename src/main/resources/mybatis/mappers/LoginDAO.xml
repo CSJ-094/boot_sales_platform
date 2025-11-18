@@ -6,7 +6,12 @@
 
     <!-- 로그인 여부 확인 -->
     <select id="loginYn" resultType="com.boot.dto.LoginDTO">
-    	select member_pw AS memberPw, member_id AS memberId, member_name AS memberName from user_db where member_id=#{memberId}
+    	select member_pw AS memberPw,
+        member_id AS memberId,
+        member_name AS memberName
+        from user_db
+        where member_id=#{memberId}
+        and member_status = 'ACTIVE'
     </select>
         
     <!-- 회원 가입 -->
@@ -66,11 +71,45 @@
         SELECT *
         FROM user_db
         WHERE member_email = #{email}
+
+    </select>
+    <!-- 삭제 계정 찾기  -->
+    <select id="findDeletedByEmail" resultType="com.boot.dto.LoginDTO">
+        SELECT *
+        FROM user_db
+        WHERE member_email = #{email}
+        AND member_status = 'DELETED'
     </select>
 
-    <delete id="deleteUser" parameterType="string">
-        DELETE FROM USER_DB WHERE MEMBER_ID = #{memberId}
-    </delete>
+
+    <!--   회원 탈퇴기능 DELETED로 수정 -->
+
+    <update id="deleteUser" parameterType="string">
+        UPDATE USER_DB
+        SET MEMBER_STATUS = 'DELETED',
+        MEMBER_ID = MEMBER_ID || '_deleted_' || TO_CHAR(SYSDATE,'YYYYMMDDHH24MISS'),
+        MEMBER_EMAIL = MEMBER_ID || '_deleted_' || TO_CHAR(SYSDATE,'YYYYMMDDHH24MISS'),
+        MEMBER_PW = 'deleted_' || DBMS_RANDOM.STRING('x', 20),
+        MEMBER_PHONE = '000-0000-0000',
+        MEMBER_ZIPCODE = '00000',
+        MEMBER_ADDR1 = 'DELETED',
+        MEMBER_ADDR2 = 'DELETED'
+        WHERE MEMBER_ID = #{memberId}
+    </update>
+
+    <!--    카카오 회원탈퇴-->
+    <update id="deleteKakaoUser" parameterType="string">
+        UPDATE USER_DB
+        SET MEMBER_STATUS = 'DELETED'
+        WHERE MEMBER_ID = #{memberId}
+    </update>
+    <!-- 카카오 회원 재가입 시 STATUS를 ACTIVE 활성화.   -->
+
+    <update id="reactivateUser" parameterType="string">
+        UPDATE USER_DB
+        SET MEMBER_STATUS = 'ACTIVE'
+        WHERE MEMBER_EMAIL = #{value}
+    </update>
 
     <!-- 포인트 기능 추가 -->
     <select id="getMemberPoint" resultType="int">

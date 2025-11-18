@@ -25,6 +25,9 @@ public interface LoginDAO {
     public LoginDTO kakaoLoginProcess(KakaoUserInfo userInfo);
     public void kakaoUnlink(String accessToken);
     public void deleteUser(String memberId);
+    public void deleteKakaoUser(String memberId);
+    public LoginDTO findDeletedByEmail(String email);
+    public void reactivateUser(String email);
 
     // 포인트 기능 추가
     Integer getMemberPoint(@Param("memberId") String memberId);

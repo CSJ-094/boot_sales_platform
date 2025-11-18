@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
@@ -215,11 +216,21 @@ public class LoginServiceImpl implements LoginService {
 		return user;
 	}
 
+	@Transactional
 	@Override
 	public LoginDTO kakaoLoginProcess(KakaoUserInfo userInfo) {
 		LoginDTO exist = loginDAO.findByEmail(userInfo.getEmail());
 
 		if(exist == null) {
+
+//			DELETED 계정인지 검사하고 DELETED 계정이면 ACTIVE로 활성화
+			LoginDTO deletedCheck = loginDAO.findDeletedByEmail(userInfo.getEmail());
+			log.info("@# = {} ",deletedCheck);
+			if(deletedCheck != null) {
+				loginDAO.reactivateUser(userInfo.getEmail());
+				return loginDAO.findByEmail(userInfo.getEmail());
+			}
+
 			LoginDTO newUser = new LoginDTO();
 			newUser.setMemberId("kakao_"+userInfo.getId());
 			newUser.setMemberEmail(userInfo.getEmail());
@@ -259,6 +270,9 @@ public class LoginServiceImpl implements LoginService {
     public void deleteUser(String memberId) {
         loginDAO.deleteUser(memberId);
     }
+	public void deleteKakaoUser(String memberId){
+		loginDAO.deleteKakaoUser(memberId);
+	}
 
     @Override
 	public LoginDTO findByEmail(String email) {

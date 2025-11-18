@@ -25,6 +25,7 @@ public interface LoginService { // UserDetailsService 상속 제거
     public LoginDTO findByEmail(String email);
     public void kakaoUnlink(String accessToken);
     public void deleteUser(String memberId);
+    public void deleteKakaoUser(String memberId);
 
     // UserDetailsService의 loadUserByUsername 메서드는 LoginServiceImpl에서 구현
 }
