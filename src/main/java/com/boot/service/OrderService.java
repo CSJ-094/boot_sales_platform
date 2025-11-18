@@ -1,6 +1,7 @@
 package com.boot.service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import com.boot.dao.CartDAO;
@@ -9,9 +10,8 @@ import com.boot.dao.OrderDetailDAO;
 import com.boot.dto.CartDTO;
 import com.boot.dto.OrdDTO;
 import com.boot.dto.OrderDetailDTO;
-import com.boot.dto.SellerOrderSummaryDTO;
-import com.boot.dto.TrackingResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,9 +30,6 @@ public class OrderService {
 
     @Autowired
     private CartDAO cartDAO;
-
-    @Autowired
-    private DeliveryService deliveryService;
 
     /**
      * 회원 ID로 주문 내역 목록을 조회합니다.
@@ -249,98 +246,5 @@ public class OrderService {
     @Transactional
     public void confirmOrder(String orderId, String memberId) {
         ordDAO.updateStatus(orderId, "구매확정");
-    }
-
-    /**
-     * 주문 상태를 '배송완료'로 수동 변경합니다.
-     * @param orderId 주문 ID
-     */
-    @Transactional
-    public void manuallyCompleteOrder(String orderId) {
-        // 기존의 주문 상태 업데이트 DAO 메소드를 재사용합니다.
-        ordDAO.updateStatus(orderId, "배송완료");
-        log.info("Order status manually updated to '배송완료' for orderId: {}", orderId);
-    }
-
-    /**
-     * 판매자 ID로 해당 판매자 상품의 주문 요약을 조회합니다.
-     */
-    public List<SellerOrderSummaryDTO> getSellerOrderSummaries(String sellerId) {
-        return ordDAO.getOrdersBySellerId(sellerId);
-    }
-
-    /**
-     * 송장번호와 택배사 코드를 입력하고 주문 상태를 배송중으로 변경합니다.
-     * 배송 추적 API로 유효<%-- '배송중' 상태일 때만 '배송완료 처리' 버튼이 나타납니다. --%>
-     <c:if test="${order.orderStatus == '배송중'}">
-     
-       <%-- 버튼을 누르면 확인 창이 뜨고, 확인을 누르면 form이 제출됩니다. --%>
-       <form action="/seller/orders/complete" method="post" style="display: inline-block;" onsubmit="return confirm('해당 주문을 배송완료 처리하시겠습니까?');">
-         
-         <%-- 컨트롤러에 주문 ID를 전달하기 위한 hidden input --%>
-         <input type="hidden" name="orderId" value="${order.orderId}">
-         
-         <button type="submit" class="btn btn-success btn-sm">배송완료 처리</button>
-       </form>
-       
-     </c:if>
-     성 검증을 수행하고, 배송 완료 여부에 따라 상태를 자동 업데이트합니다.
-     * @param orderId 주문 ID
-     * @param trackingNumber 송장번호
-     * @param deliveryCompany 택배사 코드
-     * @return 검증 결과 메시지 (성공 시 null, 실패 시 오류 메시지)
-     */
-    @Transactional
-    public String updateTrackingNumber(String orderId, String trackingNumber, String deliveryCompany) {
-        String status = "배송중"; // 기본 상태
-        String validationMessage = null; // API 검증 결과 메시지
-
-        // 1. 배송 추적 API로 유효성 검증
-        TrackingResponseDTO trackingInfo = null;
-        try {
-            trackingInfo = deliveryService.getTrackingInfo(deliveryCompany, trackingNumber);
-            if (trackingInfo != null) {
-                status = determineOrderStatus(trackingInfo); // API 응답 기반으로 상태 결정
-            } else {
-                validationMessage = "송장번호가 저장되었습니다. 배송 추적 API 검증에 실패하여 자동 상태 업데이트는 되지 않았습니다. 송장번호를 확인해주세요.";
-            }
-        } catch (Exception e) {
-            log.warn("API 검증 중 예외 발생 (송장번호는 저장됨): orderId={}, error={}", orderId, e.getMessage());
-            validationMessage = "송장번호가 저장되었으나, 배송 추적 API 연동 중 오류가 발생했습니다.";
-        }
-        
-        // 2. 송장번호, 택배사, 주문 상태를 한 번에 업데이트
-        ordDAO.updateTrackingAndStatus(orderId, trackingNumber, deliveryCompany, status);
-        log.info("송장 정보 업데이트 완료: orderId={}, trackingNumber={}, status={}", orderId, trackingNumber, status);
-
-        return validationMessage;
-    }
-
-    /**
-     * 배송 추적 정보를 기반으로 주문 상태를 결정합니다.
-     * @param trackingInfo 배송 추적 정보
-     * @return 주문 상태 ("배송중", "배송완료" 등)
-     */
-    private String determineOrderStatus(TrackingResponseDTO trackingInfo) {
-        if (trackingInfo == null) {
-            return "배송중"; // 정보가 없으면 기본값
-        }
-
-        // 1. API의 최상위 'complete' 필드를 먼저 확인 (가장 확실한 정보)
-        if (trackingInfo.isComplete()) {
-            return "배송완료";
-        }
-
-        // 2. 상세 내역이 있는 경우, 가장 마지막(최신) 내역을 확인
-        if (trackingInfo.getTrackingDetails() != null && !trackingInfo.getTrackingDetails().isEmpty()) {
-            int lastIndex = trackingInfo.getTrackingDetails().size() - 1;
-            String latestStatus = trackingInfo.getTrackingDetails().get(lastIndex).getKind();
-            if (latestStatus != null && (latestStatus.contains("배송완료") || latestStatus.contains("배달완료") || latestStatus.contains("수령완료"))) {
-                return "배송완료";
-            }
-        }
-
-        // 3. 위 조건에 해당하지 않으면 '배송중'으로 간주
-        return "배송중";
     }
 }

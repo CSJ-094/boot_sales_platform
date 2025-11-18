@@ -1,3 +1,4 @@
+
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
@@ -10,6 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="<c:url value='/css/header.css' />">
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
     function daumZipCode() {
         new daum.Postcode(
@@ -384,10 +386,61 @@
         .remove-btn:hover {
             background-color: #c82333;
         }
+        .mypage-sidebar a.withdraw {
+            color: #d9534f;
+            font-weight: 700;
+        }
+
+        .mypage-sidebar a.withdraw:hover {
+            background-color: #ffe5e5;
+            color: #c9302c;
+        }
+
+        .withdraw-warning{
+            color:#666;
+            margin-bottom:20px;
+        }
+        .withdraw-btn{
+            background:#d9534f;
+            color:#fff;
+            padding:12px 25px;
+            border:none;
+            border-radius:6px;
+            font-size:16px;
+            cursor:pointer;
+        }
         /* ⭐️ End of Wishlist Styles ⭐️ */
+		/* ... 기존 스타일 ... */
+		        
+		        /* 🚨 배송 조회 모달 스타일 추가 🚨 */
+		        #trackingResultModal {
+		            border: 1px solid #b08d57; 
+		            background-color: #ffffff;
+		            padding: 25px;
+		            border-radius: 8px;
+		            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+		            display: none; 
+		            position: fixed; 
+		            top: 50%; left: 50%;
+		            transform: translate(-50%, -50%);
+		            width: 550px;
+		            max-height: 80vh;
+		            overflow-y: auto;
+		            z-index: 1000;
+		        }
+		        #trackingInfoBox table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+		        #trackingInfoBox th, #trackingInfoBox td { border: 1px solid #e0e0e0; padding: 10px; text-align: left; font-size: 0.9em; }
+		        .loading { color: #b08d57; font-style: italic; text-align: center; padding: 20px; }
+		        #closeModalBtn { margin-top: 15px; background-color: #2c2c2c; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; }
+		    </style>
     </style>
 </head>
 <body>
+<c:if test="${not empty msg}">
+    <script>
+        alert("${msg}");
+    </script>
+</c:if>
 
 <jsp:include page="/WEB-INF/views/fragments/header.jsp" />
 
@@ -400,6 +453,8 @@
                     <li><a href="#member-info" class="active">회원 정보 수정</a></li>
                     <li><a href="#wishlist">찜목록 (Wishlist)</a></li>
                     <li><a href="#order-history">주문 내역</a></li>
+                    <li class="separator"></li>
+                    <li><a href="#deleteUser" class="withdraw">회원 탈퇴</a></li>
                 </ul>
             </nav>
         </aside>
@@ -419,14 +474,17 @@
                             </div>
                             <input type="hidden" name="memberId" value="${memberInfo.memberId}">
                         </div>
-
+                    <c:choose>
+                        <c:when test="${sessionScope.userType != 'kakao'}">
                         <div class="form-group">
                             <div class="form-row">
                                 <label for="MEMBER_PW">새 비밀번호</label>
                                 <input type="password" id="MEMBER_PW" name="memberPw" placeholder="새 비밀번호를 입력해주세요 (변경 시에만 입력)" >
                             </div>
                         </div>
-                        
+                        </c:when>
+                    </c:choose>
+
                         <div class="form-group">
                             <div class="form-row">
                                 <label for="MEMBER_NAME">이름</label>
@@ -548,6 +606,7 @@
                                 <th style="width: 120px;">금액</th>
                                 <th style="width: 120px;">주문 상태</th>
                                 <th style="width: 120px;">관리</th>
+								<th style="width: 120px;">배송조회</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -566,37 +625,44 @@
                                             </c:forEach>
                                         </ul>
                                     </td>
+                                    <td>${order.ordStatus}</td>
                                     <td>
-                                        <fmt:formatNumber value="${order.ordAmount}" pattern="#,###" />원
-                                    </td>
-                                    <td>
-                                        <a href="<c:url value='/order/complete?orderId=${order.ordId}'/>">${order.ordStatus}</a>
-                                    </td>
-                                    <td>
-                                        <%-- '배송완료' 상태일 때 '구매 확정' 버튼 표시 --%>
-                                        <c:if test="${order.ordStatus == '배송완료'}">
-                                            <form action="<c:url value='/order/confirm'/>" method="post" style="display:inline;">
-                                                <input type="hidden" name="orderId" value="${order.ordId}">
-                                                <button type="submit" class="action-btn" style="background-color: #28a745;">구매 확정</button>
-                                            </form>
-                                        </c:if>
-
-                                        <%-- '구매확정' 상태일 때 '리뷰쓰기' 버튼 표시 --%>
-                                        <c:if test="${order.ordStatus == '구매확정'}">
-                                            <%-- 주문에 포함된 첫 번째 상품 기준으로 리뷰 작성 페이지로 이동 --%>
-                                            <c:if test="${not empty order.orderDetails}">
-                                                <a href="<c:url value='/reviews/write?productId=${order.orderDetails[0].productId}&orderId=${order.ordId}'/>" 
-                                                   class="action-btn" style="background-color: #b08d57;">
-                                                   리뷰쓰기
-                                                </a>
-                                            </c:if>
-                                        </c:if>
+                                        <%-- 상태에 따라 다른 버튼 표시 --%>
+                                        <c:choose>
+                                             <c:when test="${order.ordStatus == '배송완료'}">
+                                                <form action="<c:url value='/order/confirm'/>" method="post" style="display:inline;">
+                                                    <input type="hidden" name="orderId" value="${order.ordId}">
+                                                    <button type="submit" class="action-btn" style="background-color: #28a745;">구매 확정</button>
+                                                </form>
+                                            </c:when>
+                                            <c:when test="${order.ordStatus == '구매확정'}">
+                                                완료
+                                            </c:when>
+                                            <c:otherwise>
+                                                -
+                                            </c:otherwise>
+                                        </c:choose>
                                     </td>
                                 </tr>
                             </c:forEach>
                         </tbody>
                     </table>
                 </c:if>
+            </div>
+            <div id="deleteUser-content" class="content-panel">
+
+                <p class="withdraw-warning">
+                    탈퇴 시 모든 회원 정보가 삭제되며 복구가 불가능합니다.
+                </p>
+
+                <form action="${pageContext.request.contextPath}/mypage/deleteUser"
+                      method="post"
+                      onsubmit="return confirm('정말 탈퇴하시겠습니까?');">
+
+                    <button type="submit" class="withdraw-btn">
+                        회원 탈퇴
+                    </button>
+                </form>
             </div>
             
         </section>
@@ -654,6 +720,70 @@
                 activatePanel(getHashId());
             });
         });
+		// ==============================================
+		        // 🚨 새로 추가된 jQuery 기반 배송 조회 로직 🚨
+		        // (DOM ready 대신 jQuery를 사용하므로 별도의 블록으로 분리)
+		        // ==============================================
+		        $(document).ready(function() {
+		            const $modal = $("#trackingResultModal");
+		            const $infoBox = $("#trackingInfoBox");
+
+		            // '🚚 조회' 버튼 클릭 이벤트
+		            $(".delivery-track-btn").on("click", function() {
+		                const t_code = $(this).data("code");
+		                const t_invoice = $(this).data("invoice");
+
+		                if (!t_code || !t_invoice || t_code === 'null' || t_invoice === 'null') {
+		                    $infoBox.html("<p style='color: orange; text-align: center;'>⚠ **운송장 정보 누락:** 배송이 시작되지 않았거나 정보가 없습니다.</p>");
+		                    $modal.show();
+		                    return;
+		                }
+
+		                $infoBox.html("<p class='loading'>🚀 배송 정보를 조회 중입니다... 잠시만 기다려주세요.</p>");
+		                $modal.show();
+
+		                $.ajax({
+		                    type: "GET",
+		                    url: "/trackDelivery", 
+		                    data: { t_code: t_code, t_invoice: t_invoice },
+		                    success: function(response) {
+		                        displayTrackingResult(response);
+		                    },
+		                    error: function(xhr) {
+		                        let errorMessage = xhr.responseText || "알 수 없는 API 호출 오류가 발생했습니다.";
+		                        $infoBox.html("<p style='color: red; text-align: center;'>❌ **조회 실패:** " + errorMessage + "</p>");
+		                    }
+		                });
+		            });
+
+		            // 모달 닫기 버튼 이벤트
+		            $("#closeModalBtn").on("click", function() { $modal.hide(); });
+		            
+		            // 배송 조회 결과를 HTML 테이블로 만들어 표시하는 함수
+		            function displayTrackingResult(data) {
+		                let html = "";
+		                
+		                html += "<h4>🚛 기본 정보</h4>";
+		                html += "<p><strong>운송장:</strong> " + (data.invoiceNo || '-') + "</p>";
+		                html += "<p><strong>상품명:</strong> " + (data.itemName || '-') + "</p>";
+		                html += "<p><strong>최종 상태:</strong> <strong style='color:" + (data.complete ? 'blue' : 'orange') + ";'>" + (data.complete ? '✅ 배송 완료' : '🚛 배송 진행 중') + "</strong></p>";
+		                
+		                html += "<hr><h4>📍 단계별 이력</h4>";
+		                
+		                if (data.trackingDetails && data.trackingDetails.length > 0) {
+		                    html += "<table><thead><tr><th>시간</th><th>배송 상태</th><th>현재 위치</th></tr></thead><tbody>";
+		                    
+		                    for (let i = data.trackingDetails.length - 1; i >= 0; i--) {
+		                        const detail = data.trackingDetails[i];
+		                        html += "<tr><td>" + (detail.timeString || '-') + "</td><td>" + (detail.kind || '-') + "</td><td>" + (detail.where || '-') + "</td></tr>";
+		                    }
+		                    html += "</tbody></table>";
+		                } else {
+		                     html += "<p>상세 배송 이력이 없습니다.</p>";
+		                }
+		                $infoBox.html(html);
+		            }
+		        });
     </script>
     <c:if test="${updateSuccess}">
         <script> alert('정보 수정이 완료되었습니다.'); </script>

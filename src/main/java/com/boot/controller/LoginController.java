@@ -6,14 +6,12 @@ import java.util.List;
 import javax.servlet.http.HttpSession;
 
 import com.boot.dao.MemDAO;
-import com.boot.dto.LoginDTO;
-import com.boot.dto.MemDTO;
-import com.boot.dto.OrdDTO;
-import com.boot.dto.ProdDTO;
+import com.boot.dto.*;
 import com.boot.service.LoginService;
 import com.boot.service.OrderService;
 import com.boot.service.WishlistService;
 import org.apache.ibatis.session.SqlSession;
+import org.apache.tomcat.util.http.parser.HttpParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -142,4 +140,52 @@ public class LoginController {
 		System.out.println("이메일 인증 이메일 : " + email);
 		return service.joinEmail(email);
 	}
+
+//	=================카카오 로그인 구현=================
+
+	@GetMapping("api/v1/oauth2/kakao")
+	public String KakaoCallback(@RequestParam String code, HttpSession session, RedirectAttributes redirectAttributes) {
+		log.info("@# 카카오 인증 확인용 로그 = " + code);
+
+		String accessToken = service.getAccessToken(code);
+
+		KakaoUserInfo userInfo= service.getUserInfo(accessToken);
+
+		LoginDTO loginCheck = service.kakaoLoginProcess(userInfo);
+
+		session.setAttribute("memberId", loginCheck.getMemberId());
+		session.setAttribute("memberName", loginCheck.getMemberName());
+        session.setAttribute("userType", "kakao");
+        session.setAttribute("kakaoAccessToken", accessToken);
+
+        //카카오 로그인 시 주소가 초기값이면 정보 수정 페이지로 넘어가게 하기.
+        if("default".equals(loginCheck.getMemberAddr1())){
+            redirectAttributes.addFlashAttribute("msg", "주소를 입력해주세요!");
+            return "redirect:/mypage#member-info";
+        }
+
+		return "redirect:/";
+	}
+    //카카오 회원 탈퇴
+    @PostMapping("/mypage/deleteUser")
+    public String deleteUser(HttpSession session) {
+
+        String userType = (String) session.getAttribute("userType");
+        String accessToken = (String) session.getAttribute("kakaoAccessToken");
+        String memberId = (String) session.getAttribute("memberId");
+
+        if("kakao".equals(userType)) {
+            if(accessToken != null) {
+                service.kakaoUnlink(accessToken);
+            }
+            service.deleteUser(memberId);
+        }else {
+            service.deleteUser(memberId);
+        }
+
+        session.invalidate();
+
+        return "redirect:/";
+
+    }
 }

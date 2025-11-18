@@ -7,8 +7,16 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import com.boot.dao.LoginDAO;
+import com.boot.dto.KakaoUserInfo;
 import com.boot.dto.LoginDTO;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -18,11 +26,18 @@ import org.springframework.stereotype.Service;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
 
 @Service
 @Slf4j
 public class LoginServiceImpl implements LoginService {
+
+	@Autowired
+	private SqlSession sqlSession;
 
 	@Autowired
 	private LoginDAO loginDAO;
@@ -149,4 +164,114 @@ public class LoginServiceImpl implements LoginService {
 		}
 	}
 
+    // Kakao AccessToken 받아오기.
+	@Override
+	public String getAccessToken(String code) {
+        //카카오 oauth2 토큰 발급 URL
+		String tokenUri = "https://kauth.kakao.com/oauth/token";
+		RestTemplate rt = new RestTemplate();
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+		MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+		params.add("grant_type", "authorization_code");
+		params.add("client_id", "c9021fed6c1ed7e7f03682f69d5f67ca"); //내 RestApi키
+		params.add("redirect_uri", "http://localhost:8484/api/v1/oauth2/kakao"); //내 Redirect URI 키
+		params.add("code", code);
+
+		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+		log.info("코드 요청: {}", code);
+		try {
+			ResponseEntity<String> response = rt.postForEntity(tokenUri, request, String.class);
+			log.info("카카오 서버에서 Post 받은 Access Token : {}", response.getBody());
+
+            //Access Token은 Json 형식으로 오는데 파싱하여 필요한 정보를 추출.
+			JsonObject json = JsonParser.parseString(response.getBody()).getAsJsonObject();
+			String accessToken = json.get("access_token").getAsString();
+			log.info("@# LoginServiceImpl - getAccessToken 메소드 - accessToken 확인로그: {}", accessToken);
+			return accessToken;
+
+		} catch (HttpClientErrorException e) {
+			// 에러 확인
+			log.error("Access token request failed with status: {} and body: {}", e.getStatusCode(), e.getResponseBodyAsString());
+			throw new RuntimeException("Access Token 못얻어옴.", e);
+		}
+	}
+
+	@Override
+	public KakaoUserInfo getUserInfo(String accessToken) {
+        // 사용자 정보 요청 URL
+		String requestUri = "https://kapi.kakao.com/v2/user/me";
+		RestTemplate rt = new RestTemplate();
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Authorization", "Bearer " + accessToken);
+		headers.add("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
+
+		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(headers);
+        //Post 요청으로 사용자 정보 가져오기
+		ResponseEntity<String> response = rt.postForEntity(requestUri, request, String.class);
+
+        //JSON 파싱하여 정보 추출
+		JsonObject obj = JsonParser.parseString(response.getBody()).getAsJsonObject();
+		KakaoUserInfo user = new KakaoUserInfo();
+
+		user.setId(obj.get("id").getAsLong()); //카카오 고유 ID
+		user.setNickname(obj.get("properties").getAsJsonObject().get("nickname").getAsString()); //이름
+		user.setEmail(obj.get("kakao_account").getAsJsonObject().get("email").getAsString()); // 이메일
+		return user;
+	}
+
+	@Override
+	public LoginDTO kakaoLoginProcess(KakaoUserInfo userInfo) {
+		LoginDTO exist = loginDAO.findByEmail(userInfo.getEmail());
+
+		if(exist == null) {
+			LoginDTO newUser = new LoginDTO();
+			newUser.setMemberId("kakao_"+userInfo.getId());
+			newUser.setMemberEmail(userInfo.getEmail());
+			newUser.setMemberName(userInfo.getNickname());
+			newUser.setMemberPw("default");
+			newUser.setMemberPhone("default");
+			newUser.setMemberZipcode("default");
+			newUser.setMemberAddr1("default");
+			newUser.setMemberAddr2("default");
+			newUser.setSocialLogin("kakao");
+            //번호 같은 기능은 비즈니스 심사를 받아야해서 default로 설정해둠,.
+            //DB에 넣을 다른 값들은 default로 임의 설정.
+
+			loginDAO.write(newUser);
+			exist = newUser;
+
+		}
+		return exist;
+	}
+
+    //카카오 회원 탈퇴 구현
+    @Override
+    public void kakaoUnlink(String accessToken){
+        //로그인 시 accessToken 세션이 남아 있기 때문에 바로 호출 가능.
+        String unlinkUri = "https://kapi.kakao.com/v1/user/unlink";
+        RestTemplate rt = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + accessToken);
+
+        HttpEntity<String> request = new HttpEntity<>(headers);
+        try{
+            ResponseEntity<String> response = rt.postForEntity(unlinkUri, request, String.class);
+                log.info("회원 탈퇴 성공: {}",response.getBody());
+        }catch(HttpClientErrorException e){
+            log.error("회원 탈퇴 실패 및 오류메시지 로그 확인용: {}",e.getResponseBodyAsString());
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void deleteUser(String memberId) {
+        loginDAO.deleteUser(memberId);
+    }
+
+    @Override
+	public LoginDTO findByEmail(String email) {
+		return loginDAO.findByEmail(email);
+	}
 }

@@ -29,6 +29,13 @@
 			</li>
 
             <li>
+                <a href="<c:url value='/seller/orders' />"
+                   class="sidebar-link${param.menu eq 'orders' ? ' active' : ''}">
+                    주문 내역
+                </a>
+            </li>
+
+            <li>
                 <a href="<c:url value='/seller/members' />"
                    class="sidebar-link${param.menu eq 'members' ? ' active' : ''}">
                     회원 관리

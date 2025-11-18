@@ -21,7 +21,7 @@
 			<c:choose>
 				<c:when test="${not empty sessionScope.memberId}">
 					<c:choose>
-						<c:when test="${sessionScope.userType == 'customer'}">
+						<c:when test="${sessionScope.userType == 'customer' or sessionScope.userType == 'kakao'}">
 							<span class="auth-welcome">환영합니다, ${sessionScope.memberName}님!</span>
 							<a href="<c:url value='/mypage' />" class="auth-btn">마이페이지</a>
 							<a href="<c:url value='/cart/list' />" class="auth-btn cart-btn">장바구니</a>
