@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper
-  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.boot.dao.DashboardDAO">
 
-     <!-- 요약 조회 -->
+    <!-- 요약 조회 -->
     <select id="selectSummary"
             resultType="com.boot.dto.SellerDashboardDTO">
         <![CDATA[
@@ -13,72 +13,65 @@
             /* 오늘 주문 건수 */
             (
                 SELECT COUNT(*)
-                  FROM ORDER_DB o
-                 WHERE o.ORD_DATE >= TRUNC(SYSDATE)
-                   AND o.ORD_DATE <  TRUNC(SYSDATE) + 1
+                FROM ORDER_DB o
+                WHERE o.ORD_DATE >= TRUNC(SYSDATE)
+                  AND o.ORD_DATE <  TRUNC(SYSDATE) + 1
             ) AS todayOrderCount,
 
             /* 오늘 매출액 */
             (
                 SELECT NVL(SUM(o.ORD_AMOUNT), 0)
-                  FROM ORDER_DB o
-                 WHERE o.ORD_DATE >= TRUNC(SYSDATE)
-                   AND o.ORD_DATE <  TRUNC(SYSDATE) + 1
+                FROM ORDER_DB o
+                WHERE o.ORD_DATE >= TRUNC(SYSDATE)
+                  AND o.ORD_DATE <  TRUNC(SYSDATE) + 1
             ) AS todaySalesAmount,
 
             /* 오늘 신규 가입자 */
             (
                 SELECT COUNT(*)
-                  FROM USER_DB u
-                 WHERE u.MEMBER_REGDATE >= TRUNC(SYSDATE)
-                   AND u.MEMBER_REGDATE <  TRUNC(SYSDATE) + 1
+                FROM USER_DB u
+                WHERE u.MEMBER_REGDATE >= TRUNC(SYSDATE)
+                  AND u.MEMBER_REGDATE <  TRUNC(SYSDATE) + 1
             ) AS todayNewMembers,
 
             /* 오늘 방문자 수 */
             (
                 SELECT COUNT(DISTINCT NVL(v.MEMBER_ID, v.IP))
-                  FROM VISIT_LOG_DB v
-                 WHERE v.VISIT_DATE >= TRUNC(SYSDATE)
-                   AND v.VISIT_DATE <  TRUNC(SYSDATE) + 1
+                FROM VISIT_LOG_DB v
+                WHERE v.VISIT_DATE >= TRUNC(SYSDATE)
+                  AND v.VISIT_DATE <  TRUNC(SYSDATE) + 1
             ) AS todayVisitors,
 
             /* 미처리 문의 수 */
             (
                 SELECT COUNT(*)
-                  FROM QNA_DB q
-                 WHERE q.QNA_PARENT_ID IS NULL
-                   AND q.QNA_STATUS = '답변대기'
+                FROM QNA_DB q
+                WHERE q.QNA_PARENT_ID IS NULL
+                  AND q.QNA_STATUS = '답변대기'
             ) AS pendingQnaCount,
 
             /* 어제 주문 건수 */
             (
                 SELECT COUNT(*)
-                  FROM ORDER_DB o
-                 WHERE o.ORD_DATE >= TRUNC(SYSDATE) - 1
-                   AND o.ORD_DATE <  TRUNC(SYSDATE)
+                FROM ORDER_DB o
+                WHERE o.ORD_DATE >= TRUNC(SYSDATE) - 1
+                  AND o.ORD_DATE <  TRUNC(SYSDATE)
             ) AS yesterdayOrderCount,
 
             /* 어제 매출액 */
             (
                 SELECT NVL(SUM(o.ORD_AMOUNT), 0)
-                  FROM ORDER_DB o
-                 WHERE o.ORD_DATE >= TRUNC(SYSDATE) - 1
-                   AND o.ORD_DATE <  TRUNC(SYSDATE)
+                FROM ORDER_DB o
+                WHERE o.ORD_DATE >= TRUNC(SYSDATE) - 1
+                  AND o.ORD_DATE <  TRUNC(SYSDATE)
             ) AS yesterdaySalesAmount
 
-            0 AS todayOrderCount,
-            0 AS todaySalesAmount,
-            0 AS todayNewMembers,
-            0 AS todayVisitors,
-            0 AS pendingQnaCount,
-            0 AS yesterdayOrderCount,
-            0 AS yesterdaySalesAmount
         FROM DUAL
         ]]>
     </select>
 
-	<!--	일별 매출-->
-	 <select id="selectDailySales"
+    <!--	일별 매출-->
+    <select id="selectDailySales"
             resultType="com.boot.dto.SalesStatDTO">
         <![CDATA[
         SELECT
@@ -91,11 +84,10 @@
         GROUP BY TO_CHAR(ORD_DATE, 'YYYY-MM-DD')
         ORDER BY label
         ]]>
-        SELECT 'nodata' AS label, 0 AS salesAmount, 0 AS orderCount FROM DUAL WHERE 1=0
     </select>
-    
-<!--    주별 매출-->
-	<select id="selectWeeklySales"
+
+    <!--    주별 매출-->
+    <select id="selectWeeklySales"
             resultType="com.boot.dto.SalesStatDTO">
         <![CDATA[
         SELECT
@@ -108,11 +100,10 @@
         GROUP BY TO_CHAR(ORD_DATE, 'IYYY'), TO_CHAR(ORD_DATE, 'IW')
         ORDER BY MIN(ORD_DATE)
         ]]>
-        SELECT 'nodata' AS label, 0 AS salesAmount, 0 AS orderCount FROM DUAL WHERE 1=0
     </select>
-    
-<!--    월별 매출-->
- 	<select id="selectMonthlySales"
+
+    <!--    월별 매출-->
+    <select id="selectMonthlySales"
             resultType="com.boot.dto.SalesStatDTO">
         <![CDATA[
         SELECT
@@ -125,10 +116,9 @@
         GROUP BY TO_CHAR(ORD_DATE, 'YYYY-MM')
         ORDER BY label
         ]]>
-        SELECT 'nodata' AS label, 0 AS salesAmount, 0 AS orderCount FROM DUAL WHERE 1=0
    	 </select>
-   	 
-	<!-- 일별 방문자 -->
+
+    <!-- 일별 방문자 -->
     <select id="selectDailyVisitors"
             resultType="com.boot.dto.VisitStatDTO">
         <![CDATA[
@@ -141,7 +131,6 @@
         GROUP BY TO_CHAR(VISIT_DATE, 'YYYY-MM-DD')
         ORDER BY label
         ]]>
-        SELECT 'nodata' AS label, 0 AS visitor_count FROM DUAL WHERE 1=0
     </select>
 
     <!-- 주별 방문자 -->
@@ -157,7 +146,6 @@
         GROUP BY TO_CHAR(VISIT_DATE, 'IYYY'), TO_CHAR(VISIT_DATE, 'IW')
         ORDER BY MIN(VISIT_DATE)
         ]]>
-        SELECT 'nodata' AS label, 0 AS visitor_count FROM DUAL WHERE 1=0
     </select>
 
     <!-- 월별 방문자 -->
@@ -173,50 +161,47 @@
         GROUP BY TO_CHAR(VISIT_DATE, 'YYYY-MM')
         ORDER BY label
         ]]>
-        SELECT 'nodata' AS label, 0 AS visitor_count FROM DUAL WHERE 1=0
     </select>
-    
+
     <!-- 최근 주문 10건 -->
-	<select id="selectRecentOrders"
-	        resultType="com.boot.dto.SellerRecentOrderDTO">
+    <select id="selectRecentOrders"
+            resultType="com.boot.dto.SellerRecentOrderDTO">
 	    <![CDATA[
-	    SELECT *
-	    FROM (
-	        SELECT
-	            o.ORD_DATE    AS ordDate,
-	            o.ORD_ID      AS ordId,
-	            u.MEMBER_NAME AS buyerName,
-	            o.ORD_AMOUNT  AS ordAmount,
-	            o.ORD_STATUS  AS ordStatus
-	        FROM ORDER_DB o
-	             JOIN USER_DB u ON o.ORD_MEMID = u.MEMBER_ID
-	        ORDER BY o.ORD_DATE DESC
-	    )
-	    WHERE ROWNUM <= 10
-	    ]]>
-        SELECT SYSDATE AS ordDate, 'nodata' AS ordId, 'nodata' AS buyerName, 0 AS ordAmount, 'nodata' AS ordStatus FROM DUAL WHERE 1=0
+        SELECT *
+        FROM (
+                 SELECT
+                     o.ORD_DATE    AS ordDate,
+                     o.ORD_ID      AS ordId,
+                     u.MEMBER_NAME AS buyerName,
+                     o.ORD_AMOUNT  AS ordAmount,
+                     o.ORD_STATUS  AS ordStatus
+                 FROM ORDER_DB o
+                          JOIN USER_DB u ON o.ORD_MEMID = u.MEMBER_ID
+                 ORDER BY o.ORD_DATE DESC
+             )
+        WHERE ROWNUM <= 10
+        ]]>
 	</select>
 
-<!-- 최근 문의 10건 -->
+    <!-- 최근 문의 10건 -->
     <select id="selectRecentQna"
             resultType="com.boot.dto.SellerRecentQnaDTO">
         <![CDATA[
         SELECT *
         FROM (
-            SELECT
-                q.QNA_REG_DATE AS qnaDate,
-                q.QNA_ID       AS qnaId,
-                p.PROD_NAME    AS prodName,
-                q.MEMBER_ID    AS memberId,
-                q.QNA_TITLE    AS title,
-                q.QNA_STATUS   AS status
-            FROM QNA_DB q
-                 JOIN PRODUCT_DB p ON q.PROD_ID = p.PROD_ID
-            WHERE q.QNA_PARENT_ID IS NULL   -- 원글만
-            ORDER BY q.QNA_REG_DATE DESC
-        )
+                 SELECT
+                     q.QNA_REG_DATE AS qnaDate,
+                     q.QNA_ID       AS qnaId,
+                     p.PROD_NAME    AS prodName,
+                     q.MEMBER_ID    AS memberId,
+                     q.QNA_TITLE    AS title,
+                     q.QNA_STATUS   AS status
+                 FROM QNA_DB q
+                          JOIN PRODUCT_DB p ON q.PROD_ID = p.PROD_ID
+                 WHERE q.QNA_PARENT_ID IS NULL   -- 원글만
+                 ORDER BY q.QNA_REG_DATE DESC
+             )
         WHERE ROWNUM <= 10
         ]]>
-        SELECT SYSDATE AS qnaDate, 0 AS qnaId, 'nodata' AS prodName, 'nodata' AS memberId, 'nodata' AS title, 'nodata' AS status FROM DUAL WHERE 1=0
     </select>
 </mapper>

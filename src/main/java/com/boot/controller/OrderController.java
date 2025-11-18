@@ -1,6 +1,7 @@
 package com.boot.controller;
 
 import java.util.List;
+import java.util.Date; // Date import 추가
 
 import javax.servlet.http.HttpSession;
 
@@ -8,6 +9,8 @@ import com.boot.dto.CartDTO;
 import com.boot.dto.OrdDTO;
 import com.boot.service.CartService;
 import com.boot.service.OrderService;
+import com.boot.service.UserCouponService; // UserCouponService import 추가
+import com.boot.service.PointService; // PointService import 추가
 import com.boot.dao.OrdDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -33,6 +36,11 @@ public class OrderController {
 
     @Autowired
     private OrdDAO ordDAO; // 주문 정보 조회를 위해 추가
+
+    @Autowired
+    private UserCouponService userCouponService; // UserCouponService 주입
+    @Autowired
+    private PointService pointService; // PointService 주입
 
     /**
      * 주문서 작성 페이지를 보여줍니다.
@@ -67,6 +75,12 @@ public class OrderController {
 
         final int SHIPPING_FEE = 3000; // 배송비는 3000원으로 가정
         model.addAttribute("shippingFee", SHIPPING_FEE);
+
+        // ⭐️ 3. 사용자 보유 쿠폰 목록과 현재 포인트를 모델에 추가합니다.
+        model.addAttribute("userCoupons", userCouponService.getUserCouponsByMemberId(memberId));
+        model.addAttribute("currentPoint", pointService.getCurrentPoint(memberId));
+        model.addAttribute("now", new Date()); // 현재 날짜를 모델에 추가
+
         return "order/orderForm";
     }
 

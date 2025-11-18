@@ -1,21 +1,36 @@
 package com.boot.controller;
 
 import com.boot.dao.MemDAO;
+import com.boot.dto.CouponDTO;
 import com.boot.dto.MemDTO;
 import com.boot.dto.OrdDTO;
+import com.boot.dto.PointHistoryDTO;
 import com.boot.dto.ProdDTO;
+import com.boot.dto.UserCouponDTO;
+import com.boot.service.CouponService;
+import com.boot.service.LoginService;
 import com.boot.service.OrderService;
+import com.boot.service.PointService;
+import com.boot.service.UserCouponService;
+import com.boot.service.UserService; // UserService import 추가
 import com.boot.service.WishlistService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.util.Date;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
 @Slf4j
@@ -34,14 +49,30 @@ public class MyPageController {
     @Autowired
     private OrderService orderService;
 
-    @GetMapping
-    public String mypage_view(HttpSession session, Model model) {
-        log.info("@# mypage_view() - 정보 조회 및 리스트 로드");
+    @Autowired
+    private UserCouponService userCouponService;
+    @Autowired
+    private PointService pointService;
+    @Autowired
+    private CouponService couponService;
+    @Autowired
+    private LoginService loginService;
+    @Autowired
+    private UserService userService; // UserService 주입
 
+    private String getMemberIdOrRedirect(HttpSession session, RedirectAttributes redirectAttributes) {
         String memberId = (String) session.getAttribute("memberId");
-
         if (memberId == null) {
-            log.warn("@# mypage_view() - 세션 ID 없음. 로그인 페이지로 리다이렉트.");
+            redirectAttributes.addFlashAttribute("loginError", "로그인이 필요합니다.");
+            return null;
+        }
+        return memberId;
+    }
+
+    @GetMapping
+    public String myPage(HttpSession session, Model model, RedirectAttributes redirectAttributes) {
+        String memberId = getMemberIdOrRedirect(session, redirectAttributes);
+        if (memberId == null) {
             return "redirect:/login";
         }
 
@@ -57,6 +88,32 @@ public class MyPageController {
         List<OrdDTO> orderList = orderService.getOrdersWithDetailsByMemberId(memberId);
         model.addAttribute("orderList", orderList);
 
+        // 4. 사용자 쿠폰 조회
+        List<UserCouponDTO> userCoupons = userCouponService.getUserCouponsByMemberId(memberId);
+        model.addAttribute("userCoupons", userCoupons);
+
+        // 5. 포인트 내역 조회
+        List<PointHistoryDTO> pointHistory = pointService.getPointHistory(memberId);
+        model.addAttribute("pointHistory", pointHistory);
+
+        // 6. 현재 포인트 조회
+        Integer currentPoint = pointService.getCurrentPoint(memberId);
+        model.addAttribute("currentPoint", currentPoint);
+
+        model.addAttribute("now", new Date());
+
+        // 7. 발급 가능한 쿠폰 조회
+        List<CouponDTO> allActiveCoupons = couponService.getActiveCoupons();
+        
+        Set<Long> possessedCouponIds = userCoupons.stream()
+                                                .map(UserCouponDTO::getCouponId)
+                                                .collect(Collectors.toSet());
+        
+        List<CouponDTO> claimableCoupons = allActiveCoupons.stream()
+                                                        .filter(coupon -> !possessedCouponIds.contains(coupon.getCouponId()))
+                                                        .collect(Collectors.toList());
+        model.addAttribute("claimableCoupons", claimableCoupons);
+
         return "user/mypage";
     }
 
@@ -64,19 +121,54 @@ public class MyPageController {
     public String mypage_update(@ModelAttribute MemDTO member, RedirectAttributes redirectAttributes) {
         log.info("@# mypage_update() - 정보 수정 요청: {}", member.getMemberId());
 
-        if(member.getMemberPw() != null && !member.getMemberPw().isEmpty()) {
-            String encodePw = passwordEncoder.encode(member.getMemberPw());
-            member.setMemberPw(encodePw);
-            //정보 수정 시 다시 비밀번호 암호화 하기.
-        }
-        else{
-            MemDTO OriginalInfo = memDAO.getMemberInfo(member.getMemberId());
-            member.setMemberPw(OriginalInfo.getMemberPw());
-            //정보 수정 시 비밀번호 란이 비어있으면 기존 비밀번호 유지.
-        }
+        // UserService의 updateUserInfo 메서드를 호출하여 회원 정보 수정 처리
+        userService.updateUserInfo(member); // 메서드 호출 변경
 
-        memDAO.modify(member);
         redirectAttributes.addFlashAttribute("updateSuccess", true);
         return "redirect:/mypage";
+    }
+
+    // 쿠폰 발급 기능
+    @PostMapping("/claimCoupon")
+    public String claimCoupon(@RequestParam("couponId") Long couponId,
+                              HttpSession session,
+                              RedirectAttributes redirectAttributes) {
+        String memberId = getMemberIdOrRedirect(session, redirectAttributes);
+        if (memberId == null) {
+            return "redirect:/login";
+        }
+
+        try {
+            userCouponService.issueCouponToUser(memberId, couponId);
+            redirectAttributes.addFlashAttribute("couponMessage", "쿠폰이 성공적으로 발급되었습니다!");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("couponError", e.getMessage());
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("couponError", "쿠폰 발급 중 오류가 발생했습니다.");
+        }
+
+        return "redirect:/mypage#my-coupons";
+    }
+
+    // 찜목록 삭제 기능
+    @PostMapping("/wishlist/remove")
+    public String removeWishlist(@RequestParam("prodId") Long prodId,
+                                 HttpSession session,
+                                 RedirectAttributes redirectAttributes) {
+        String memberId = (String) session.getAttribute("memberId");
+        if (memberId == null) {
+            redirectAttributes.addFlashAttribute("loginError", "로그인이 필요합니다.");
+            return "redirect:/login";
+        }
+
+        try {
+            wishlistService.removeProductFromWishlist(memberId, prodId);
+            redirectAttributes.addFlashAttribute("message", "찜목록에서 상품이 삭제되었습니다.");
+        } catch (Exception e) {
+            log.error("찜목록 삭제 중 오류 발생: {}", e.getMessage());
+            redirectAttributes.addFlashAttribute("message", "찜목록 삭제 중 오류가 발생했습니다.");
+        }
+
+        return "redirect:/mypage#wishlist";
     }
 }

@@ -33,7 +33,7 @@
     -- ⭐️ 이미지 테이블 JOIN (IMAGE_DB로 변경)
 		LEFT JOIN IMAGE_DB I 
         ON P.PROD_ID = I.IMG_PROD_ID 
-        AND I.IMG_MAIN = 'Y'  WHERE C.MEMBER_ID = #{memberId}
+        AND I.IS_MAIN = 'Y'  WHERE C.MEMBER_ID = #{memberId}
 		ORDER BY C.REG_DATE DESC
     </select>
 

@@ -48,42 +48,63 @@
             color: #155724;
         }
 
-        .tracking-form {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
+		/* 송장번호 입력 폼: 위에 택배사, 아래 송장번호+버튼 */
+		.tracking-form {
+		    display: flex;
+		    flex-direction: column;   /* 위/아래 두 줄 */
+		    gap: 6px;
+		    align-items: flex-start;
+		    width: 100%;
+		}
 
-        .tracking-form select {
-            padding: 6px 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-            min-width: 120px;
-        }
+		/* 위 줄: 택배사 선택만 */
+		.tracking-top {
+		    width: 100%;
+		}
 
-        .tracking-form input {
-            flex: 1;
-            padding: 6px 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-        }
+		.tracking-top select {
+		    padding: 6px 10px;
+		    border: 1px solid #ddd;
+		    border-radius: 4px;
+		    font-size: 14px;
+		    min-width: 120px;
+		}
 
-        .tracking-form button {
-            padding: 6px 16px;
-            background-color: #b08d57;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            white-space: nowrap;
-        }
+		/* 아래 줄: 송장번호 입력 + 등록 버튼 */
+		.tracking-bottom {
+		    display: flex;
+		    width: 100%;
+		    gap: 8px;
+		    align-items: center;
+		}
 
-        .tracking-form button:hover {
-            background-color: #9a7748;
-        }
+		.tooltip-wrap {
+		    position: relative;
+		    flex: 1; /* 아래 줄에서 폭 채우기 */
+		}
+
+		.tooltip-wrap input {
+		    width: 100%;
+		    padding: 6px 10px;
+		    border: 1px solid #ddd;
+		    border-radius: 4px;
+		    font-size: 14px;
+		}
+
+		.tracking-form button {
+		    padding: 6px 16px;
+		    background-color: #b08d57;
+		    color: white;
+		    border: none;
+		    border-radius: 4px;
+		    cursor: pointer;
+		    font-size: 14px;
+		    white-space: nowrap;
+		}
+
+		.tracking-form button:hover {
+		    background-color: #9a7748;
+		}
 
         .tracking-number {
             color: #666;
@@ -175,6 +196,42 @@
             padding: 20px;
             color: #666;
         }
+		/* 송장번호 툴팁 */
+		.tooltip-wrap {
+		    position: relative;
+		    flex: 1; /* tracking-form 안에서 나머지 폭 채우기 */
+		}
+
+		.tooltip-hint {
+		    position: absolute;
+		    left: 0;
+		    top: calc(100% + 4px);
+		    padding: 10px 14px;     /* 조금 넓게 */
+		    background: #fff;
+		    border: 1px solid #ddd;
+		    border-radius: 6px;
+		    font-size: 0.8rem;
+		    color: #555;
+		    line-height: 1.5;
+
+		    width: 260px;           /* 박스 너비 고정 */
+		    white-space: normal;    /* 문장 자연스럽게 줄바꿈 */
+		    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+
+		    opacity: 0;
+		    visibility: hidden;
+		    transition: opacity 0.15s ease;
+		    z-index: 50;
+		}
+
+
+		/* 마우스 올리거나, 포커스되면 표시 */
+		.tooltip-wrap:hover .tooltip-hint,
+		.tooltip-wrap input:focus + .tooltip-hint {
+		    opacity: 1;
+		    visibility: visible;
+		}
+
     </style>
 </head>
 <body>
@@ -259,31 +316,54 @@
                                     </c:when>
                                     <c:otherwise>
                                         <c:if test="${order.orderStatus == '결제완료'}">
-                                            <form class="tracking-form" action="${pageContext.request.contextPath}/seller/orders/${order.orderId}/tracking" method="post">
-                                                <select name="deliveryCompany" id="deliveryCompany_${order.orderId}" required onchange="updateTrackingPlaceholder('${order.orderId}')">
-                                                    <option value="">택배사 선택</option>
-                                                    <option value="04">CJ대한통운 (12자리)</option>
-                                                    <option value="05">한진택배 (10자리)</option>
-                                                    <option value="08">로젠택배 (10자리)</option>
-                                                    <option value="01">우체국택배 (13자리)</option>
-                                                    <option value="23">경동택배</option>
-                                                    <option value="46">CU편의점택배</option>
-                                                    <option value="24">대신택배</option>
-                                                    <option value="16">한의사랑택배</option>
-                                                    <option value="17">천일택배</option>
-                                                    <option value="18">건영택배</option>
-                                                    <option value="25">일양로지스</option>
-                                                    <option value="26">합동택배</option>
-                                                    <option value="27">한서호남택배</option>
-                                                    <option value="28">GS25</option>
-                                                    <option value="33">동부익스프레스</option>
-                                                </select>
-                                                <input type="text" name="trackingNumber" id="trackingNumber_${order.orderId}" placeholder="송장번호 입력 (예: 123456789012)" required />
-                                                <button type="submit">등록</button>
-                                                <small style="display: block; margin-top: 4px; color: #666; font-size: 0.85rem;">
-                                                    ※ 실제 배송된 송장번호를 입력하세요. 배송 추적 API로 유효성 검증이 진행됩니다.
-                                                </small>
-                                            </form>
+											<form class="tracking-form"
+											      action="${pageContext.request.contextPath}/seller/orders/${order.orderId}/tracking"
+											      method="post">
+
+											    <!-- 위 줄: 택배사 선택만 -->
+											    <div class="tracking-top">
+											        <select name="deliveryCompany"
+											                id="deliveryCompany_${order.orderId}"
+											                required
+											                onchange="updateTrackingPlaceholder('${order.orderId}')">
+											            <option value="">택배사 선택</option>
+											            <option value="04">CJ대한통운 (12자리)</option>
+											            <option value="05">한진택배 (10자리)</option>
+											            <option value="08">로젠택배 (10자리)</option>
+											            <option value="01">우체국택배 (13자리)</option>
+											            <option value="23">경동택배</option>
+											            <option value="46">CU편의점택배</option>
+											            <option value="24">대신택배</option>
+											            <option value="16">한의사랑택배</option>
+											            <option value="17">천일택배</option>
+											            <option value="18">건영택배</option>
+											            <option value="25">일양로지스</option>
+											            <option value="26">합동택배</option>
+											            <option value="27">한서호남택배</option>
+											            <option value="28">GS25</option>
+											            <option value="33">동부익스프레스</option>
+											        </select>
+											    </div>
+
+											    <!-- 아래 줄: 송장번호 입력칸 + 등록 버튼 -->
+											    <div class="tracking-bottom">
+											        <div class="tooltip-wrap">
+											            <input type="text"
+											                   name="trackingNumber"
+											                   id="trackingNumber_${order.orderId}"
+											                   placeholder="송장번호 입력 (예: 123456789012)"
+											                   required />
+											            <div class="tooltip-hint">
+											                ※ 실제 배송된 송장번호를 입력하세요.<br>
+											                배송 추적 API로 유효성 검증이 진행됩니다.
+											            </div>
+											        </div>
+
+											        <button type="submit">등록</button>
+											    </div>
+											</form>
+
+
                                         </c:if>
                                         <c:if test="${order.orderStatus != '결제완료'}">
                                             <span style="color:#999; font-size:0.9rem;">-</span>

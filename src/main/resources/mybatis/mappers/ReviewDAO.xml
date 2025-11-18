@@ -80,4 +80,10 @@
         WHERE r.REVIEW_ID = #{reviewId}
     </select>
 
+    <select id="existsReview" resultType="int" parameterType="map">
+        SELECT COUNT(*)
+        FROM REVIEW_DB
+        WHERE MEMBER_ID = #{memberId} AND PROD_ID = #{prodId} AND REVIEW_PARENT_ID IS NULL
+    </select>
+
 </mapper>

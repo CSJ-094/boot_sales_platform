@@ -17,13 +17,13 @@ public class WishlistService {
         return wishlistDAO.getWishlistByMemberId(memberId);
     }
 
-    public void addWishlist(String memberId, Integer prodId) {
-        // DTO를 생성할 필요 없이 파라미터를 직접 전달합니다.
+    // 메서드 이름 복구 및 prodId 타입 Long으로 변경
+    public void addProductToWishlist(String memberId, Long prodId) {
         wishlistDAO.addWishlist(memberId, prodId);
     }
 
-    public void removeWishlist(String memberId, Integer prodId) {
-        // DAO의 delete 메서드를 호출하도록 수정합니다.
+    // 메서드 이름 복구 및 prodId 타입 Long으로 변경
+    public void removeProductFromWishlist(String memberId, Long prodId) {
         wishlistDAO.delete(memberId, prodId);
     }
 
@@ -33,8 +33,8 @@ public class WishlistService {
      * @param prodId 상품 ID
      * @return 찜 목록에 있으면 true, 없으면 false
      */
-    public boolean isProductInWishlist(String memberId, Integer prodId) {
-        // DAO의 count 메서드를 호출하여 0보다 크면 true를 반환합니다.
+    // prodId 타입 Long으로 변경
+    public boolean isProductInWishlist(String memberId, Long prodId) {
         return wishlistDAO.countByMemberIdAndProdId(memberId, prodId) > 0;
     }
 }

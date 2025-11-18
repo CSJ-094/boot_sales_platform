@@ -23,7 +23,7 @@ public class WishlistController {
 
     @PostMapping("/add")
     public String addWishlist(HttpSession session,
-                              @RequestParam("prodId") Integer prodId,
+                              @RequestParam("prodId") Long prodId, // Integer -> Long 변경
                               RedirectAttributes redirectAttributes,
                               HttpServletRequest request) {
 
@@ -34,33 +34,30 @@ public class WishlistController {
         }
 
         try {
-            wishlistService.addWishlist(memberId, prodId);
+            wishlistService.addProductToWishlist(memberId, prodId); // 메서드 이름 복구
             redirectAttributes.addFlashAttribute("message", "상품을 찜 목록에 추가했습니다.");
         } catch (Exception e) {
-            // 데이터베이스 제약 조건(PK 중복 등) 위반 시 예외가 발생할 수 있습니다.
             log.error("찜하기 추가 중 오류 발생: {}", e.getMessage());
             redirectAttributes.addFlashAttribute("errorMessage", "이미 찜한 상품이거나, 처리 중 오류가 발생했습니다.");
         }
 
-        // 이전 페이지(상품 상세 페이지)로 리다이렉트
         String referer = request.getHeader("Referer");
         return "redirect:" + (referer != null ? referer : "/");
     }
 
     @PostMapping("/remove")
     public String removeWishlist(HttpSession session,
-                                 @RequestParam("prodId") Integer prodId,
+                                 @RequestParam("prodId") Long prodId, // Integer -> Long 변경
                                  RedirectAttributes redirectAttributes,
                                  HttpServletRequest request) {
 
         String memberId = (String) session.getAttribute("memberId");
         if (memberId == null) {
-            // 비로그인 사용자는 이 경로에 접근할 수 없지만, 안전장치로 추가
             return "redirect:/login";
         }
 
         try {
-            wishlistService.removeWishlist(memberId, prodId);
+            wishlistService.removeProductFromWishlist(memberId, prodId); // 메서드 이름 복구
             redirectAttributes.addFlashAttribute("message", "상품을 찜 목록에서 제거했습니다.");
         } catch (Exception e) {
             log.error("찜하기 삭제 중 오류 발생: {}", e.getMessage());

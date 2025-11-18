@@ -14,7 +14,10 @@
             ORD_AMOUNT as ordAmount,
             ORD_DFEE as ordDfee,
             ORD_DISCOUNT as ordDiscount,
-            ORD_STATUS as ordStatus
+            ORD_STATUS as ordStatus,
+            ORD_PAYMENT_KEY as ordPaymentKey,
+            DELIVERY_COMPANY as deliveryCompany,
+            TRACKING_NUMBER as trackingNumber
         FROM ORDER_DB
         WHERE ORD_MEMID = #{memberId}
         ORDER BY ORD_DATE DESC
@@ -22,8 +25,8 @@
 
     <!-- 새로운 주문 정보 저장 -->
     <insert id="save" parameterType="com.boot.dto.OrdDTO">
-        INSERT INTO ORDER_DB (ORD_ID, ORD_MEMID, ORD_DATE, ORD_AMOUNT, ORD_DFEE, ORD_DISCOUNT, ORD_STATUS)
-        VALUES (#{ordId}, #{ordMemId}, SYSDATE, #{ordAmount}, #{ordDfee}, #{ordDiscount}, #{ordStatus})
+        INSERT INTO ORDER_DB (ORD_ID, ORD_MEMID, ORD_DATE, ORD_AMOUNT, ORD_DFEE, ORD_DISCOUNT, ORD_STATUS, ORD_PAYMENT_KEY)
+        VALUES (#{ordId}, #{ordMemId}, SYSDATE, #{ordAmount}, #{ordDfee}, #{ordDiscount}, #{ordStatus}, #{ordPaymentKey})
     </insert>
 
     <!-- 주문 ID로 단일 주문 정보 조회 -->
@@ -84,7 +87,7 @@
             SUM(od.QUANTITY)                 AS totalQuantity,
             SUM(od.PRICE * od.QUANTITY)      AS totalAmount,
             o.TRACKING_NUMBER                AS trackingNumber,
-            o.DELIVERY_COMPANY                AS deliveryCompany
+            o.DELIVERY_COMPANY               AS deliveryCompany
         FROM ORDER_DB o
                  JOIN ORDER_DETAILS od ON o.ORD_ID = od.ORDERID
                  JOIN PRODUCT_DB p ON od.PRODUCTID = p.PROD_ID
