@@ -41,6 +41,11 @@ public class NoticeService {
         // 수정 권한 확인 등의 비즈니스 로직을 여기에 추가할 수 있습니다.
         noticeMapper.modify(noticeDTO);
     }
+    
+    // 메인에서 쓸 최근 공지 조회
+    public List<NoticeDTO> getRecentNotices(int limit) {
+        return noticeMapper.findRecent(limit);
+    }
 
     // 5. 공지사항 삭제
     public void delete(int notNo) {

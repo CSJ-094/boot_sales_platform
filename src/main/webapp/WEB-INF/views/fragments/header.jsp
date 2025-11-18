@@ -21,7 +21,7 @@
 			<c:choose>
 				<c:when test="${not empty sessionScope.memberId}">
 					<c:choose>
-						<c:when test="${sessionScope.userType == 'customer'}">
+						<c:when test="${sessionScope.userType == 'customer' or sessionScope.userType == 'kakao'}">
 							<span class="auth-welcome">환영합니다, ${sessionScope.memberName}님!</span>
 							<a href="<c:url value='/mypage' />" class="auth-btn">마이페이지</a>
 							<a href="<c:url value='/cart/list' />" class="auth-btn cart-btn">장바구니</a>
@@ -48,15 +48,17 @@
 					<li><a href="<c:url value='/category/mans/top' />">상의</a></li>
 					<li><a href="<c:url value='/category/mans/bottom' />">하의</a></li>
 					<li><a href="<c:url value='/category/mans/outer' />">아우터</a></li>
-					<li><a href="<c:url value='/category/mans/acc' />">모자/액세서리</a></li>
+					<li><a href="<c:url value='/category/mans/shoes' />">신발</a></li>
+					<li><a href="<c:url value='/category/mans/acc' />">잡화</a></li>
 				</ul>
 			</li>
 			<li class="category-item"><a href="<c:url value='/category/women' />">WOMEN</a>
 				<ul class="sub-category">
-					<li><a href="<c:url value='/category/women/top' />">블라우스/티셔츠</a></li>
-					<li><a href="<c:url value='/category/women/dress' />">원피스</a></li>
-					<li><a href="<c:url value='/category/women/skirt' />">스커트</a></li>
-					<li><a href="<c:url value='/category/women/bag' />">가방/잡화</a></li>
+					<li><a href="<c:url value='/category/women/top' />">상의</a></li>
+					<li><a href="<c:url value='/category/women/dress' />">하의</a></li>
+					<li><a href="<c:url value='/category/women/skirt' />">아우터</a></li>
+					<li><a href="<c:url value='/category/women/shoes' />">신발</a></li>
+					<li><a href="<c:url value='/category/women/acc' />">잡화</a></li>
 				</ul>
 			</li>
 			<li class="category-item"><a href="<c:url value='/category/unisex' />">UNISEX</a>

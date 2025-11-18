@@ -65,7 +65,7 @@ document.addEventListener("DOMContentLoaded", function () {
     header.style.alignItems = "center";
     header.style.fontWeight = "600";
     header.innerHTML = `
-        <span>GPT Chat</span>
+        <span>Eric</span>
         <button id="chatCloseBtn" style="
             background:none;
             border:none;

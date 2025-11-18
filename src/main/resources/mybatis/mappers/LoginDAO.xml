@@ -70,4 +70,8 @@
         WHERE member_email = #{email}
     </select>
 
+    <delete id="deleteUser" parameterType="string">
+        DELETE FROM USER_DB WHERE MEMBER_ID = #{memberId}
+    </delete>
+
 </mapper>

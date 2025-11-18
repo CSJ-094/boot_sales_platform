@@ -3,6 +3,7 @@ package com.boot.service;
 import com.boot.dao.MemDAO;
 import com.boot.dto.MemDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,5 +14,9 @@ public class UserService {
 
     public MemDTO getUserById(String memberId) {
         return userMapper.getUserById(memberId);
+    }
+
+    public List<MemDTO> getUserList() {
+        return userMapper.getUserList();
     }
 }

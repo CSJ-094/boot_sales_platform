@@ -21,4 +21,6 @@ public interface LoginDAO {
     public String getAccessToken(String code);
     public String getUserInfo(String accessToken);
     public LoginDTO kakaoLoginProcess(KakaoUserInfo userInfo);
+    public void kakaoUnlink(String accessToken);
+    public void deleteUser(String memberId);
 }

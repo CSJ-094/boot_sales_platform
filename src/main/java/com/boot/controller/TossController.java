@@ -85,10 +85,8 @@ public class TossController {
         boolean isSuccess = code == 200;
 
         if (isSuccess) {
-            // ⭐️ 3. 결제 승인 성공 시, 세션의 상품 정보로 주문을 생성합니다.
-            // 이 로직은 OrderService에 구현되어야 합니다.
             orderService.createOrderFromCart(memberId, cartItems, orderId, paymentKey, amount);
-            session.removeAttribute("cartItemsForOrder"); // ⭐️ 주문 생성 후 세션 정보 제거
+            session.removeAttribute("cartItemsForOrder");
  
             return "redirect:/order/complete?orderId=" + orderId;
         } else {

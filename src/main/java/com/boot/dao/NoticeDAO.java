@@ -16,4 +16,5 @@ public interface NoticeDAO {
 	NoticeDTO contentView(@Param("notNo") int notNo);
 	void modify(NoticeDTO dto);
 	void delete(@Param("notNo") int notNo);
+	List<NoticeDTO> findRecent(@Param("limit") int limit); //최근 공지(메인)
 }
