@@ -10,10 +10,6 @@
     </select>
         
     <!-- 회원 가입 -->
-<!--    <insert id="write">-->
-<!--	    insert into user_db(member_id, member_pw, member_name, member_email, member_phone, member_zipcode, member_addr1, member_addr2) -->
-<!--        values(#{memberId},#{memberPw},#{memberName},#{memberEmail},#{memberPhone},#{memberZipcode},#{memberAddr1},#{memberAddr2})-->
-<!--    </insert>-->
     <insert id="write">
         insert into user_db
             (member_id,
@@ -23,7 +19,8 @@
             member_phone,
             member_zipcode,
             member_addr1, member_addr2,
-            social_login
+            social_login,
+            member_point
         )
         values(
             #{memberId},
@@ -32,7 +29,8 @@
             #{memberPhone, jdbcType=VARCHAR},
             #{memberZipcode},
             #{memberAddr1},#{memberAddr2},
-            #{socialLogin}
+            #{socialLogin},
+            0
         )
     </insert>
     
@@ -73,5 +71,31 @@
     <delete id="deleteUser" parameterType="string">
         DELETE FROM USER_DB WHERE MEMBER_ID = #{memberId}
     </delete>
+
+    <!-- 포인트 기능 추가 -->
+    <select id="getMemberPoint" resultType="int">
+        SELECT MEMBER_POINT FROM USER_DB WHERE MEMBER_ID = #{memberId}
+    </select>
+
+    <update id="updateMemberPoint">
+        UPDATE USER_DB SET MEMBER_POINT = #{point} WHERE MEMBER_ID = #{memberId}
+    </update>
+
+    <!-- 자동 로그인 기능 관련 SQL 제거 -->
+    <!--
+    <update id="insertRememberMeToken">
+        UPDATE USER_DB SET REMEMBER_ME_TOKEN = #{token}, TOKEN_EXPIRY_DATE = #{expiryDate} WHERE MEMBER_ID = #{memberId}
+    </update>
+
+    <select id="findMemberByRememberMeToken" resultType="com.boot.dto.LoginDTO">
+        SELECT MEMBER_ID, MEMBER_PW, MEMBER_NAME, MEMBER_EMAIL, MEMBER_PHONE, MEMBER_ZIPCODE, MEMBER_ADDR1, MEMBER_ADDR2, SOCIAL_LOGIN, REMEMBER_ME_TOKEN, TOKEN_EXPIRY_DATE
+        FROM USER_DB
+        WHERE REMEMBER_ME_TOKEN = #{token} AND TOKEN_EXPIRY_DATE > SYSDATE
+    </select>
+
+    <update id="deleteRememberMeToken">
+        UPDATE USER_DB SET REMEMBER_ME_TOKEN = NULL, TOKEN_EXPIRY_DATE = NULL WHERE MEMBER_ID = #{memberId}
+    </update>
+    -->
 
 </mapper>

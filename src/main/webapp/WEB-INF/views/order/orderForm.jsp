@@ -47,6 +47,17 @@
     }
     .order-section {
         margin-bottom: 40px;
+        background-color: #fff;
+        padding: 25px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    }
+    .order-section h3 {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 15px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
     }
     .product-table {
         width: 100%;
@@ -113,6 +124,63 @@
     .text-center {
         text-align: center;
     }
+
+    /* 쿠폰/포인트 섹션 스타일 */
+    .discount-section {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    .discount-group {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 10px 0;
+        border-bottom: 1px dashed #eee;
+    }
+    .discount-group:last-of-type {
+        border-bottom: none;
+    }
+    .discount-group label {
+        font-weight: 500;
+        color: #555;
+        flex-basis: 100px;
+        flex-shrink: 0;
+    }
+    .discount-group select,
+    .discount-group input[type="number"] {
+        flex-grow: 1;
+        padding: 8px 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 14px;
+        max-width: 250px;
+    }
+    .discount-group button {
+        padding: 8px 15px;
+        background-color: #2c2c2c;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: background-color 0.3s ease;
+    }
+    .discount-group button:hover {
+        background-color: #b08d57;
+        color: #2c2c2c;
+    }
+    .discount-group .info-text {
+        font-size: 13px;
+        color: #888;
+        margin-left: 10px;
+    }
+    .discount-group .error-text {
+        font-size: 13px;
+        color: #d64545;
+        margin-left: 10px;
+    }
 </style>
 </head>
 <body>
@@ -154,19 +222,62 @@
         </div>
 
         <div class="order-section">
+            <h3>할인 정보</h3>
+            <div class="discount-section">
+                <div class="discount-group">
+                    <label for="couponSelect">쿠폰 사용</label>
+                    <select id="couponSelect" name="selectedCouponId">
+                        <option value="">쿠폰 선택 안 함</option>
+                        <c:forEach var="uc" items="${userCoupons}">
+                            <c:if test="${uc.isUsed == 'N' && (uc.expirationDate == null || uc.expirationDate.after(now))}">
+                                <option value="${uc.userCouponId}"
+                                        data-coupon-type="${uc.couponType}"
+                                        data-discount-value="${uc.discountValue}"
+                                        data-min-order-amount="${uc.minOrderAmount}"
+                                        data-max-discount-amount="${uc.maxDiscountAmount}">
+                                    ${uc.couponName}
+                                    <c:if test="${uc.couponType == 'PERCENT'}">(${uc.discountValue}% 할인<c:if test="${uc.maxDiscountAmount != null}">, 최대 <fmt:formatNumber value="${uc.maxDiscountAmount}" pattern="#,###"/>원</c:if>)</c:if>
+                                    <c:if test="${uc.couponType == 'AMOUNT'}">(<fmt:formatNumber value="${uc.discountValue}" pattern="#,###"/>원 할인)</c:if>
+                                    (최소 <fmt:formatNumber value="${uc.minOrderAmount}" pattern="#,###"/>원)
+                                </option>
+                            </c:if>
+                        </c:forEach>
+                    </select>
+                    <span id="couponDiscountInfo" class="info-text"></span>
+                    <span id="couponError" class="error-text"></span>
+                </div>
+                <div class="discount-group">
+                    <label for="pointInput">포인트 사용</label>
+                    <input type="number" id="pointInput" name="usedPoint" min="0" value="0" placeholder="사용할 포인트">
+                    <button type="button" id="applyPointBtn">적용</button>
+                    <span class="info-text">보유 포인트: <fmt:formatNumber value="${currentPoint}" pattern="#,###"/> P</span>
+                    <span id="pointError" class="error-text"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="order-section">
             <h3>최종 결제 금액</h3>
             <div class="summary">
                 <div class="summary-row">
                     <span>총 상품 금액</span>
-                    <span><fmt:formatNumber value="${totalAmount}" pattern="#,###" />원</span>
+                    <span id="displayTotalProductAmount"><fmt:formatNumber value="${totalAmount}" pattern="#,###" />원</span>
                 </div>
                 <div class="summary-row">
                     <span>배송비</span>
-                    <span><fmt:formatNumber value="${shippingFee}" pattern="#,###" />원</span>
+                    <span id="displayShippingFee"><fmt:formatNumber value="${shippingFee}" pattern="#,###" />원</span>
+                </div>
+                <div class="summary-row">
+                    <span>쿠폰 할인</span>
+                    <span id="displayCouponDiscount">- <fmt:formatNumber value="0" pattern="#,###" />원</span>
+                </div>
+                <div class="summary-row">
+                    <span>포인트 사용</span>
+                    <span id="displayPointUsage">- <fmt:formatNumber value="0" pattern="#,###" />원</span>
                 </div>
                 <div class="summary-row total">
                     <span>총 결제 금액</span>
-                    <span><fmt:formatNumber value="${totalAmount + shippingFee}" pattern="#,###" />원</span>
+                    <span id="displayFinalAmount"><fmt:formatNumber value="${totalAmount + shippingFee}" pattern="#,###" />원</span>
                 </div>
             </div>
         </div>
@@ -189,58 +300,142 @@
     <script src="<c:url value='/js/jquery.js'/>"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            console.log("DOM 로드 완료. 토스페이먼츠 스크립트 초기화를 시작합니다.");
-
             const clientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
-            // ⭐️ [디버깅] 주입된 클라이언트 키를 콘솔에서 확인합니다.
-            console.log("사용 중인 클라이언트 키:", clientKey);
-
             const paymentWidget = PaymentWidget(clientKey, PaymentWidget.ANONYMOUS);
-
-            console.log("결제 위젯 객체:", paymentWidget);
-
-            // 임시 주문번호 생성 (세션 ID와 타임스탬프 조합)
             const orderId = "ORD-" + new Date().getTime() + "-" + "${sessionScope.memberId}".substring(0, 4);
-
-            // ⭐️ 서버에서 계산된 최종 금액을 사용합니다.
-            const amount = ${totalAmount + shippingFee};
-
-            // 상품명 (첫 번째 상품명 외 N건 형식)
             const orderName = "${cartItems[0].prodName}${fn:length(cartItems) > 1 ? ' 외 '.concat(fn:length(cartItems) - 1).concat('건') : ''}";
+            const originalTotalProductAmount = ${totalAmount};
+            const originalShippingFee = ${shippingFee};
+            const currentPoint = ${currentPoint};
 
-            console.log("결제 위젯 렌더링을 시도합니다. (결제 금액: " + amount + ")");
-            // 결제 위젯 렌더링
-            paymentWidget.renderPaymentMethods(
+            let finalPaymentAmount = originalTotalProductAmount + originalShippingFee;
+            let appliedCouponDiscount = 0;
+            let appliedPointUsage = 0;
+            let selectedUserCouponId = null; // 선택된 userCouponId 저장
+
+            let paymentMethodsWidget; // 결제 수단 위젯 인스턴스를 저장할 변수 선언
+
+            // 금액 업데이트 함수
+            function updatePaymentAmounts() {
+                let tempTotalProductAmount = originalTotalProductAmount; // 총 상품 금액은 할인 전 금액으로 시작
+                let tempShippingFee = originalShippingFee;
+                let tempCouponDiscount = 0;
+                let tempPointUsage = 0;
+
+                // 1. 쿠폰 할인 적용
+                const selectedOption = $('#couponSelect option:selected');
+                if (selectedOption.val() !== "") {
+                    const couponType = selectedOption.data('coupon-type');
+                    const discountValue = selectedOption.data('discount-value');
+                    const minOrderAmount = selectedOption.data('min-order-amount');
+                    const maxDiscountAmount = selectedOption.data('max-discount-amount');
+
+                    if (tempTotalProductAmount >= minOrderAmount) { // 총 상품 금액 기준으로 최소 주문 금액 확인
+                        if (couponType === 'PERCENT') {
+                            tempCouponDiscount = tempTotalProductAmount * (discountValue / 100);
+                            if (maxDiscountAmount && tempCouponDiscount > maxDiscountAmount) {
+                                tempCouponDiscount = maxDiscountAmount;
+                            }
+                        } else if (couponType === 'AMOUNT') {
+                            tempCouponDiscount = discountValue;
+                        }
+                        $('#couponError').text('');
+                        selectedUserCouponId = selectedOption.val(); // userCouponId 저장
+                    } else {
+                        $('#couponError').text('최소 주문 금액 ' + minOrderAmount.toLocaleString() + '원 이상 시 사용 가능합니다.');
+                        selectedUserCouponId = null;
+                        // 쿠폰이 적용되지 않았으므로 할인 금액 초기화
+                        tempCouponDiscount = 0;
+                    }
+                } else {
+                    $('#couponError').text('');
+                    selectedUserCouponId = null;
+                }
+                appliedCouponDiscount = Math.floor(tempCouponDiscount); // 소수점 제거
+
+                // 2. 포인트 사용 적용 (쿠폰 할인 후 금액에 대해)
+                const usedPoint = parseInt($('#pointInput').val()) || 0;
+                // 포인트 사용 가능 금액은 (총 상품 금액 + 배송비 - 쿠폰 할인)
+                const amountAvailableForPoint = tempTotalProductAmount + tempShippingFee - appliedCouponDiscount;
+
+                if (usedPoint > 0) {
+                    if (usedPoint > currentPoint) {
+                        $('#pointError').text('보유 포인트를 초과하여 사용할 수 없습니다.');
+                        tempPointUsage = 0;
+                    } else if (usedPoint > amountAvailableForPoint) {
+                        $('#pointError').text('결제 금액보다 많은 포인트를 사용할 수 없습니다.');
+                        tempPointUsage = amountAvailableForPoint; // 결제 금액까지만 사용
+                        $('#pointInput').val(tempPointUsage); // 입력 필드 값도 조정
+                    } else {
+                        $('#pointError').text('');
+                        tempPointUsage = usedPoint;
+                    }
+                } else {
+                    $('#pointError').text('');
+                }
+                appliedPointUsage = tempPointUsage;
+
+                // 3. 최종 금액 계산
+                finalPaymentAmount = tempTotalProductAmount + tempShippingFee - appliedCouponDiscount - appliedPointUsage;
+                if (finalPaymentAmount < 0) finalPaymentAmount = 0; // 최종 금액이 음수가 되는 것을 방지
+
+                // 4. 화면 업데이트
+                $('#displayTotalProductAmount').text(originalTotalProductAmount.toLocaleString() + '원');
+                $('#displayShippingFee').text(originalShippingFee.toLocaleString() + '원');
+                $('#displayCouponDiscount').text('- ' + appliedCouponDiscount.toLocaleString() + '원');
+                $('#displayPointUsage').text('- ' + appliedPointUsage.toLocaleString() + '원');
+                $('#displayFinalAmount').text(finalPaymentAmount.toLocaleString() + '원');
+
+                // 5. 토스 결제 위젯 금액 업데이트
+                if (paymentMethodsWidget) { // 위젯 인스턴스가 준비되었는지 확인
+                    paymentMethodsWidget.updateAmount(finalPaymentAmount);
+                }
+            }
+
+            // 결제 위젯 렌더링 (Promise 체인 제거)
+            paymentMethodsWidget = paymentWidget.renderPaymentMethods(
                 "#payment-method",
-                { value: amount },
+                { value: finalPaymentAmount },
                 { variantKey: "DEFAULT" }
             );
+            
+            // 위젯 렌더링 후 초기 금액 설정 및 이벤트 리스너 연결
+            updatePaymentAmounts(); // 초기 금액 계산 및 위젯에 반영
 
-            // '결제하기' 버튼 클릭 이벤트
+            // '결제하기' 버튼 클릭 이벤트 리스너 (이전과 동일하게 paymentWidget 사용)
             document.getElementById("payment-button").addEventListener("click", function () {
                 console.log("'결제하기' 버튼 클릭됨. 결제를 요청합니다.");
-                // 1. 서버에 미리 주문 정보를 생성하고, 검증된 금액을 받아오는 로직 (권장)
-                //    (현재는 클라이언트에서 금액을 바로 사용하지만, 보안에 취약할 수 있습니다.)
-
-                // 2. 결제 요청
+                
                 paymentWidget.requestPayment({
                     orderId: orderId,
                     orderName: orderName,
-                    successUrl: window.location.origin + "${pageContext.request.contextPath}/toss/success", // 성공 시 이동할 우리 서버의 URL
-                    failUrl: window.location.origin + "${pageContext.request.contextPath}/toss/fail",     // 실패 시 이동할 우리 서버의 URL
-                    customerName: "${sessionScope.memberName}",
-                    // customerEmail: "${memberInfo.memberEmail}" // 회원 정보에 이메일이 있다면 추가
+                    successUrl: window.location.origin + "${pageContext.request.contextPath}/toss/success",
+                    failUrl: window.location.origin + "${pageContext.request.contextPath}/toss/fail",
+                    customerName: "${sessionScope.memberName}"
+                    // ⭐️ metadata의 값이 null인 경우 오류가 발생하므로, 빈 문자열로 대체합니다.
+                    , metadata: {
+                        selectedUserCouponId: selectedUserCouponId || '',
+                        usedPoint: appliedPointUsage
+                    } 
                 }).catch(function (error) {
                     console.error("결제 요청 실패:", error);
-                    // 결제창 호출 실패 처리
                     if (error.code === 'USER_CANCEL') {
-                        // 사용자가 결제를 취소한 경우
                         console.log('결제가 취소되었습니다.');
                     } else {
-                        // 기타 에러
                         alert('결제 중 오류가 발생했습니다: ' + error.message);
                     }
                 });
+            });
+
+            // 이벤트 리스너 연결 (이들은 updatePaymentAmounts를 호출하므로, 위젯 준비 여부를 updatePaymentAmounts 내에서 확인)
+            $('#couponSelect').on('change', updatePaymentAmounts);
+            $('#applyPointBtn').on('click', updatePaymentAmounts);
+            $('#pointInput').on('change', function() {
+                let val = parseInt($(this).val());
+                if (isNaN(val) || val < 0) {
+                    $(this).val(0);
+                }
+                updatePaymentAmounts();
             });
         });
     </script>

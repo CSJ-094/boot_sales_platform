@@ -26,6 +26,7 @@ import com.boot.service.OrderService;
 import com.boot.service.SellerService;
 import com.boot.service.UserService;
 import com.boot.service.QnaService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -39,14 +40,18 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.slf4j.Slf4j; // Slf4j import 주석 해제
+// import org.slf4j.Logger; // Logger import 제거
+// import org.slf4j.LoggerFactory; // LoggerFactory import 제거
+
 @Slf4j
 @Controller
-@RequestMapping("/seller") // ✅ 모든 URL에 /seller를 붙이는 대신 클래스 레벨에 매핑
+@RequestMapping("/seller")
 public class SellerController {
+
+	// private static final Logger log = LoggerFactory.getLogger(SellerController.class); // log 변수 수동 선언 제거
 	
 	@Autowired private ProdDAO prodDAO;
-	// ⭐️ 추가: Service와 DAO들을 주입받습니다.
 	@Autowired private ProductService productService;
 	@Autowired private CategoryDAO categoryDAO;
 	@Autowired private ProductCategoryDAO productCategoryDAO;
@@ -56,54 +61,45 @@ public class SellerController {
 	@Autowired private UserService userService;
 	@Autowired private OrderService orderService;
 	
-	// 1. 판매자 로그인 페이지 이동 
 	@GetMapping("/login")
     public String sellerLogin(HttpSession session) {
-        // 이미 로그인 되어있다면 메인으로 리다이렉트
 		if (session.getAttribute("seller") != null) {
 		return "redirect:/seller/mypage";
 		}
         return "login/login"; 
     }
 
-    // 2. 판매자 로그인 처리 (POST: /seller/loginCheck)
     @PostMapping("/loginCheck")
     public String sellerLoginCheck(SellerDTO sellerDTO, HttpSession session) {
         
-        // ID와 PW로 DB에서 판매자 정보 조회
         SellerDTO resultDTO = sellerService.loginCheck(sellerDTO);
 
         if (resultDTO != null) {
-            // 로그인 성공: 세션에 판매자 정보(seller) 저장
 			session.setAttribute("memberId", resultDTO.getSelId());
 			session.setAttribute("userType", "seller");
 			session.setAttribute("memberName", resultDTO.getSelName());
 			session.setAttribute("seller", resultDTO);
-            return "redirect:/seller/mypage"; // 판매자 메인 페이지로 이동
+            return "redirect:/seller/mypage";
         } else {
-            // 로그인 실패
             return "redirect:login/login?error=fail"; 
         }
     }
     
-    // 4. 판매자 로그아웃 (GET: /seller/logout)
     @GetMapping("/logout")
     public String sellerLogout(HttpSession session) {
-        session.invalidate(); // 세션 전체 무효화
+        session.invalidate();
         return "redirect:/seller/login";
     }
     
-	//마이페이지 메인 (/seller/mypage)
 	@RequestMapping("/mypage")
 	public String mypage() {
 		return "redirect:/seller/dashboard";
 	}
 	
-	//상품 목록 (/seller/products)
 	@GetMapping("/products")
 	public String productList(@RequestParam(value = "created", required = false) Long createdId, Model model) {
 		model.addAttribute("products", prodDAO.getProductList());
-		model.addAttribute("createdId", createdId); // 등록 성공 배너
+		model.addAttribute("createdId", createdId);
 		model.addAttribute("activeMenu", "product");
 		return "seller/products";
 	}
@@ -111,7 +107,6 @@ public class SellerController {
 	@GetMapping("/products/new")
 	public String productNewForm(Model model) {
 		model.addAttribute("product", new ProdDTO());
-		// ⭐️ categoryDAO를 주입받아 인스턴스 메서드로 호출하도록 수정
 		model.addAttribute("categories", categoryDAO.selectTreeFlat()); 
 		model.addAttribute("checkedMap", new HashMap<String, Boolean>());
 		model.addAttribute("mainCatIdStr", null);	
@@ -119,7 +114,6 @@ public class SellerController {
 		return "seller/product_new";
 	}
 	
-	//상품 등록 처리 + 카테고리 매핑(Service로 위임)
 	@PostMapping("/products")
     public String createProduct(@ModelAttribute ProdDTO dto,
                                  @RequestParam(value = "catIds", required = false) List<Long> catIds,
@@ -129,81 +123,68 @@ public class SellerController {
                                  HttpSession session) {
 
         SellerDTO seller = (SellerDTO) session.getAttribute("seller");
-        
         if (seller == null) {
             return "redirect:/seller/login";
         }
 	    
-	    // 2. 로그인된 판매자 ID를 DTO에 설정
 	    dto.setProdSeller(seller.getSelId()); 
 	    
-	    // 3. 상품 등록 서비스 호출 (catIds, mainCatId 사용)
 	    productService.createProductWithCategories(dto, catIds, mainCatId, file);
 	    
-	    // 4. 리다이렉트 설정 (ra 사용)
 	    ra.addFlashAttribute("createdId", dto.getProdId());
-	    return "redirect:/seller/products/" + dto.getProdId(); //상세로
+	    return "redirect:/seller/products/" + dto.getProdId();
 	}
 	
-	//상품 상세 (/seller/products/{prodId})
 	@GetMapping("/products/{prodId}")
-		public String productDetail(@PathVariable("prodId") Long prodId, Model model) { 
-			ProdDTO product = productService.getProductById(prodId.intValue());
+		public String productDetail(@PathVariable("prodId") Long prodId, Model model) { // Integer -> Long 변경
+			ProdDTO product = productService.getProductById(prodId);
 			model.addAttribute("product", product);
 			model.addAttribute("activeMenu", "product");
 			return "seller/productDetail";
 		}
 	
-	//수정 폼 이동(/seller/products/{id}/edit)
 	@GetMapping("/products/{id}/edit")
 	public String editForm(@PathVariable("id") Long id, Model model) {
-		// ⭐️ ProdDTO -> ProdDTO로 변경
-		ProdDTO p = prodDAO.getProduct(id); 
+		ProdDTO p = prodDAO.getProduct(id); // .intValue() 제거
 		if (p == null) {
 			return "redirect:/seller/products?error=notfound";
 		}
 		model.addAttribute("product", p);
 		model.addAttribute("categories", categoryDAO.selectTreeFlat());
 		
-		// ⭐️ productCategoryDAO 주입 완료 후 메서드 호출
 		List<ProductCategoryDTO> mappings = productCategoryDAO.selectByProdId(id);
 
 		 String mainCatIdStr = null;
-		 Map<Long, Boolean> checkedMap = new HashMap<>(); // ⭐️ Map<Long, Boolean>으로 타입 명시
+		 Map<Long, Boolean> checkedMap = new HashMap<>();
 		 Set<Long> checkedCatIds = new HashSet<>();
 		Long mainCatId = null;
 		for (ProductCategoryDTO m : mappings) {
-			 checkedCatIds.add(m.getCatId());
-			 if ("Y".equals(m.getIsMain())) mainCatId = m.getCatId();
+			checkedCatIds.add(m.getCatId());
+			if ("Y".equals(m.getIsMain())) mainCatId = m.getCatId();
 		}
-		// ⭐️ checkedMap에 값을 채우는 로직이 누락되어있지만 일단 컴파일되도록 주석처리 후 변수만 전달
 		model.addAttribute("checkedMap", checkedMap); 
-		// model.addAttribute("mainCatId", mainCatId); // 이 줄은 주석 처리된 상태로 유지
 		model.addAttribute("mainCatIdStr", mainCatIdStr);
 		model.addAttribute("activeMenu", "product");
 		return "seller/product_edit";
 	}
 	
-	//수정 처리 (/seller/products/{id}/edit)
 	@PostMapping("/products/{id}/edit")
 	public String update(@PathVariable("id") Long id,
-					@ModelAttribute ProdDTO form, // ⭐️ ProdDTO -> ProdDTO로 변경
+					@ModelAttribute ProdDTO form,
 					@RequestParam(value = "catIds", required = false) List<Long> catIds,
-					@RequestParam(value = "mainCatId", required = false) Long mainCatId, // 이미지 파일 추가
+					@RequestParam(value = "mainCatId", required = false) Long mainCatId,
 					@RequestParam(value = "uploadFile", required = false) MultipartFile file,
-					 @RequestParam(value = "deleteImage", defaultValue = "false") boolean deleteImage,
+					@RequestParam(value = "deleteImage", defaultValue = "false") boolean deleteImage,
 					RedirectAttributes ra) {
 
 		form.setProdId(id);
-//		boolean deleteFlag = "Y".equals(deleteImage);
 		productService.updateProductWithCategories(form, catIds, mainCatId, file, deleteImage); 
 		ra.addFlashAttribute("msg", "수정되었습니다.");
-		return "redirect:/seller/products/" + id; // 상세로 이동
+		return "redirect:/seller/products/" + id;
 	}
 	
-	//삭제(/seller/products/{id}/delete)
 	@PostMapping("/products/{id}/delete")
-	public String delete(@PathVariable("id") Long id, RedirectAttributes ra) { // ⭐️ id를 Long으로 받도록 통일
+	public String delete(@PathVariable("id") Long id, RedirectAttributes ra) { // int -> Long 변경
 		int deleted = prodDAO.deleteProduct(id);
 		if (deleted == 0) {
 			ra.addFlashAttribute("error", "삭제할 수 없습니다.");
@@ -213,10 +194,8 @@ public class SellerController {
 		return "redirect:/seller/products";
 	}
 	
-	//회원 목록(/seller/members)
 	@GetMapping("/members")
 	public String memberList(Model model) {
-		// ⭐️ 주입된 UserService를 사용하여 모든 회원 정보를 조회합니다.
 		List<MemDTO> users = userService.getUserList();
 		model.addAttribute("users", users);
 		model.addAttribute("activeMenu", "member");
@@ -281,17 +260,12 @@ public class SellerController {
 			return "redirect:/seller/orders";
 		}
 
-	//회원 상세(/seller/members/{memberId})
 	@GetMapping("/members/{memberId}")
 	public String memberDetail(@PathVariable("memberId") String memberId ,Model model) {
-		// 1. 회원 정보 조회
 		MemDTO member = userService.getUserById(memberId);
 		if (member == null) {
-			// 회원이 존재하지 않을 경우 목록으로 리다이렉트
 			return "redirect:/seller/members";
 		}
-
-		// 2. 회원의 주문 내역 조회 (주문 상세 포함)
 		List<OrdDTO> orders = orderService.getOrdersWithDetailsByMemberId(memberId);
 
 		model.addAttribute("member", member);
@@ -300,7 +274,6 @@ public class SellerController {
 		return "seller/memberDetail";
 	}
 
-	// 문의 관리 목록
 	@GetMapping("/qna")
 	public String qnaList(HttpSession session, Model model) {
 		SellerDTO seller = (SellerDTO) session.getAttribute("seller");
@@ -314,7 +287,6 @@ public class SellerController {
 		return "seller/qna_list";
 	}
 
-	// 답변 작성 폼
 	@GetMapping("/qna/{qnaId}/reply")
 	public String qnaReplyForm(@PathVariable("qnaId") Long qnaId, HttpSession session, Model model) {
 		SellerDTO seller = (SellerDTO) session.getAttribute("seller");
@@ -325,7 +297,6 @@ public class SellerController {
 		QnaDTO question = qnaService.getQnaById(qnaId);
 		model.addAttribute("question", question);
 
-		// ⭐️ 기존 답변 목록을 조회하여 모델에 추가
 		List<QnaDTO> replies = qnaService.getRepliesByParentId(qnaId);
 		model.addAttribute("replies", replies);
 
@@ -333,7 +304,6 @@ public class SellerController {
 		return "seller/qna_reply";
 	}
 
-	// 답변 등록 처리
 	@PostMapping("/qna/reply")
 	public String addReply(QnaDTO reply, HttpSession session, RedirectAttributes ra) {
 		SellerDTO seller = (SellerDTO) session.getAttribute("seller");
@@ -341,23 +311,19 @@ public class SellerController {
 			return "redirect:/seller/login";
 		}
 
-		// ⭐️ 원본 질문 정보를 조회하여 작성자 ID를 가져옴
 		QnaDTO question = qnaService.getQnaById(reply.getQnaParentId());
 		if (question == null) {
 			ra.addFlashAttribute("error", "원본 문의글을 찾을 수 없습니다.");
 			return "redirect:/seller/qna";
 		}
-		// ⭐️ 답변의 작성자 ID를 원본 질문자의 ID로 설정하여 DB 오류를 방지하고,
-		//    판매자가 남긴 답변임을 명확히 하기 위해 제목에 "Re: "를 붙입니다.
 		reply.setMemberId(question.getMemberId());
-		reply.setQnaTitle("Re: " + reply.getQnaTitle()); // 답변 제목 설정
+		reply.setQnaTitle("Re: " + reply.getQnaTitle());
 
 		qnaService.addReply(reply);
 		ra.addFlashAttribute("msg", "답변이 등록되었습니다.");
 		return "redirect:/seller/qna";
 	}
 
-	// 리뷰 관리 목록
 	@GetMapping("/reviews")
 	public String reviewList(HttpSession session, Model model) {
 		SellerDTO seller = (SellerDTO) session.getAttribute("seller");
@@ -371,7 +337,6 @@ public class SellerController {
 		return "seller/review_list";
 	}
 
-	// 리뷰 답변 작성 폼
 	@GetMapping("/reviews/{reviewId}/reply")
 	public String reviewReplyForm(@PathVariable("reviewId") Long reviewId, HttpSession session, Model model) {
 		SellerDTO seller = (SellerDTO) session.getAttribute("seller");
@@ -385,7 +350,6 @@ public class SellerController {
 		return "seller/review_reply";
 	}
 
-	// 리뷰 답변 등록 처리
 	@PostMapping("/reviews/reply")
 	public String addReviewReply(ReviewDTO reply, HttpSession session, RedirectAttributes ra) {
 		SellerDTO seller = (SellerDTO) session.getAttribute("seller");
@@ -393,15 +357,14 @@ public class SellerController {
 			return "redirect:/seller/login";
 		}
 
-		// 원본 리뷰 정보를 조회하여 답변에 필요한 정보를 설정
 		ReviewDTO originalReview = reviewService.getReviewById(reply.getReviewParentId());
 		if (originalReview == null) {
 			ra.addFlashAttribute("error", "원본 리뷰를 찾을 수 없습니다.");
 			return "redirect:/seller/reviews";
 		}
 
-		reply.setMemberId(originalReview.getMemberId()); // 답변의 작성자 ID는 원본 리뷰 작성자 ID로 설정
-		reply.setProdId(originalReview.getProdId()); // 상품 ID 설정
+		reply.setMemberId(originalReview.getMemberId());
+		reply.setProdId(originalReview.getProdId());
 
 		reviewService.addReply(reply);
 		ra.addFlashAttribute("msg", "리뷰 답변이 등록되었습니다.");

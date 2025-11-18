@@ -29,6 +29,14 @@
 	</section>
 
 	<main class="main-content">
+		<!-- 중앙 검색 기능 추가 -->
+		<section class="main-search-section">
+		    <form action="<c:url value='/product/search'/>" method="get" class="main-search-form">
+		        <input type="text" name="keyword" placeholder="검색어를 입력하세요" class="main-search-input">
+		        <button type="submit" class="main-search-button">검색</button>
+		    </form>
+		</section>
+
 		<section class="benefit-strip">
 		       <div class="benefit-strip-inner">
 		           <div class="benefit-strip-item">
@@ -104,7 +112,7 @@
 				<c:choose>
 					<c:when test="${not empty mansRecommendList}">
 						<c:forEach var="product" items="${mansRecommendList}">
-							<a href="${pageContext.request.contextPath}/products/detail?prodId=${product.prodId}">
+							<a href="${pageContext.request.contextPath}/product/detail?id=${product.prodId}">
 								<div class="product-item">
 									<div class="product-img">
 										<img
@@ -135,7 +143,7 @@
 				<c:choose>
 					<c:when test="${not empty womansRecommendList}">
 						<c:forEach var="product" items="${womansRecommendList}">
-							<a href="${pageContext.request.contextPath}/products/detail?prodId=${product.prodId}">
+							<a href="${pageContext.request.contextPath}/product/detail?id=${product.prodId}">
 								<div class="product-item">
 									<div class="product-img">
 										<img
@@ -216,6 +224,9 @@
         let slideInterval = setInterval(nextSlide, intervalTime);
     });
 </script>
+
+<%-- 룰렛 팝업을 페이지에 포함시킵니다. --%>
+<jsp:include page="/WEB-INF/views/roulette.jsp" />
 
 </body>
 </html>

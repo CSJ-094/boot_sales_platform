@@ -27,7 +27,7 @@ public class ReviewController {
     private com.boot.service.ReviewService reviewService;
 
     @GetMapping("/write")
-    public String showReviewWriteForm(@RequestParam("productId") Integer productId,
+    public String showReviewWriteForm(@RequestParam("productId") Long productId, // Integer -> Long 변경
                                       @RequestParam("orderId") String orderId,
                                       HttpSession session, Model model) {
         String memberId = (String) session.getAttribute("memberId");

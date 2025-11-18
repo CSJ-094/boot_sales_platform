@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.dao.UserCouponDAO">
+
+    <resultMap id="userCouponResultMap" type="com.boot.dto.UserCouponDTO">
+        <id property="userCouponId" column="USER_COUPON_ID"/>
+        <result property="memberId" column="MEMBER_ID"/>
+        <result property="couponId" column="COUPON_ID"/>
+        <result property="issueDate" column="ISSUE_DATE"/>
+        <result property="usedDate" column="USED_DATE"/>
+        <result property="isUsed" column="IS_USED"/>
+        <!-- JOIN을 통해 가져올 쿠폰 정보 -->
+        <result property="couponName" column="COUPON_NAME"/>
+        <result property="couponType" column="COUPON_TYPE"/>
+        <result property="discountValue" column="DISCOUNT_VALUE"/>
+        <result property="minOrderAmount" column="MIN_ORDER_AMOUNT"/>
+        <result property="expirationDate" column="EXPIRATION_DATE"/>
+        <result property="maxDiscountAmount" column="MAX_DISCOUNT_AMOUNT"/>
+        <result property="description" column="DESCRIPTION"/>
+    </resultMap>
+
+    <insert id="insertUserCoupon" parameterType="com.boot.dto.UserCouponDTO">
+        <selectKey keyProperty="userCouponId" resultType="long" order="BEFORE">
+            SELECT USER_COUPON_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO USER_COUPON_DB (
+            USER_COUPON_ID, MEMBER_ID, COUPON_ID, ISSUE_DATE, IS_USED
+        ) VALUES (
+            #{userCouponId}, #{memberId}, #{couponId}, SYSDATE, 'N'
+        )
+    </insert>
+
+    <select id="getUserCouponsByMemberId" resultMap="userCouponResultMap">
+        SELECT
+            uc.USER_COUPON_ID,
+            uc.MEMBER_ID,
+            uc.COUPON_ID,
+            uc.ISSUE_DATE,
+            uc.USED_DATE,
+            uc.IS_USED,
+            c.COUPON_NAME,
+            c.COUPON_TYPE,
+            c.DISCOUNT_VALUE,
+            c.MIN_ORDER_AMOUNT,
+            c.EXPIRATION_DATE,
+            c.MAX_DISCOUNT_AMOUNT,
+            c.DESCRIPTION
+        FROM
+            USER_COUPON_DB uc
+        JOIN
+            COUPON_DB c ON uc.COUPON_ID = c.COUPON_ID
+        WHERE
+            uc.MEMBER_ID = #{memberId}
+        ORDER BY
+            uc.ISSUE_DATE DESC
+    </select>
+
+    <select id="getUserCouponById" resultMap="userCouponResultMap">
+        SELECT
+            uc.USER_COUPON_ID,
+            uc.MEMBER_ID,
+            uc.COUPON_ID,
+            uc.ISSUE_DATE,
+            uc.USED_DATE,
+            uc.IS_USED,
+            c.COUPON_NAME,
+            c.COUPON_TYPE,
+            c.DISCOUNT_VALUE,
+            c.MIN_ORDER_AMOUNT,
+            c.EXPIRATION_DATE,
+            c.MAX_DISCOUNT_AMOUNT,
+            c.DESCRIPTION
+        FROM
+            USER_COUPON_DB uc
+        JOIN
+            COUPON_DB c ON uc.COUPON_ID = c.COUPON_ID
+        WHERE
+            uc.USER_COUPON_ID = #{userCouponId}
+    </select>
+
+    <select id="getUserCouponByMemberIdAndCouponId" resultMap="userCouponResultMap">
+        SELECT
+            uc.USER_COUPON_ID,
+            uc.MEMBER_ID,
+            uc.COUPON_ID,
+            uc.ISSUE_DATE,
+            uc.USED_DATE,
+            uc.IS_USED,
+            c.COUPON_NAME,
+            c.COUPON_TYPE,
+            c.DISCOUNT_VALUE,
+            c.MIN_ORDER_AMOUNT,
+            c.EXPIRATION_DATE,
+            c.MAX_DISCOUNT_AMOUNT,
+            c.DESCRIPTION
+        FROM
+            USER_COUPON_DB uc
+        JOIN
+            COUPON_DB c ON uc.COUPON_ID = c.COUPON_ID
+        WHERE
+            uc.MEMBER_ID = #{memberId} AND uc.COUPON_ID = #{couponId}
+    </select>
+
+    <update id="updateUserCouponUsedStatus" parameterType="com.boot.dto.UserCouponDTO">
+        UPDATE USER_COUPON_DB
+        SET
+            USED_DATE = SYSDATE,
+            IS_USED = 'Y'
+        WHERE
+            USER_COUPON_ID = #{userCouponId} AND MEMBER_ID = #{memberId} AND IS_USED = 'N'
+    </update>
+
+    <delete id="deleteUserCoupon">
+        DELETE FROM USER_COUPON_DB WHERE USER_COUPON_ID = #{userCouponId}
+    </delete>
+
+    <!-- 회원 탈퇴 시 해당 회원의 모든 쿠폰 삭제 -->
+    <delete id="deleteAllCouponsByMemberId">
+        DELETE FROM USER_COUPON_DB WHERE MEMBER_ID = #{memberId}
+    </delete>
+
+</mapper>

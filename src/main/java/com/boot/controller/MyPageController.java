@@ -1,50 +1,83 @@
 package com.boot.controller;
 
+import com.boot.dao.MemDAO;
+import com.boot.dto.CouponDTO;
 import com.boot.dto.MemDTO;
 import com.boot.dto.OrdDTO;
+import com.boot.dto.PointHistoryDTO;
 import com.boot.dto.ProdDTO;
-import com.boot.dto.TrackingResponseDTO;
-import com.boot.service.DeliveryService;
+import com.boot.dto.UserCouponDTO;
+import com.boot.service.CouponService;
+import com.boot.service.LoginService;
 import com.boot.service.OrderService;
-import com.boot.service.UserService;
+import com.boot.service.PointService;
+import com.boot.service.UserCouponService;
+import com.boot.service.UserService; // UserService import 추가
 import com.boot.service.WishlistService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.util.Date;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
 @Slf4j
-@RequiredArgsConstructor // ⭐️ final 필드에 대한 생성자를 자동으로 생성합니다.
 @RequestMapping("/mypage")
 public class MyPageController {
 
-    // ⭐️ 생성자 주입 방식으로 변경
-    private final UserService userService;
-    private final WishlistService wishlistService;
-    private final OrderService orderService;
-    private final DeliveryService deliveryService;
+    @Autowired
+    private MemDAO memDAO;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private WishlistService wishlistService;
+
+    @Autowired
+    private OrderService orderService;
+
+    @Autowired
+    private UserCouponService userCouponService;
+    @Autowired
+    private PointService pointService;
+    @Autowired
+    private CouponService couponService;
+    @Autowired
+    private LoginService loginService;
+    @Autowired
+    private UserService userService; // UserService 주입
+
+    private String getMemberIdOrRedirect(HttpSession session, RedirectAttributes redirectAttributes) {
+        String memberId = (String) session.getAttribute("memberId");
+        if (memberId == null) {
+            redirectAttributes.addFlashAttribute("loginError", "로그인이 필요합니다.");
+            return null;
+        }
+        return memberId;
+    }
 
     @GetMapping
-    public String mypage_view(HttpSession session, Model model) {
-        log.info("@# mypage_view() - 정보 조회 및 리스트 로드");
-
-        String memberId = (String) session.getAttribute("memberId");
-
+    public String myPage(HttpSession session, Model model, RedirectAttributes redirectAttributes) {
+        String memberId = getMemberIdOrRedirect(session, redirectAttributes);
         if (memberId == null) {
-            log.warn("@# mypage_view() - 세션 ID 없음. 로그인 페이지로 리다이렉트.");
             return "redirect:/login";
         }
 
-        // 1. 회원 정보 조회 (DAO -> Service)
-        MemDTO memberInfo = userService.getUserById(memberId);
+        // 1. 회원 정보 조회
+        MemDTO memberInfo = memDAO.getMemberInfo(memberId);
         model.addAttribute("memberInfo", memberInfo);
 
         // 2. 찜목록 조회
@@ -55,33 +88,87 @@ public class MyPageController {
         List<OrdDTO> orderList = orderService.getOrdersWithDetailsByMemberId(memberId);
         model.addAttribute("orderList", orderList);
 
+        // 4. 사용자 쿠폰 조회
+        List<UserCouponDTO> userCoupons = userCouponService.getUserCouponsByMemberId(memberId);
+        model.addAttribute("userCoupons", userCoupons);
+
+        // 5. 포인트 내역 조회
+        List<PointHistoryDTO> pointHistory = pointService.getPointHistory(memberId);
+        model.addAttribute("pointHistory", pointHistory);
+
+        // 6. 현재 포인트 조회
+        Integer currentPoint = pointService.getCurrentPoint(memberId);
+        model.addAttribute("currentPoint", currentPoint);
+
+        model.addAttribute("now", new Date());
+
+        // 7. 발급 가능한 쿠폰 조회
+        List<CouponDTO> allActiveCoupons = couponService.getActiveCoupons();
+        
+        Set<Long> possessedCouponIds = userCoupons.stream()
+                                                .map(UserCouponDTO::getCouponId)
+                                                .collect(Collectors.toSet());
+        
+        List<CouponDTO> claimableCoupons = allActiveCoupons.stream()
+                                                        .filter(coupon -> !possessedCouponIds.contains(coupon.getCouponId()))
+                                                        .collect(Collectors.toList());
+        model.addAttribute("claimableCoupons", claimableCoupons);
+
         return "user/mypage";
     }
 
     @PostMapping("/user_info")
     public String mypage_update(@ModelAttribute MemDTO member, RedirectAttributes redirectAttributes) {
         log.info("@# mypage_update() - 정보 수정 요청: {}", member.getMemberId());
-        
-        // ⭐️ 회원 정보 수정 로직을 서비스 계층으로 위임
-        userService.updateUserInfo(member);
-        
+
+        // UserService의 updateUserInfo 메서드를 호출하여 회원 정보 수정 처리
+        userService.updateUserInfo(member); // 메서드 호출 변경
+
         redirectAttributes.addFlashAttribute("updateSuccess", true);
         return "redirect:/mypage";
     }
 
-    /**
-     * 배송 추적 API를 호출하고 결과를 JSON으로 반환합니다.
-     */
-    @GetMapping("/trackDelivery")
-    @ResponseBody
-    public ResponseEntity<TrackingResponseDTO> trackDelivery(@RequestParam("t_code") String t_code,
-                                                             @RequestParam("t_invoice") String t_invoice) {
-        try {
-            TrackingResponseDTO trackingInfo = deliveryService.getTrackingInfo(t_code, t_invoice);
-            return ResponseEntity.ok(trackingInfo);
-        } catch (Exception e) {
-            log.error("배송 추적 오류: code={}, invoice={}", t_code, t_invoice, e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+    // 쿠폰 발급 기능
+    @PostMapping("/claimCoupon")
+    public String claimCoupon(@RequestParam("couponId") Long couponId,
+                              HttpSession session,
+                              RedirectAttributes redirectAttributes) {
+        String memberId = getMemberIdOrRedirect(session, redirectAttributes);
+        if (memberId == null) {
+            return "redirect:/login";
         }
+
+        try {
+            userCouponService.issueCouponToUser(memberId, couponId);
+            redirectAttributes.addFlashAttribute("couponMessage", "쿠폰이 성공적으로 발급되었습니다!");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("couponError", e.getMessage());
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("couponError", "쿠폰 발급 중 오류가 발생했습니다.");
+        }
+
+        return "redirect:/mypage#my-coupons";
+    }
+
+    // 찜목록 삭제 기능
+    @PostMapping("/wishlist/remove")
+    public String removeWishlist(@RequestParam("prodId") Long prodId,
+                                 HttpSession session,
+                                 RedirectAttributes redirectAttributes) {
+        String memberId = (String) session.getAttribute("memberId");
+        if (memberId == null) {
+            redirectAttributes.addFlashAttribute("loginError", "로그인이 필요합니다.");
+            return "redirect:/login";
+        }
+
+        try {
+            wishlistService.removeProductFromWishlist(memberId, prodId);
+            redirectAttributes.addFlashAttribute("message", "찜목록에서 상품이 삭제되었습니다.");
+        } catch (Exception e) {
+            log.error("찜목록 삭제 중 오류 발생: {}", e.getMessage());
+            redirectAttributes.addFlashAttribute("message", "찜목록 삭제 중 오류가 발생했습니다.");
+        }
+
+        return "redirect:/mypage#wishlist";
     }
 }
