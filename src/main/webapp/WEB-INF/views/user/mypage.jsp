@@ -1,4 +1,3 @@
-
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
@@ -12,41 +11,6 @@
     <link rel="stylesheet" href="<c:url value='/css/header.css' />">
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-    function daumZipCode() {
-        new daum.Postcode(
-            {
-                oncomplete: function(data) {
-                    var addr = '';
-                    var extraAddr = '';
-
-                    if (data.userSelectedType === 'R') {
-                        addr = data.roadAddress;
-                    } else {
-                        addr = data.jibunAddress;
-                    }
-
-                    if (data.userSelectedType === 'R') {
-                        if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
-                            extraAddr += data.bname;
-                        }
-                        if (data.buildingName !== '' && data.apartment === 'Y') {
-                            extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
-                        }
-                        if (extraAddr !== '') {
-                            extraAddr = ' (' + extraAddr + ')';
-                        }
-                    }
-
-                    document.getElementById('zipcode').value = data.zonecode;
-                    // MEMBER_ADDR_PRIMARY는 기본 주소, MEMBER_ADDR_DETAIL은 상세 주소
-                    document.getElementById("MEMBER_ADDR_PRIMARY").value = addr + extraAddr;
-                    document.getElementById("MEMBER_ADDR_DETAIL").focus();
-                }
-            }
-        ).open();
-    }
-    </script>
     
     <style>
         /* ==================== 0. 기본 스타일 & 초기화 (mainpage.jsp 기준) ==================== */
@@ -366,10 +330,10 @@
             background-color: #fff;
         }
         .action-btn {
-            background-color: #6c757d; /* ⭐️ 버튼 높이 조절 */
+            background-color: #6c757d;
             color: white;
             border: none;
-            padding: 5px 10px;
+            padding: 8px 12px;
             cursor: pointer;
             border-radius: 5px;
             font-size: 0.9em;
@@ -410,26 +374,132 @@
             cursor:pointer;
         }
         /* ⭐️ End of Wishlist Styles ⭐️ */
-    </style>
-    <%-- ⭐️ seller/orders.jsp의 모달 스타일을 가져와서 적용 --%>
-    <style>
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); }
-        .modal-content { background-color: #fefefe; margin: 5% auto; padding: 20px; border: 1px solid #888; border-radius: 8px; width: 80%; max-width: 600px; }
-        .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
-        .close:hover, .close:focus { color: black; }
-        .tracking-details { margin-top: 20px; }
-        .tracking-detail-item { padding: 12px; border-bottom: 1px solid #eee; }
-        .tracking-detail-item:last-child { border-bottom: none; }
-        .tracking-detail-time { font-weight: bold; color: #333; }
-        .tracking-detail-location { color: #666; margin-top: 4px; }
-        .tracking-detail-status { color: #b08d57; margin-top: 4px; }
-        .loading { text-align: center; padding: 20px; color: #666; }
+		/* ... 기존 스타일 ... */
+		        
+		        /* 🚨 배송 조회 모달 스타일 추가 🚨 */
+		        #trackingModal {
+		            border: 1px solid #b08d57; 
+		            background-color: #ffffff;
+		            padding: 25px;
+		            border-radius: 8px;
+		            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+		            display: none; 
+		            position: fixed; 
+		            top: 50%; left: 50%;
+		            transform: translate(-50%, -50%);
+		            width: 550px;
+		            max-height: 80vh;
+		            overflow-y: auto;
+		            z-index: 1000;
+		        }
+		        #trackingModal .modal-content {
+		            background-color: #fefefe;
+		            margin: auto;
+		            padding: 20px;
+		            border: 1px solid #888;
+		            width: 80%;
+		            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+		            animation-name: animatetop;
+		            animation-duration: 0.4s;
+		        }
+		        @keyframes animatetop {
+		            from {top: -300px; opacity: 0}
+		            to {top: 0; opacity: 1}
+		        }
+		        #trackingModal .close {
+		            color: #aaa;
+		            float: right;
+		            font-size: 28px;
+		            font-weight: bold;
+		        }
+		        #trackingModal .close:hover,
+		        #trackingModal .close:focus {
+		            color: black;
+		            text-decoration: none;
+		            cursor: pointer;
+		        }
+		        #trackingContent { margin-top: 15px; }
+		        #trackingContent table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+		        #trackingContent th, #trackingContent td { border: 1px solid #e0e0e0; padding: 10px; text-align: left; font-size: 0.9em; }
+		        .loading { color: #b08d57; font-style: italic; text-align: center; padding: 20px; }
+		        .tracking-detail-item {
+		            border-bottom: 1px dashed #eee;
+		            padding: 10px 0;
+		            display: flex;
+		            justify-content: space-between;
+		            align-items: center;
+		        }
+		        .tracking-detail-item:last-child { border-bottom: none; }
+		        .tracking-detail-time { font-weight: bold; color: #555; flex-basis: 30%; }
+		        .tracking-detail-location { flex-basis: 40%; color: #777; }
+		        .tracking-detail-status { font-weight: bold; color: #b08d57; flex-basis: 30%; text-align: right; }
+		        /* 쿠폰/포인트 관련 스타일 */
+		        .point-summary {
+		            background-color: #f8f8f8;
+		            border: 1px solid #eee;
+		            padding: 15px 20px;
+		            margin-bottom: 20px;
+		            border-radius: 5px;
+		            font-size: 1.1em;
+		            text-align: center;
+		        }
+		        .point-summary span {
+		            font-weight: 700;
+		            color: #b08d57;
+		            margin-left: 10px;
+		        }
+		        .coupon-claim-form {
+		            display: inline-block;
+		            margin-left: 10px;
+		        }
+		        .coupon-claim-btn {
+		            background-color: #2c2c2c; /* 기존 초록색에서 테마의 어두운 색상으로 변경 */
+		            color: white;
+		            border: none;
+		            padding: 8px 15px; /* 패딩 조정 */
+		            border-radius: 5px; /* 둥근 모서리 */
+		            cursor: pointer;
+		            font-size: 0.95em; /* 폰트 크기 조정 */
+		            font-weight: 600; /* 폰트 굵기 */
+		            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+		            box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* 미세한 그림자 */
+		        }
+		        .coupon-claim-btn:hover {
+		            background-color: #b08d57; /* 호버 시 강조색 */
+		            color: #2c2c2c; /* 호버 시 글자색 변경 */
+		            box-shadow: 0 4px 8px rgba(0,0,0,0.15); /* 호버 시 그림자 강조 */
+		        }
+		        .expired {
+		            color: #999;
+		            text-decoration: line-through;
+		        }
+		        .expired .coupon-claim-btn {
+		            background-color: #ccc;
+		            cursor: not-allowed;
+		            box-shadow: none;
+		        }
+		        .expired .coupon-claim-btn:hover {
+		            background-color: #ccc;
+		            color: #666;
+		            box-shadow: none;
+		        }
+		    </style>
     </style>
 </head>
 <body>
 <c:if test="${not empty msg}">
     <script>
         alert("${msg}");
+    </script>
+</c:if>
+<c:if test="${not empty couponMessage}">
+    <script>
+        alert("${couponMessage}");
+    </script>
+</c:if>
+<c:if test="${not empty couponError}">
+    <script>
+        alert("${couponError}");
     </script>
 </c:if>
 
@@ -444,8 +514,10 @@
                     <li><a href="#member-info" class="active">회원 정보 수정</a></li>
                     <li><a href="#wishlist">찜목록 (Wishlist)</a></li>
                     <li><a href="#order-history">주문 내역</a></li>
+                    <li><a href="#my-coupons">내 쿠폰</a></li> <%-- 쿠폰 메뉴 추가 --%>
+                    <li><a href="#my-points">내 포인트</a></li> <%-- 포인트 메뉴 추가 --%>
+                    <li><a href="#deleteUser">회원 탈퇴</a></li> <%-- 포인트 메뉴 추가 --%>
                     <li class="separator"></li>
-                    <li><a href="#deleteUser" class="withdraw">회원 탈퇴</a></li>
                 </ul>
             </nav>
         </aside>
@@ -562,14 +634,14 @@
                                     <td>${product.prodStock}</td>
                                     <td>
                                         <form action="/mypage/wishlist/remove" method="post" style="display:inline;">
-                                            <input type="hidden" name="memberId" value="${sessionScope.memberId}">
+                                            <input type="hidden" name="memberId" value="${param.memberId}">
                                             <input type="hidden" name="prodId" value="${product.prodId}">
                                             <button type="submit" class="action-btn remove-btn">삭제</button>
                                         </form>
                                     </td>
                                     <td>
                                         <form action="/cart/moveFromWishlist" method="post" style="display:inline;">
-                                            <input type="hidden" name="memberId" value="${sessionScope.memberId}">
+                                            <input type="hidden" name="memberId" value="${param.memberId}">
                                             <input type="hidden" name="prodId" value="${product.prodId}">
                                             <input type="hidden" name="cartQty" value="1"> 
                                             <button type="submit" class="action-btn">장바구니로 이동</button>
@@ -611,24 +683,21 @@
                                             <c:forEach var="detail" items="${order.orderDetails}">
                                                 <li style="display: flex; align-items: center; margin-bottom: 10px;">
                                                     <img src="<c:url value='${detail.prodImage}'/>" alt="${detail.prodName}" style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px; border-radius: 4px;">
-                                                    <a href="<c:url value='/products/detail?prodId=${detail.productId}'/>">${detail.prodName}</a>
+                                                    <a href="<c:url value='/product/detail?id=${detail.productId}'/>">${detail.prodName}</a>
                                                 </li>
                                             </c:forEach>
                                         </ul>
                                     </td>
-                                    <td><fmt:formatNumber value="${order.ordTotal}" pattern="#,###" />원</td>
+                                    <td><fmt:formatNumber value="${order.ordAmount}" pattern="#,###" />원</td>
                                     <td>${order.ordStatus}</td>
-                                    <%-- ⭐️ '주문 관리'와 '리뷰 관리'를 하나의 '관리' 열로 통합 --%>
                                     <td>
                                         <c:choose>
-                                            <%-- 1. '배송완료' 상태일 때: '구매 확정' 버튼 표시 --%>
                                             <c:when test="${order.ordStatus == '배송완료'}">
                                                 <form action="<c:url value='/order/confirm'/>" method="post" style="display:inline;">
                                                     <input type="hidden" name="orderId" value="${order.ordId}">
                                                     <button type="submit" class="action-btn" style="background-color: #28a745;">구매 확정</button>
                                                 </form>
                                             </c:when>
-                                            <%-- 2. '구매확정' 상태일 때: '리뷰 쓰기' 버튼 또는 '작성 완료' 텍스트 표시 --%>
                                             <c:when test="${order.ordStatus == '구매확정'}">
                                                 <%-- 모든 상품에 대한 리뷰 작성 여부를 확인하기 위한 변수 --%>
                                                 <c:set var="allReviewed" value="${true}" />
@@ -640,20 +709,21 @@
                                                         </div>
                                                     </c:if>
                                                 </c:forEach>
-                                                
+
                                                 <%-- 모든 상품의 리뷰가 작성되었다면 완료 메시지 표시 --%>
                                                 <c:if test="${allReviewed}">
                                                     <span style="color: #888; font-size: 0.9em;">리뷰 작성 완료</span>
                                                 </c:if>
                                             </c:when>
-                                            <%-- 3. 그 외 상태일 때는 아무것도 표시하지 않음 --%>
                                             <c:otherwise>
                                                 -
                                             </c:otherwise>
                                         </c:choose>
                                     </td>
                                     <td>
-                                        <button class="action-btn delivery-track-btn" data-code="${order.deliveryCompany}" data-invoice="${order.trackingNumber}">🚚 조회</button>
+                                        <button type="button" class="action-btn delivery-track-btn"
+                                                data-code="${order.deliveryCompany}"
+                                                data-invoice="${order.trackingNumber}">🚚 조회</button>
                                     </td>
                                 </tr>
                             </c:forEach>
@@ -661,20 +731,135 @@
                     </table>
                 </c:if>
             </div>
-            <div id="deleteUser-content" class="content-panel">
-
+                <div id="deleteUser-content" class="content-panel">
                 <p class="withdraw-warning">
                     탈퇴 시 모든 회원 정보가 삭제되며 복구가 불가능합니다.
                 </p>
-
                 <form action="${pageContext.request.contextPath}/mypage/deleteUser"
                       method="post"
                       onsubmit="return confirm('정말 탈퇴하시겠습니까?');">
-
                     <button type="submit" class="withdraw-btn">
                         회원 탈퇴
                     </button>
                 </form>
+            </div>
+
+            <!-- 내 쿠폰 -->
+            <div id="my-coupons-content" class="content-panel">
+                <c:if test="${not empty couponMessage}">
+                    <script>alert("${couponMessage}");</script>
+                </c:if>
+                <c:if test="${not empty couponError}">
+                    <script>alert("${couponError}");</script>
+                </c:if>
+                <c:if test="${empty userCoupons}">
+                    <p class="no-items">보유한 쿠폰이 없습니다.</p>
+                </c:if>
+                <c:if test="${not empty userCoupons}">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>쿠폰명</th>
+                                <th>할인</th>
+                                <th>최소 주문 금액</th>
+                                <th>유효 기간</th>
+                                <th>상태</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <c:forEach var="uc" items="${userCoupons}">
+                                <tr class="${uc.isUsed == 'Y' or (uc.expirationDate != null and uc.expirationDate.before(now))} ? 'expired' : ''">
+                                    <td>${uc.couponName}</td>
+                                    <td>
+                                        <c:if test="${uc.couponType == 'PERCENT'}">${uc.discountValue}%</c:if>
+                                        <c:if test="${uc.couponType == 'AMOUNT'}"><fmt:formatNumber value="${uc.discountValue}" pattern="#,###"/>원</c:if>
+                                    </td>
+                                    <td><fmt:formatNumber value="${uc.minOrderAmount}" pattern="#,###"/>원 이상</td>
+                                    <td><fmt:formatDate value="${uc.expirationDate}" pattern="yyyy-MM-dd"/></td>
+                                    <td>
+                                        <c:choose>
+                                            <c:when test="${uc.isUsed == 'Y'}">사용 완료</c:when>
+                                            <c:when test="${uc.isUsed == 'N' and (uc.expirationDate == null or uc.expirationDate.after(now))}">사용 가능</c:when>
+                                            <c:when test="${uc.isUsed == 'N' and uc.expirationDate != null and uc.expirationDate.before(now)}">기간 만료</c:when>
+                                        </c:choose>
+                                    </td>
+                                </tr>
+                            </c:forEach>
+                        </tbody>
+                    </table>
+                </c:if>
+
+                <h3>발급 가능한 쿠폰</h3>
+                <c:if test="${empty claimableCoupons}">
+                    <p class="no-items">현재 발급 가능한 쿠폰이 없습니다.</p>
+                </c:if>
+                <c:if test="${not empty claimableCoupons}">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>쿠폰명</th>
+                                <th>할인</th>
+                                <th>최소 주문 금액</th>
+                                <th>유효 기간</th>
+                                <th>발급</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <c:forEach var="coupon" items="${claimableCoupons}">
+                                <tr>
+                                    <td>${coupon.couponName}</td>
+                                    <td>
+                                        <c:if test="${coupon.couponType == 'PERCENT'}">${coupon.discountValue}%</c:if>
+                                        <c:if test="${coupon.couponType == 'AMOUNT'}"><fmt:formatNumber value="${coupon.discountValue}" pattern="#,###"/>원</c:if>
+                                    </td>
+                                    <td><fmt:formatNumber value="${coupon.minOrderAmount}" pattern="#,###"/>원 이상</td>
+                                    <td><fmt:formatDate value="${coupon.expirationDate}" pattern="yyyy-MM-dd"/></td>
+                                    <td>
+                                        <form action="<c:url value='/mypage/claimCoupon'/>" method="post" class="coupon-claim-form">
+                                            <input type="hidden" name="couponId" value="${coupon.couponId}">
+                                            <button type="submit" class="coupon-claim-btn">쿠폰 받기</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            </c:forEach>
+                        </tbody>
+                    </table>
+                </c:if>
+            </div>
+
+            <!-- 내 포인트 -->
+            <div id="my-points-content" class="content-panel">
+                <div class="point-summary">
+                    <strong>현재 보유 포인트:</strong>
+                    <span><fmt:formatNumber value="${currentPoint}" pattern="#,###"/> P</span>
+                </div>
+                <c:if test="${empty pointHistory}">
+                    <p class="no-items">포인트 적립/사용 내역이 없습니다.</p>
+                </c:if>
+                <c:if test="${not empty pointHistory}">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>날짜</th>
+                                <th>유형</th>
+                                <th>변동</th>
+                                <th>내용</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <c:forEach var="history" items="${pointHistory}">
+                                <tr>
+                                    <td><fmt:formatDate value="${history.changeDate}" pattern="yyyy-MM-dd HH:mm"/></td>
+                                    <td>${history.pointType == 'EARN' ? '적립' : '사용'}</td>
+                                    <td>
+                                        <c:if test="${history.amount > 0}">+</c:if><fmt:formatNumber value="${history.amount}" pattern="#,###"/>
+                                    </td>
+                                    <td>${history.description}</td>
+                                </tr>
+                            </c:forEach>
+                        </tbody>
+                    </table>
+                </c:if>
             </div>
             
         </section>
@@ -692,59 +877,7 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const sidebarLinks = document.querySelectorAll('.mypage-sidebar a');
-            const contentPanels = document.querySelectorAll('.content-panel');
-            const mainTitle = document.querySelector('.mypage-content-area h2');
-
-            // URL Hash에서 ID를 추출 (예: #wishlist -> wishlist)
-            // 없으면 'member-info'를 기본값으로 설정
-            const getHashId = () => window.location.hash.substring(1) || 'member-info';
-
-            function activatePanel(targetId) {
-                const panelId = targetId + '-content';
-                // 1. 사이드바 링크 활성화
-                sidebarLinks.forEach(link => {
-                    const linkHash = link.getAttribute('href').substring(1);
-                    if (linkHash === targetId) {
-                        link.classList.add('active');
-                        // 2. 메인 타이틀 업데이트
-                        mainTitle.textContent = link.textContent;
-                    } else {
-                        link.classList.remove('active');
-                    }
-                });
-                // 3. 콘텐츠 패널 표시/숨김
-                contentPanels.forEach(panel => {
-                    if (panel.id === panelId) {
-                        panel.classList.add('active');
-                    } else {
-                        panel.classList.remove('active');
-                    }
-                });
-            }
-
-            // 초기 로드 시 실행 (URL 해시에 따라 페이지 표시)
-            activatePanel(getHashId());
-            // 사이드바 링크 클릭 이벤트
-            sidebarLinks.forEach(link => {
-                link.addEventListener('click', function(event) {
-                    event.preventDefault(); // 기본 해시 이동 방지
-                    const targetHash = this.getAttribute('href').substring(1);
-                    activatePanel(targetHash);
-                    
-                    // URL 해시 업데이트 (페이지 새로고침 없음)
-                    window.history.pushState(null, null, this.href);
-                });
-            });
-
-            // 브라우저 뒤로/앞으로 버튼 처리
-            window.addEventListener('popstate', function() {
-                activatePanel(getHashId());
-            });
-        });
-
-        // ⭐️ 배송 조회 스크립트 (seller/orders.jsp와 동일한 로직)
+        // 배송 추적 관련 함수들을 DOMContentLoaded 외부로 이동하여 전역적으로 접근 가능하게 함
         function trackDelivery(deliveryCompany, trackingNumber) {
             const modal = document.getElementById('trackingModal');
             const content = document.getElementById('trackingContent');
@@ -758,7 +891,7 @@
             modal.style.display = 'block';
             content.innerHTML = '<div class="loading">배송 정보를 조회하는 중...</div>';
 
-            fetch('${pageContext.request.contextPath}/mypage/trackDelivery?t_code=' + deliveryCompany + '&t_invoice=' + trackingNumber)
+            fetch('${pageContext.request.contextPath}/trackDelivery?t_code=' + deliveryCompany + '&t_invoice=' + trackingNumber)
                 .then(response => response.json())
                 .then(data => {
                     if (data && data.trackingDetails) {
@@ -802,22 +935,58 @@
             document.getElementById('trackingModal').style.display = 'none';
         }
 
-        // '🚚 조회' 버튼에 이벤트 리스너 추가
-        document.querySelectorAll('.delivery-track-btn').forEach(button => {
-            button.addEventListener('click', function() {
-                const code = this.getAttribute('data-code');
-                const invoice = this.getAttribute('data-invoice');
-                trackDelivery(code, invoice);
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebarLinks = document.querySelectorAll('.mypage-sidebar a');
+            const contentPanels = document.querySelectorAll('.content-panel');
+            const mainTitle = document.querySelector('.mypage-content-area h2');
+
+            const getHashId = () => window.location.hash.substring(1) || 'member-info';
+
+            function activatePanel(targetId) {
+                const panelId = targetId + '-content';
+                sidebarLinks.forEach(link => {
+                    const linkHash = link.getAttribute('href').substring(1);
+                    if (linkHash === targetId) {
+                        link.classList.add('active');
+                        mainTitle.textContent = link.textContent;
+                    } else {
+                        link.classList.remove('active');
+                    }
+                });
+                contentPanels.forEach(panel => {
+                    if (panel.id === panelId) {
+                        panel.classList.add('active');
+                    } else {
+                        panel.classList.remove('active');
+                    }
+                });
+            }
+
+            activatePanel(getHashId());
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    const targetHash = this.getAttribute('href').substring(1);
+                    activatePanel(targetHash);
+                    
+                    window.history.pushState(null, null, this.href);
+                });
+            });
+
+            window.addEventListener('popstate', function() {
+                activatePanel(getHashId());
+            });
+
+            // '🚚 조회' 버튼에 이벤트 리스너 추가 (jQuery 대신 일반 JS 사용)
+            document.querySelectorAll('.delivery-track-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const deliveryCompany = this.getAttribute('data-code');
+                    const trackingNumber = this.getAttribute('data-invoice');
+                    trackDelivery(deliveryCompany, trackingNumber);
+                });
             });
         });
-
-        // 모달 외부 클릭 시 닫기
-        window.onclick = function(event) {
-            const modal = document.getElementById('trackingModal');
-            if (event.target == modal) {
-                modal.style.display = 'none';
-            }
-        }
     </script>
     <c:if test="${updateSuccess}">
         <script> alert('정보 수정이 완료되었습니다.'); </script>

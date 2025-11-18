@@ -19,18 +19,18 @@
         ORDER BY W.WISH_DATE DESC
     </select>
 
-    <insert id="addWishlist">
+    <insert id="addWishlist" parameterType="map">
         INSERT INTO WISHLIST_DB (WISH_ID, MEMBER_ID, PROD_ID, WISH_DATE)
         VALUES (WISHLIST_SEQ.NEXTVAL, #{memberId}, #{prodId}, SYSDATE)
     </insert>
 
-    <delete id="delete">
+    <delete id="delete" parameterType="map">
         DELETE FROM WISHLIST_DB
         WHERE MEMBER_ID = #{memberId} AND PROD_ID = #{prodId}
     </delete>
 
     <!-- 찜 목록에 상품이 있는지 확인 -->
-    <select id="countByMemberIdAndProdId" resultType="int">
+    <select id="countByMemberIdAndProdId" resultType="int" parameterType="map">
         SELECT COUNT(*) FROM WISHLIST_DB
         WHERE MEMBER_ID = #{memberId} AND PROD_ID = #{prodId}
     </select>

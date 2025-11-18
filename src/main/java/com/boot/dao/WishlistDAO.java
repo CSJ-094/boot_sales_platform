@@ -25,17 +25,17 @@ public interface WishlistDAO {
      * @param memberId 회원 ID
      * @param prodId 상품 ID
      */
-    void addWishlist(@Param("memberId") String memberId, @Param("prodId") Integer prodId);
+    void addWishlist(@Param("memberId") String memberId, @Param("prodId") Long prodId); // Integer -> Long 변경
 
     /**
      * 찜목록에서 특정 상품을 삭제합니다.
      * @param memberId 회원 ID
      * @param prodId 상품 ID
      */
-    void delete(@Param("memberId") String memberId, @Param("prodId") Integer prodId);
+    void delete(@Param("memberId") String memberId, @Param("prodId") Long prodId); // Integer -> Long 변경
 
     /**
      * 특정 상품이 찜 목록에 있는지 확인합니다.
      */
-    int countByMemberIdAndProdId(@Param("memberId") String memberId, @Param("prodId") Integer prodId);
+    int countByMemberIdAndProdId(@Param("memberId") String memberId, @Param("prodId") Long prodId); // Integer -> Long 변경
 }

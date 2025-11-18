@@ -11,7 +11,7 @@
         FROM 
             PRODUCT_DB P
         LEFT JOIN 
-            IMAGE_DB I ON P.PROD_ID = I.IMG_PROD_ID AND I.IMG_MAIN = 'Y'
+            IMAGE_DB I ON P.PROD_ID = I.IMG_PROD_ID AND I.IS_MAIN = 'Y' <!-- IMG_MAIN -> IS_MAIN 변경 -->
         WHERE P.PROD_ID = #{prodId}
     </select>
   
@@ -45,7 +45,7 @@
             P.PROD_ID, P.PROD_SELLER, P.PROD_NAME, P.PROD_PRICE, P.PROD_STOCK, P.PROD_DESC, P.PROD_CODE, P.PROD_REG, P.PROD_UPD,
             I.IMG_PATH AS PROD_IMG_PATH
         FROM PRODUCT_DB P
-        LEFT JOIN IMAGE_DB I ON P.PROD_ID = I.IMG_PROD_ID AND I.IMG_MAIN = 'Y'
+        LEFT JOIN IMAGE_DB I ON P.PROD_ID = I.IMG_PROD_ID AND I.IS_MAIN = 'Y' <!-- IMG_MAIN -> IS_MAIN 변경 -->
         WHERE P.PROD_ID = #{prodId}
 	</select>
 
@@ -114,7 +114,7 @@
         LEFT JOIN 
             IMAGE_DB I 
         ON 
-            P.PROD_ID = I.IMG_PROD_ID AND I.IMG_MAIN = 'Y'
+            P.PROD_ID = I.IMG_PROD_ID AND I.IS_MAIN = 'Y' <!-- IMG_MAIN -> IS_MAIN 변경 -->
         WHERE
             PC.CAT_ID = #{catId}  
         ORDER BY 
@@ -142,11 +142,52 @@
         LEFT JOIN 
             IMAGE_DB I 
         ON 
-            P.PROD_ID = I.IMG_PROD_ID AND I.IMG_MAIN = 'Y'
+            P.PROD_ID = I.IMG_PROD_ID AND I.IS_MAIN = 'Y' <!-- IMG_MAIN -> IS_MAIN 변경 -->
         WHERE
             PC.CAT_ID = #{catId}  
         ORDER BY 
             P.PROD_REG DESC       
     )
+    </select>
+
+    <!-- 상품 검색 기능 -->
+    <select id="searchProducts" parameterType="com.boot.dto.ProductSearchCondition" resultMap="ProductMap">
+        SELECT
+            P.PROD_ID, P.PROD_SELLER, P.PROD_NAME, P.PROD_PRICE, P.PROD_STOCK, P.PROD_DESC, P.PROD_CODE, P.PROD_REG, P.PROD_UPD,
+            I.IMG_PATH AS PROD_IMG_PATH
+        FROM
+            PRODUCT_DB P
+        LEFT JOIN
+            IMAGE_DB I ON P.PROD_ID = I.IMG_PROD_ID AND I.IS_MAIN = 'Y' <!-- IMG_MAIN -> IS_MAIN 변경 -->
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (P.PROD_NAME LIKE '%' || #{keyword} || '%' OR P.PROD_DESC LIKE '%' || #{keyword} || '%')
+            </if>
+            <if test="minPrice != null">
+                AND P.PROD_PRICE >= #{minPrice}
+            </if>
+            <if test="maxPrice != null">
+                AND P.PROD_PRICE &lt;= #{maxPrice}
+            </if>
+            <if test="category != null and category != ''">
+                AND P.PROD_ID IN (SELECT PROD_ID FROM PRODUCT_CATEGORY_DB WHERE CAT_ID = #{category})
+            </if>
+        </where>
+        <choose>
+            <when test="sortBy != null and sortBy != ''">
+                ORDER BY
+                <choose>
+                    <when test="sortBy == 'prodName'">P.PROD_NAME</when>
+                    <when test="sortBy == 'prodPrice'">P.PROD_PRICE</when>
+                    <when test="sortBy == 'prodReg'">P.PROD_REG</when>
+                    <otherwise>P.PROD_ID</otherwise>
+                </choose>
+                <if test="sortOrder != null and sortOrder == 'desc'">DESC</if>
+                <if test="sortOrder != null and sortOrder == 'asc'">ASC</if>
+            </when>
+            <otherwise>
+                ORDER BY P.PROD_ID DESC
+            </otherwise>
+        </choose>
     </select>
 </mapper>

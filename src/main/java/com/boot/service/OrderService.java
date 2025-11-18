@@ -12,6 +12,7 @@ import com.boot.dto.OrdDTO;
 import com.boot.dto.OrderDetailDTO;
 import com.boot.dto.SellerOrderSummaryDTO;
 import com.boot.dto.TrackingResponseDTO;
+import com.boot.dto.UserCouponDTO; // UserCouponDTO import 추가
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,13 +31,18 @@ public class OrderService {
     private OrderDetailDAO orderDetailDAO;
 
     @Autowired
-    private ReviewDAO reviewDAO; // ⭐️ 리뷰 확인을 위해 ReviewDAO 주입
+    private ReviewDAO reviewDAO;
 
     @Autowired
     private CartDAO cartDAO;
 
     @Autowired
     private DeliveryService deliveryService;
+
+    @Autowired
+    private UserCouponService userCouponService; // UserCouponService 주입
+    @Autowired
+    private PointService pointService; // PointService 주입
 
     /**
      * 회원 ID로 주문 내역 목록을 조회합니다.
@@ -52,9 +58,7 @@ public class OrderService {
         List<OrdDTO> orders = ordDAO.getOrdersByMemberId(memberId);
         for (OrdDTO order : orders) {
             List<OrderDetailDTO> details = orderDetailDAO.findByOrderId(order.getOrdId());
-            // ⭐️ 각 주문 상세 항목에 대해 리뷰 작성 여부를 확인하고 설정
             for (OrderDetailDTO detail : details) {
-                // ⭐️ orderId 대신 memberId를 사용하여 리뷰 존재 여부 확인
                 boolean hasReview = reviewDAO.existsReview(memberId, detail.getProductId()) > 0;
                 detail.setHasReview(hasReview);
             }
@@ -82,31 +86,25 @@ public class OrderService {
     public OrdDTO prepareOrder(String memberId, List<CartDTO> cartItems) {
         log.info("Preparing order for member: {}", memberId);
 
-        // 1. 주문 ID 생성
         String orderId = "ORD-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
 
-        // 2. 주문 총액 계산
         int totalProductPrice = cartItems.stream()
                 .mapToInt(item -> item.getProdPrice() * item.getCartQty())
                 .sum();
 
-        final int SHIPPING_FEE = 3000; // 배송비는 3000원으로 가정
+        final int SHIPPING_FEE = 3000;
 
-        // 3. 주문(Orders) 정보 생성 및 DB 저장
         OrdDTO pendingOrder = new OrdDTO();
         pendingOrder.setOrdId(orderId);
         pendingOrder.setOrdMemId(memberId);
-        pendingOrder.setOrdAmount(totalProductPrice); // 상품 금액만 저장
+        pendingOrder.setOrdAmount(totalProductPrice);
         pendingOrder.setOrdDfee(SHIPPING_FEE);
         pendingOrder.setOrdDiscount(0);
-        pendingOrder.setOrdStatus("결제대기"); // ⭐️ 주문 상태를 '결제대기'로 설정
+        pendingOrder.setOrdStatus("결제대기");
         ordDAO.save(pendingOrder);
         log.info("Pending order saved: {}", orderId);
 
-        // 4. 주문 상세(Order_details) 정보 생성 및 DB 저장
         saveOrderDetails(orderId, cartItems);
-
-        // ⭐️ 아직 결제가 완료되지 않았으므로 장바구니는 비우지 않습니다.
 
         return pendingOrder;
     }
@@ -122,39 +120,33 @@ public class OrderService {
     public OrdDTO createOrder(String memberId) throws IllegalStateException {
         log.info("Creating order for member: {}", memberId);
 
-        // 1. 장바구니에서 주문할 상품 목록 가져오기
         List<CartDTO> cartItems = cartDAO.getCartListByMemberId(memberId);
 
         if (cartItems == null || cartItems.isEmpty()) {
             throw new IllegalStateException("장바구니에 주문할 상품이 없습니다.");
         }
 
-        // 2. 주문 ID 생성 (고유한 문자열 ID 사용)
         String orderId = "ORD-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         
-        // 3. 주문 총액 계산
         int totalProductPrice = cartItems.stream()
                                  .mapToInt(item -> item.getProdPrice() * item.getCartQty())
                                  .sum();
         
-        final int SHIPPING_FEE = 3000; // 배송비는 3000원으로 가정
-        int ordAmount = totalProductPrice; // 상품 금액만 저장
+        final int SHIPPING_FEE = 3000;
+        int ordAmount = totalProductPrice;
         
-        // 4. 주문(Orders) 정보 생성 및 DB 저장
         OrdDTO newOrder = new OrdDTO();
         newOrder.setOrdId(orderId);
         newOrder.setOrdMemId(memberId);
         newOrder.setOrdAmount(ordAmount);
         newOrder.setOrdDfee(SHIPPING_FEE);
-        newOrder.setOrdDiscount(0); // 할인은 0으로 가정
+        newOrder.setOrdDiscount(0);
         newOrder.setOrdStatus("결제완료"); 
         ordDAO.save(newOrder);
         log.info("Order saved: {}", orderId);
 
-        // 5. 주문 상세(Order_details) 정보 생성 및 DB 저장
         saveOrderDetails(orderId, cartItems);
 
-        // 6. 주문 완료 후 장바구니 비우기
         cartDAO.clearCartByMemberId(memberId);
         log.info("Cart cleared for member: {}", memberId);
 
@@ -170,7 +162,7 @@ public class OrderService {
             orderDetail.setOrderId(orderId);
             orderDetail.setProductId(cartItem.getProdId());
             orderDetail.setQuantity(cartItem.getCartQty());
-            orderDetail.setPrice(cartItem.getProdPrice()); // 주문 시점의 가격
+            orderDetail.setPrice(cartItem.getProdPrice());
             orderDetailDAO.save(orderDetail);
         }
         log.info("Saved {} order detail items for order: {}", cartItems.size(), orderId);
@@ -189,11 +181,9 @@ public class OrderService {
             throw new IllegalArgumentException("존재하지 않는 주문입니다: " + orderId);
         }
 
-        // 1. 주문 상태와 결제 키 업데이트
         ordDAO.updateAfterPayment(orderId, "결제완료", paymentKey);
         log.info("Order status updated to '결제완료' for orderId: {}", orderId);
 
-        // 2. 결제가 성공적으로 완료되었으므로 장바구니를 비웁니다.
         cartDAO.clearCartByMemberId(order.getOrdMemId());
         log.info("Cart cleared for member: {}", order.getOrdMemId());
     }
@@ -204,51 +194,93 @@ public class OrderService {
      * @param cartItems 세션에 저장된 장바구니 상품 목록
      * @param orderId 토스페이먼츠에서 사용된 주문 ID
      * @param paymentKey 토스페이먼츠 결제 키
-     * @param amount 최종 결제 금액
+     * @param finalPaymentAmount 최종 결제 금액 (할인 적용 후)
+     * @param selectedUserCouponId 사용된 쿠폰의 userCouponId (없으면 null)
+     * @param usedPoint 사용된 포인트 (없으면 0)
      * @return 생성된 주문 정보 DTO
      */
     @Transactional
-    public OrdDTO createOrderFromCart(String memberId, List<CartDTO> cartItems, String orderId, String paymentKey, Long amount) {
+    public OrdDTO createOrderFromCart(String memberId, List<CartDTO> cartItems, String orderId, String paymentKey, Long finalPaymentAmount, Long selectedUserCouponId, int usedPoint) {
         log.info("Creating order from cart for member: {}, orderId: {}", memberId, orderId);
 
         if (cartItems == null || cartItems.isEmpty()) {
             throw new IllegalStateException("주문할 상품 정보가 없습니다.");
         }
 
-        // 1. 주문 총 상품 금액 및 배송비 계산
+        // 1. 총 상품 금액 및 배송비 계산 (할인 적용 전)
         int totalProductPrice = cartItems.stream()
                 .mapToInt(item -> item.getProdPrice() * item.getCartQty())
                 .sum();
         final int SHIPPING_FEE = 3000;
 
-        // 2. 주문(Orders) 정보 생성 및 DB 저장
+        int totalDiscountAmount = 0; // 총 할인 금액
+
+        // 2. 쿠폰 할인 계산 및 적용
+        if (selectedUserCouponId != null) {
+            UserCouponDTO userCoupon = userCouponService.getUserCouponById(selectedUserCouponId);
+            if (userCoupon != null && "N".equals(userCoupon.getIsUsed()) && (userCoupon.getExpirationDate() == null || userCoupon.getExpirationDate().after(new java.util.Date()))) {
+                int couponDiscount = 0;
+                if (userCoupon.getCouponType().equals("PERCENT")) {
+                    couponDiscount = (int) (totalProductPrice * (userCoupon.getDiscountValue() / 100.0));
+                    if (userCoupon.getMaxDiscountAmount() != null && couponDiscount > userCoupon.getMaxDiscountAmount()) {
+                        couponDiscount = userCoupon.getMaxDiscountAmount();
+                    }
+                } else if (userCoupon.getCouponType().equals("AMOUNT")) {
+                    couponDiscount = userCoupon.getDiscountValue();
+                }
+
+                if (totalProductPrice >= userCoupon.getMinOrderAmount()) {
+                    totalDiscountAmount += couponDiscount;
+                    userCouponService.useUserCoupon(selectedUserCouponId, memberId); // 쿠폰 사용 처리
+                    log.info("Coupon {} applied for order {}. Discount: {}", userCoupon.getCouponName(), orderId, couponDiscount);
+                } else {
+                    log.warn("Coupon {} not applied: Minimum order amount not met.", userCoupon.getCouponName());
+                }
+            } else {
+                log.warn("Invalid or already used coupon: {}", selectedUserCouponId);
+            }
+        }
+
+        // 3. 포인트 사용 적용
+        if (usedPoint > 0) {
+            try {
+                pointService.usePoint(memberId, usedPoint, "주문 결제 포인트 사용 (주문번호: " + orderId + ")");
+                totalDiscountAmount += usedPoint;
+                log.info("Point {} used for order {}. Usage: {}", memberId, orderId, usedPoint);
+            } catch (IllegalArgumentException e) {
+                log.error("Point usage failed for order {}: {}", orderId, e.getMessage());
+            }
+        }
+
+        // 4. 최종 결제 금액 계산 (클라이언트에서 넘어온 finalPaymentAmount와 서버에서 계산한 금액 비교)
+        long calculatedFinalAmount = totalProductPrice + SHIPPING_FEE - totalDiscountAmount;
+        if (calculatedFinalAmount < 0) calculatedFinalAmount = 0;
+
+        if (calculatedFinalAmount != finalPaymentAmount) {
+            log.error("Final payment amount mismatch! Calculated: {}, Received: {}", calculatedFinalAmount, finalPaymentAmount);
+            throw new IllegalStateException("결제 금액이 일치하지 않습니다. 결제를 다시 시도해주세요.");
+        }
+
+        // 5. 주문(Orders) 정보 생성 및 DB 저장
         OrdDTO newOrder = new OrdDTO();
-        newOrder.setOrdId(orderId); // 토스에서 받은 주문 ID 사용
+        newOrder.setOrdId(orderId);
         newOrder.setOrdMemId(memberId);
-        newOrder.setOrdAmount(totalProductPrice);
+        newOrder.setOrdAmount(totalProductPrice); // 총 상품 금액 (할인 전)
         newOrder.setOrdDfee(SHIPPING_FEE);
-        newOrder.setOrdDiscount(0);
+        newOrder.setOrdDiscount(totalDiscountAmount); // 총 할인 금액 저장
         newOrder.setOrdStatus("결제완료");
-        newOrder.setOrdPaymentKey(paymentKey); // 결제 키 저장
+        newOrder.setOrdPaymentKey(paymentKey);
         ordDAO.save(newOrder);
         log.info("Order saved: {}", orderId);
 
-        // 3. 주문 상세(Order_details) 정보 생성 및 DB 저장
+        // 6. 주문 상세(Order_details) 정보 생성 및 DB 저장
         saveOrderDetails(orderId, cartItems);
 
-        return newOrder;
-    }
+        // 7. 장바구니 비우기
+        cartDAO.clearCartByMemberId(memberId);
+        log.info("Cart cleared for member: {}", memberId);
 
-    /**
-     * 특정 사용자가 특정 상품을 구매했는지 확인합니다.
-     * @param memberId 회원 ID
-     * @param productId 상품 ID
-     * @return 구매 이력이 있으면 true, 없으면 false
-     */
-    public boolean hasUserPurchasedProduct(String memberId, Long productId) {
-        // 특정 사용자가 특정 상품을 포함하는 '구매확정' 상태의 주문을 했는지 확인
-        int count = orderDetailDAO.countConfirmedPurchase(memberId, productId);
-        return count > 0;
+        return newOrder;
     }
 
     /**
@@ -267,7 +299,6 @@ public class OrderService {
      */
     @Transactional
     public void manuallyCompleteOrder(String orderId) {
-        // 기존의 주문 상태 업데이트 DAO 메소드를 재사용합니다.
         ordDAO.updateStatus(orderId, "배송완료");
         log.info("Order status manually updated to '배송완료' for orderId: {}", orderId);
     }
@@ -281,20 +312,7 @@ public class OrderService {
 
     /**
      * 송장번호와 택배사 코드를 입력하고 주문 상태를 배송중으로 변경합니다.
-     * 배송 추적 API로 유효<%-- '배송중' 상태일 때만 '배송완료 처리' 버튼이 나타납니다. --%>
-     <c:if test="${order.orderStatus == '배송중'}">
-     
-       <%-- 버튼을 누르면 확인 창이 뜨고, 확인을 누르면 form이 제출됩니다. --%>
-       <form action="/seller/orders/complete" method="post" style="display: inline-block;" onsubmit="return confirm('해당 주문을 배송완료 처리하시겠습니까?');">
-         
-         <%-- 컨트롤러에 주문 ID를 전달하기 위한 hidden input --%>
-         <input type="hidden" name="orderId" value="${order.orderId}">
-         
-         <button type="submit" class="btn btn-success btn-sm">배송완료 처리</button>
-       </form>
-       
-     </c:if>
-     성 검증을 수행하고, 배송 완료 여부에 따라 상태를 자동 업데이트합니다.
+     * 배송 추적 API로 유효성 검증을 수행하고, 배송 완료 여부에 따라 상태를 자동 업데이트합니다.
      * @param orderId 주문 ID
      * @param trackingNumber 송장번호
      * @param deliveryCompany 택배사 코드
@@ -302,15 +320,14 @@ public class OrderService {
      */
     @Transactional
     public String updateTrackingNumber(String orderId, String trackingNumber, String deliveryCompany) {
-        String status = "배송중"; // 기본 상태
-        String validationMessage = null; // API 검증 결과 메시지
+        String status = "배송중";
+        String validationMessage = null;
 
-        // 1. 배송 추적 API로 유효성 검증
         TrackingResponseDTO trackingInfo = null;
         try {
             trackingInfo = deliveryService.getTrackingInfo(deliveryCompany, trackingNumber);
             if (trackingInfo != null) {
-                status = determineOrderStatus(trackingInfo); // API 응답 기반으로 상태 결정
+                status = determineOrderStatus(trackingInfo);
             } else {
                 validationMessage = "송장번호가 저장되었습니다. 배송 추적 API 검증에 실패하여 자동 상태 업데이트는 되지 않았습니다. 송장번호를 확인해주세요.";
             }
@@ -319,7 +336,6 @@ public class OrderService {
             validationMessage = "송장번호가 저장되었으나, 배송 추적 API 연동 중 오류가 발생했습니다.";
         }
         
-        // 2. 송장번호, 택배사, 주문 상태를 한 번에 업데이트
         ordDAO.updateTrackingAndStatus(orderId, trackingNumber, deliveryCompany, status);
         log.info("송장 정보 업데이트 완료: orderId={}, trackingNumber={}, status={}", orderId, trackingNumber, status);
 
@@ -333,15 +349,13 @@ public class OrderService {
      */
     private String determineOrderStatus(TrackingResponseDTO trackingInfo) {
         if (trackingInfo == null) {
-            return "배송중"; // 정보가 없으면 기본값
+            return "배송중";
         }
 
-        // 1. API의 최상위 'complete' 필드를 먼저 확인 (가장 확실한 정보)
         if (trackingInfo.isComplete()) {
             return "배송완료";
         }
 
-        // 2. 상세 내역이 있는 경우, 가장 마지막(최신) 내역을 확인
         if (trackingInfo.getTrackingDetails() != null && !trackingInfo.getTrackingDetails().isEmpty()) {
             int lastIndex = trackingInfo.getTrackingDetails().size() - 1;
             String latestStatus = trackingInfo.getTrackingDetails().get(lastIndex).getKind();
@@ -350,7 +364,16 @@ public class OrderService {
             }
         }
 
-        // 3. 위 조건에 해당하지 않으면 '배송중'으로 간주
         return "배송중";
+    }
+
+    /**
+     * 특정 사용자가 특정 상품을 구매했는지 확인합니다.
+     * @param memberId 회원 ID
+     * @param productId 상품 ID
+     * @return 구매 이력이 있으면 true, 없으면 false
+     */
+    public boolean hasUserPurchasedProduct(String memberId, Long productId) {
+        return orderDetailDAO.countConfirmedPurchase(memberId, productId) > 0;
     }
 }

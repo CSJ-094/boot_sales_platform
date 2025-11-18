@@ -32,17 +32,18 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.apache.tomcat.embed:tomcat-embed-jasper'
     implementation 'com.googlecode.json-simple:json-simple:1.1.1'
-    compileOnly 'org.projectlombok:lombok'
+    compileOnly 'org.projectlombok:lombok:1.18.28' // 버전 명시
     implementation 'javax.servlet:jstl:1.2'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'com.oracle.database.jdbc:ojdbc11'
-    annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok:1.18.28' // 버전 명시
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.5'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'com.google.code.gson:gson:2.10.1'
-    
+    // Spring Security JSP 태그 라이브러리 제거
+    // implementation 'org.springframework.security:spring-security-taglibs'
 }
 
 tasks.named('test') {
