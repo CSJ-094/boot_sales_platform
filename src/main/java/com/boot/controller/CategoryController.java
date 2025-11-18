@@ -72,6 +72,7 @@ public class CategoryController {
         model.addAttribute("group", group);
         model.addAttribute("sub", "all");
         model.addAttribute("productList", products);
+        model.addAttribute("totalCount", products.size());
 
         return "category/category";
     }
