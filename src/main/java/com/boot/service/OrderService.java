@@ -6,6 +6,7 @@ import java.util.UUID;
 import com.boot.dao.CartDAO;
 import com.boot.dao.OrdDAO;
 import com.boot.dao.OrderDetailDAO;
+import com.boot.dao.ReviewDAO;
 import com.boot.dto.CartDTO;
 import com.boot.dto.OrdDTO;
 import com.boot.dto.OrderDetailDTO;
@@ -29,6 +30,9 @@ public class OrderService {
     private OrderDetailDAO orderDetailDAO;
 
     @Autowired
+    private ReviewDAO reviewDAO; // ⭐️ 리뷰 확인을 위해 ReviewDAO 주입
+
+    @Autowired
     private CartDAO cartDAO;
 
     @Autowired
@@ -48,7 +52,13 @@ public class OrderService {
         List<OrdDTO> orders = ordDAO.getOrdersByMemberId(memberId);
         for (OrdDTO order : orders) {
             List<OrderDetailDTO> details = orderDetailDAO.findByOrderId(order.getOrdId());
-            order.setOrderDetails(details); // OrdDTO에 setOrderDetails 메서드 필요
+            // ⭐️ 각 주문 상세 항목에 대해 리뷰 작성 여부를 확인하고 설정
+            for (OrderDetailDTO detail : details) {
+                // ⭐️ orderId 대신 memberId를 사용하여 리뷰 존재 여부 확인
+                boolean hasReview = reviewDAO.existsReview(memberId, detail.getProductId()) > 0;
+                detail.setHasReview(hasReview);
+            }
+            order.setOrderDetails(details);
         }
         return orders;
     }

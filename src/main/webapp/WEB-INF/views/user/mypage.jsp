@@ -366,10 +366,10 @@
             background-color: #fff;
         }
         .action-btn {
-            background-color: #6c757d;
+            background-color: #6c757d; /* ⭐️ 버튼 높이 조절 */
             color: white;
             border: none;
-            padding: 8px 12px;
+            padding: 5px 10px;
             cursor: pointer;
             border-radius: 5px;
             font-size: 0.9em;
@@ -410,29 +410,20 @@
             cursor:pointer;
         }
         /* ⭐️ End of Wishlist Styles ⭐️ */
-		/* ... 기존 스타일 ... */
-		        
-		        /* 🚨 배송 조회 모달 스타일 추가 🚨 */
-		        #trackingResultModal {
-		            border: 1px solid #b08d57; 
-		            background-color: #ffffff;
-		            padding: 25px;
-		            border-radius: 8px;
-		            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-		            display: none; 
-		            position: fixed; 
-		            top: 50%; left: 50%;
-		            transform: translate(-50%, -50%);
-		            width: 550px;
-		            max-height: 80vh;
-		            overflow-y: auto;
-		            z-index: 1000;
-		        }
-		        #trackingInfoBox table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-		        #trackingInfoBox th, #trackingInfoBox td { border: 1px solid #e0e0e0; padding: 10px; text-align: left; font-size: 0.9em; }
-		        .loading { color: #b08d57; font-style: italic; text-align: center; padding: 20px; }
-		        #closeModalBtn { margin-top: 15px; background-color: #2c2c2c; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; }
-		    </style>
+    </style>
+    <%-- ⭐️ seller/orders.jsp의 모달 스타일을 가져와서 적용 --%>
+    <style>
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); }
+        .modal-content { background-color: #fefefe; margin: 5% auto; padding: 20px; border: 1px solid #888; border-radius: 8px; width: 80%; max-width: 600px; }
+        .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+        .close:hover, .close:focus { color: black; }
+        .tracking-details { margin-top: 20px; }
+        .tracking-detail-item { padding: 12px; border-bottom: 1px solid #eee; }
+        .tracking-detail-item:last-child { border-bottom: none; }
+        .tracking-detail-time { font-weight: bold; color: #333; }
+        .tracking-detail-location { color: #666; margin-top: 4px; }
+        .tracking-detail-status { color: #b08d57; margin-top: 4px; }
+        .loading { text-align: center; padding: 20px; color: #666; }
     </style>
 </head>
 <body>
@@ -571,14 +562,14 @@
                                     <td>${product.prodStock}</td>
                                     <td>
                                         <form action="/mypage/wishlist/remove" method="post" style="display:inline;">
-                                            <input type="hidden" name="memberId" value="${param.memberId}">
+                                            <input type="hidden" name="memberId" value="${sessionScope.memberId}">
                                             <input type="hidden" name="prodId" value="${product.prodId}">
                                             <button type="submit" class="action-btn remove-btn">삭제</button>
                                         </form>
                                     </td>
                                     <td>
                                         <form action="/cart/moveFromWishlist" method="post" style="display:inline;">
-                                            <input type="hidden" name="memberId" value="${param.memberId}">
+                                            <input type="hidden" name="memberId" value="${sessionScope.memberId}">
                                             <input type="hidden" name="prodId" value="${product.prodId}">
                                             <input type="hidden" name="cartQty" value="1"> 
                                             <button type="submit" class="action-btn">장바구니로 이동</button>
@@ -604,9 +595,9 @@
                                 <th style="width: 150px;">주문날짜</th>
                                 <th>상품정보</th>
                                 <th style="width: 120px;">금액</th>
-                                <th style="width: 120px;">주문 상태</th>
-                                <th style="width: 120px;">관리</th>
-								<th style="width: 120px;">배송조회</th>
+                                <th style="width: 110px;">주문 상태</th>
+                                <th style="width: 150px;">관리</th>
+                                <th style="width: 120px;">배송조회</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -625,23 +616,44 @@
                                             </c:forEach>
                                         </ul>
                                     </td>
+                                    <td><fmt:formatNumber value="${order.ordTotal}" pattern="#,###" />원</td>
                                     <td>${order.ordStatus}</td>
+                                    <%-- ⭐️ '주문 관리'와 '리뷰 관리'를 하나의 '관리' 열로 통합 --%>
                                     <td>
-                                        <%-- 상태에 따라 다른 버튼 표시 --%>
                                         <c:choose>
-                                             <c:when test="${order.ordStatus == '배송완료'}">
+                                            <%-- 1. '배송완료' 상태일 때: '구매 확정' 버튼 표시 --%>
+                                            <c:when test="${order.ordStatus == '배송완료'}">
                                                 <form action="<c:url value='/order/confirm'/>" method="post" style="display:inline;">
                                                     <input type="hidden" name="orderId" value="${order.ordId}">
                                                     <button type="submit" class="action-btn" style="background-color: #28a745;">구매 확정</button>
                                                 </form>
                                             </c:when>
+                                            <%-- 2. '구매확정' 상태일 때: '리뷰 쓰기' 버튼 또는 '작성 완료' 텍스트 표시 --%>
                                             <c:when test="${order.ordStatus == '구매확정'}">
-                                                완료
+                                                <%-- 모든 상품에 대한 리뷰 작성 여부를 확인하기 위한 변수 --%>
+                                                <c:set var="allReviewed" value="${true}" />
+                                                <c:forEach var="detail" items="${order.orderDetails}">
+                                                    <c:if test="${!detail.hasReview}">
+                                                        <c:set var="allReviewed" value="${false}" />
+                                                        <div style="margin-bottom: 5px;">
+                                                            <a href="<c:url value='/reviews/write?productId=${detail.productId}&orderId=${order.ordId}'/>" class="action-btn" style="background-color: #b08d57;">리뷰 쓰기</a>
+                                                        </div>
+                                                    </c:if>
+                                                </c:forEach>
+                                                
+                                                <%-- 모든 상품의 리뷰가 작성되었다면 완료 메시지 표시 --%>
+                                                <c:if test="${allReviewed}">
+                                                    <span style="color: #888; font-size: 0.9em;">리뷰 작성 완료</span>
+                                                </c:if>
                                             </c:when>
+                                            <%-- 3. 그 외 상태일 때는 아무것도 표시하지 않음 --%>
                                             <c:otherwise>
                                                 -
                                             </c:otherwise>
                                         </c:choose>
+                                    </td>
+                                    <td>
+                                        <button class="action-btn delivery-track-btn" data-code="${order.deliveryCompany}" data-invoice="${order.trackingNumber}">🚚 조회</button>
                                     </td>
                                 </tr>
                             </c:forEach>
@@ -667,6 +679,17 @@
             
         </section>
     </main>
+
+    <%-- ⭐️ 배송 추적 결과를 보여줄 모달 창 HTML 추가 --%>
+    <div id="trackingModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeTrackingModal()">&times;</span>
+            <h2>배송 추적 정보</h2>
+            <div id="trackingContent">
+                <div class="loading">배송 정보를 조회하는 중...</div>
+            </div>
+        </div>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -720,70 +743,81 @@
                 activatePanel(getHashId());
             });
         });
-		// ==============================================
-		        // 🚨 새로 추가된 jQuery 기반 배송 조회 로직 🚨
-		        // (DOM ready 대신 jQuery를 사용하므로 별도의 블록으로 분리)
-		        // ==============================================
-		        $(document).ready(function() {
-		            const $modal = $("#trackingResultModal");
-		            const $infoBox = $("#trackingInfoBox");
 
-		            // '🚚 조회' 버튼 클릭 이벤트
-		            $(".delivery-track-btn").on("click", function() {
-		                const t_code = $(this).data("code");
-		                const t_invoice = $(this).data("invoice");
+        // ⭐️ 배송 조회 스크립트 (seller/orders.jsp와 동일한 로직)
+        function trackDelivery(deliveryCompany, trackingNumber) {
+            const modal = document.getElementById('trackingModal');
+            const content = document.getElementById('trackingContent');
 
-		                if (!t_code || !t_invoice || t_code === 'null' || t_invoice === 'null') {
-		                    $infoBox.html("<p style='color: orange; text-align: center;'>⚠ **운송장 정보 누락:** 배송이 시작되지 않았거나 정보가 없습니다.</p>");
-		                    $modal.show();
-		                    return;
-		                }
+            if (!deliveryCompany || !trackingNumber || deliveryCompany === 'null' || trackingNumber === 'null') {
+                content.innerHTML = '<div style="color: orange; padding: 20px; text-align: center;">운송장 정보가 없습니다.</div>';
+                modal.style.display = 'block';
+                return;
+            }
 
-		                $infoBox.html("<p class='loading'>🚀 배송 정보를 조회 중입니다... 잠시만 기다려주세요.</p>");
-		                $modal.show();
+            modal.style.display = 'block';
+            content.innerHTML = '<div class="loading">배송 정보를 조회하는 중...</div>';
 
-		                $.ajax({
-		                    type: "GET",
-		                    url: "/trackDelivery", 
-		                    data: { t_code: t_code, t_invoice: t_invoice },
-		                    success: function(response) {
-		                        displayTrackingResult(response);
-		                    },
-		                    error: function(xhr) {
-		                        let errorMessage = xhr.responseText || "알 수 없는 API 호출 오류가 발생했습니다.";
-		                        $infoBox.html("<p style='color: red; text-align: center;'>❌ **조회 실패:** " + errorMessage + "</p>");
-		                    }
-		                });
-		            });
+            fetch('${pageContext.request.contextPath}/mypage/trackDelivery?t_code=' + deliveryCompany + '&t_invoice=' + trackingNumber)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.trackingDetails) {
+                        displayTrackingInfo(data);
+                    } else {
+                        content.innerHTML = '<div style="color: red; padding: 20px; text-align: center;">배송 정보를 조회할 수 없습니다. 송장번호를 확인해주세요.</div>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    content.innerHTML = '<div style="color: red; padding: 20px; text-align: center;">배송 정보 조회 중 오류가 발생했습니다.</div>';
+                });
+        }
 
-		            // 모달 닫기 버튼 이벤트
-		            $("#closeModalBtn").on("click", function() { $modal.hide(); });
-		            
-		            // 배송 조회 결과를 HTML 테이블로 만들어 표시하는 함수
-		            function displayTrackingResult(data) {
-		                let html = "";
-		                
-		                html += "<h4>🚛 기본 정보</h4>";
-		                html += "<p><strong>운송장:</strong> " + (data.invoiceNo || '-') + "</p>";
-		                html += "<p><strong>상품명:</strong> " + (data.itemName || '-') + "</p>";
-		                html += "<p><strong>최종 상태:</strong> <strong style='color:" + (data.complete ? 'blue' : 'orange') + ";'>" + (data.complete ? '✅ 배송 완료' : '🚛 배송 진행 중') + "</strong></p>";
-		                
-		                html += "<hr><h4>📍 단계별 이력</h4>";
-		                
-		                if (data.trackingDetails && data.trackingDetails.length > 0) {
-		                    html += "<table><thead><tr><th>시간</th><th>배송 상태</th><th>현재 위치</th></tr></thead><tbody>";
-		                    
-		                    for (let i = data.trackingDetails.length - 1; i >= 0; i--) {
-		                        const detail = data.trackingDetails[i];
-		                        html += "<tr><td>" + (detail.timeString || '-') + "</td><td>" + (detail.kind || '-') + "</td><td>" + (detail.where || '-') + "</td></tr>";
-		                    }
-		                    html += "</tbody></table>";
-		                } else {
-		                     html += "<p>상세 배송 이력이 없습니다.</p>";
-		                }
-		                $infoBox.html(html);
-		            }
-		        });
+        function displayTrackingInfo(data) {
+            const content = document.getElementById('trackingContent');
+            let html = '<div class="tracking-details">';
+
+            if (data.complete) {
+                html += '<div style="background-color: #d4edda; padding: 10px; border-radius: 4px; margin-bottom: 15px;"><strong>배송 완료</strong></div>';
+            }
+
+            if (data.trackingDetails && data.trackingDetails.length > 0) {
+                html += '<h3 style="margin-top: 20px;">배송 내역</h3>';
+                data.trackingDetails.reverse().forEach(function(detail) { // 최신순으로 정렬
+                    html += '<div class="tracking-detail-item">';
+                    html += '<div class="tracking-detail-time">' + (detail.timeString || '') + '</div>';
+                    html += '<div class="tracking-detail-location">' + (detail.where || '') + '</div>';
+                    html += '<div class="tracking-detail-status">' + (detail.kind || '') + '</div>';
+                    html += '</div>';
+                });
+            } else {
+                html += '<p style="color: #666;">아직 배송 내역이 없습니다.</p>';
+            }
+
+            html += '</div>';
+            content.innerHTML = html;
+        }
+
+        function closeTrackingModal() {
+            document.getElementById('trackingModal').style.display = 'none';
+        }
+
+        // '🚚 조회' 버튼에 이벤트 리스너 추가
+        document.querySelectorAll('.delivery-track-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const code = this.getAttribute('data-code');
+                const invoice = this.getAttribute('data-invoice');
+                trackDelivery(code, invoice);
+            });
+        });
+
+        // 모달 외부 클릭 시 닫기
+        window.onclick = function(event) {
+            const modal = document.getElementById('trackingModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
     </script>
     <c:if test="${updateSuccess}">
         <script> alert('정보 수정이 완료되었습니다.'); </script>

@@ -27,4 +27,9 @@ public class OrdDTO {
     
 	// DB 컬럼과 관계 없는, 조회 결과를 담기 위한 필드
 	private List<OrderDetailDTO> orderDetails;
+
+	// 주문 총액(상품금액 + 배송비 - 할인)을 계산해서 반환하는 getter
+	public int getOrdTotal() {
+		return this.ordAmount + this.ordDfee - this.ordDiscount;
+	}
 }

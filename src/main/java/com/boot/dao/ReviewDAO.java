@@ -2,6 +2,7 @@ package com.boot.dao;
 
 import com.boot.dto.ReviewDTO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -12,4 +13,5 @@ public interface ReviewDAO {
     List<ReviewDTO> findByProdId(Long prodId);
     List<ReviewDTO> findBySellerId(String sellerId);
     ReviewDTO findById(Long reviewId);
+    int existsReview(@Param("memberId") String memberId, @Param("prodId") Long prodId);
 }

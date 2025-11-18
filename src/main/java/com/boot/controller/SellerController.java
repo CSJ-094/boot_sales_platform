@@ -40,6 +40,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.extern.slf4j.Slf4j;
+@Slf4j
 @Controller
 @RequestMapping("/seller") // ✅ 모든 URL에 /seller를 붙이는 대신 클래스 레벨에 매핑
 public class SellerController {

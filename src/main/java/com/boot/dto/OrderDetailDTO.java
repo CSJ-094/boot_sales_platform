@@ -15,4 +15,5 @@ public class OrderDetailDTO {
     private int price;           // 주문 당시 상품 가격 (개당 가격)
     private String prodName;
     private String prodImage;    // 상품 이미지 경로
+    private boolean hasReview;
 }
