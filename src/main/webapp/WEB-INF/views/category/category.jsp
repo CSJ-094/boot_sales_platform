@@ -47,7 +47,7 @@
 			        <c:when test="${not empty productList}">
 			            <div class="product-grid">
 			                <c:forEach var="product" items="${productList}">
-			                    <a href="${pageContext.request.contextPath}/product/detail?id=${product.prodId}">
+			                    <a href="${pageContext.request.contextPath}/products/detail?prodId=${product.prodId}">
 			                        <div class="product-card">
 			                            <div class="product-image">
 			                                <img src="${pageContext.request.contextPath}${product.prodImgPath}"

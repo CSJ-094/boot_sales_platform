@@ -18,4 +18,5 @@ public interface ProdDAO {
 	ProdDTO getProductById(int prodId);
 	public ArrayList<ProdDTO> selectProductsByCategory(int catId);
 	public ArrayList<ProdDTO> getAllProdsByCatId(int catId);
+
 }

@@ -149,4 +149,10 @@
             P.PROD_REG DESC       
     )
     </select>
+    <update id="decreaseStoke">
+        UPDATE PRODUCT_DB
+        SET PROD_STOCK = PROD_STOCK - #{num}
+        WHERE PROD_ID = #{prodId}
+        AND PROD_STOCK >= #{num}
+    </update>
 </mapper>

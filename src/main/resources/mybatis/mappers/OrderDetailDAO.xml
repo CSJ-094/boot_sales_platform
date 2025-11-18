@@ -37,4 +37,15 @@
           AND o.ORD_STATUS = '구매확정'
     </select>
 
+    <select id="selectOrderDetailByOrderId" resultType="com.boot.dto.OrderDetailDTO">
+        SELECT
+            ORDERDETAILID AS orderDetailId,
+            ORDERID AS orderId,
+            PRODUCTID AS productId,
+            QUANTITY AS quantity,
+            PRICE AS price
+        FROM ORDER_DETAILS
+        WHERE ORDERID = #{orderId}
+    </select>
+
 </mapper>

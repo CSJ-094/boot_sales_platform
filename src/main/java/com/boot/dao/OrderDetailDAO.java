@@ -21,7 +21,7 @@ public interface OrderDetailDAO {
     void save(OrderDetailDTO orderDetail);
 
     List<OrderDetailDTO> findByOrderId(String orderId);
-
+    List<OrderDetailDTO> selectOrderDetailByOrderId(String orderId);
     /**
      * 특정 사용자가 특정 상품을 구매했는지 확인합니다. (리뷰 작성 자격)
      * @param memberId 회원 ID
