@@ -220,6 +220,8 @@ public class LoginServiceImpl implements LoginService {
 	@Override
 	public LoginDTO kakaoLoginProcess(KakaoUserInfo userInfo) {
 		LoginDTO exist = loginDAO.findByEmail(userInfo.getEmail());
+		
+		//재가입 로직
 
 		LoginDTO deletedCheck = loginDAO.findDeletedByEmail(userInfo.getEmail());
 		log.info("@# deletedCheck = {} ",deletedCheck);

@@ -552,7 +552,7 @@
                 <li><a href="#order-history">주문 내역</a></li>
                 <li><a href="#my-coupons">내 쿠폰</a></li> <%-- 쿠폰 메뉴 추가 --%>
                 <li><a href="#my-points">내 포인트</a></li> <%-- 포인트 메뉴 추가 --%>
-                <li><a href="#deleteUser">회원 탈퇴</a></li> <%-- 포인트 메뉴 추가 --%>
+                <li><a href="#deleteUser" class ="withdraw">회원 탈퇴</a></li> <%-- 포인트 메뉴 추가 --%>
                 <li class="separator"></li>
             </ul>
         </nav>
