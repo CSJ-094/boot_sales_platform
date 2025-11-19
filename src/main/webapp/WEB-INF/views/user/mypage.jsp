@@ -11,6 +11,41 @@
     <link rel="stylesheet" href="<c:url value='/css/header.css' />">
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function daumZipCode() {
+            new daum.Postcode(
+                {
+                    oncomplete: function(data) {
+                        var addr = '';
+                        var extraAddr = '';
+
+                        if (data.userSelectedType === 'R') {
+                            addr = data.roadAddress;
+                        } else {
+                            addr = data.jibunAddress;
+                        }
+
+                        if (data.userSelectedType === 'R') {
+                            if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
+                                extraAddr += data.bname;
+                            }
+                            if (data.buildingName !== '' && data.apartment === 'Y') {
+                                extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                            }
+                            if (extraAddr !== '') {
+                                extraAddr = ' (' + extraAddr + ')';
+                            }
+                        }
+
+                        document.getElementById('zipcode').value = data.zonecode;
+                        // MEMBER_ADDR_PRIMARY는 기본 주소, MEMBER_ADDR_DETAIL은 상세 주소
+                        document.getElementById("MEMBER_ADDR_PRIMARY").value = addr + extraAddr;
+                        document.getElementById("MEMBER_ADDR_DETAIL").focus();
+                    }
+                }
+            ).open();
+        }
+    </script>
     
     <style>
         /* ==================== 0. 기본 스타일 & 초기화 (mainpage.jsp 기준) ==================== */
@@ -517,7 +552,7 @@
                     <li><a href="#order-history">주문 내역</a></li>
                     <li><a href="#my-coupons">내 쿠폰</a></li> <%-- 쿠폰 메뉴 추가 --%>
                     <li><a href="#my-points">내 포인트</a></li> <%-- 포인트 메뉴 추가 --%>
-                    <li><a href="#deleteUser">회원 탈퇴</a></li> <%-- 포인트 메뉴 추가 --%>
+                    <li><a href="#deleteUser" class="withdraw">회원 탈퇴</a></li> <%-- 포인트 메뉴 추가 --%>
                     <li class="separator"></li>
                 </ul>
             </nav>
