@@ -13,7 +13,7 @@
             IMG_ID, 
             IMG_PROD_ID, 
             IMG_PATH, 
-            IMG_MAIN, 
+            IS_MAIN, 
             IMG_ORDER,
             IMG_REGDATE
         ) VALUES (
@@ -29,7 +29,7 @@
             IMG_ID       AS imgId,
             IMG_PROD_ID  AS imgProdId,
             IMG_PATH     AS imgPath,
-            IMG_MAIN     AS isMain,
+            IS_MAIN     AS isMain,
             IMG_ORDER    AS imgOrder,
             IMG_REGDATE  AS imgRegDate
         FROM IMAGE_DB

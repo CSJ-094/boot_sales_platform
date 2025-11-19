@@ -178,6 +178,7 @@
 
 	<!-- 슬라이드 관련 스크립트 -->
 	<script type="text/javascript" src="/js/chat.js"></script>
+	<script type="text/javascript" src="/js/supportChat.js"></script>
 	<script>
     document.addEventListener('DOMContentLoaded', function() {
         const slide1 = document.getElementById('slide1');

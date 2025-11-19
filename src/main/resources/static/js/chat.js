@@ -168,7 +168,7 @@ document.addEventListener("DOMContentLoaded", function () {
 	            const chat = JSON.parse(event.data);
 
 	            // null 메시지는 무시
-	            if (!chat || !chat.msg) return;
+	            if (chat.sender === "customer") return;
 
 	            // sender 기반으로 말풍선 정렬
 	            const role = chat.sender === "customer" ? "user" : "assistant";

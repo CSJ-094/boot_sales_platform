@@ -35,6 +35,6 @@ public class QnaController {
 
         qnaService.addQuestion(qnaDTO);
         redirectAttributes.addFlashAttribute("message", "상품 문의가 등록되었습니다.");
-        return "redirect:/products/detail?prodId=" + qnaDTO.getProdId() + "#qna";
+        return "redirect:/product/detail?id=" + qnaDTO.getProdId() + "#qna";
     }
 }
