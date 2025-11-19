@@ -221,15 +221,17 @@ public class LoginServiceImpl implements LoginService {
 	public LoginDTO kakaoLoginProcess(KakaoUserInfo userInfo) {
 		LoginDTO exist = loginDAO.findByEmail(userInfo.getEmail());
 
+		LoginDTO deletedCheck = loginDAO.findDeletedByEmail(userInfo.getEmail());
+		log.info("@# deletedCheck = {} ",deletedCheck);
+		if(deletedCheck != null) {
+			loginDAO.reactivateUser(userInfo.getEmail());
+			return loginDAO.findByEmail(userInfo.getEmail());
+		}
+
 		if(exist == null) {
 
 //			DELETED 계정인지 검사하고 DELETED 계정이면 ACTIVE로 활성화
-			LoginDTO deletedCheck = loginDAO.findDeletedByEmail(userInfo.getEmail());
-			log.info("@# = {} ",deletedCheck);
-			if(deletedCheck != null) {
-				loginDAO.reactivateUser(userInfo.getEmail());
-				return loginDAO.findByEmail(userInfo.getEmail());
-			}
+
 
 			LoginDTO newUser = new LoginDTO();
 			newUser.setMemberId("kakao_"+userInfo.getId());
