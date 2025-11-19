@@ -1,6 +1,8 @@
 package com.boot.controller;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
@@ -127,29 +129,57 @@ public class LoginController {
 		log.info("회원가입 축하 포인트 지급: memberId={}, amount={}", loginDTO.getMemberId(), REGISTRATION_POINT);
 
 		// ⭐️ 회원가입 시 쿠폰 자동 지급
-		try {
-			// 1. 15% 할인 쿠폰 (최대 2만원 할인)
-			CouponDTO coupon1 = couponService.getCouponByName("장바구니 15% 할인 (최대 2만원)");
-			if (coupon1 != null) {
-				userCouponService.issueCouponToUser(loginDTO.getMemberId(), coupon1.getCouponId());
-				log.info("회원가입 쿠폰 지급: memberId={}, couponName={}", loginDTO.getMemberId(), coupon1.getCouponName());
-			} else {
-				log.warn("쿠폰 '장바구니 15% 할인 (최대 2만원)'을 찾을 수 없습니다. 먼저 쿠폰을 생성해야 합니다.");
-			}
-
-			// 2. 3만원 이상 구매 시 3천원 추가 할인 쿠폰
-			CouponDTO coupon2 = couponService.getCouponByName("3만원 이상 구매 시 3천원 할인");
-			if (coupon2 != null) {
-				userCouponService.issueCouponToUser(loginDTO.getMemberId(), coupon2.getCouponId());
-				log.info("회원가입 쿠폰 지급: memberId={}, couponName={}", loginDTO.getMemberId(), coupon2.getCouponName());
-			} else {
-				log.warn("쿠폰 '3만원 이상 구매 시 3천원 할인'을 찾을 수 없습니다. 먼저 쿠폰을 생성해야 합니다.");
-			}
-		} catch (Exception e) {
-			log.error("회원가입 시 쿠폰 지급 중 오류 발생: {}", e.getMessage(), e);
-		}
+		issueWelcomeCoupons(loginDTO.getMemberId());
 
 		return "redirect:/login"; // 회원가입 성공 후 로그인 페이지로 리다이렉트
+	}
+
+	private void issueWelcomeCoupons(String memberId) {
+		try {
+			// 1. 15% 할인 쿠폰 (최대 2만원)
+			createAndIssueCoupon(memberId, "신규가입 15% 할인", "PERCENT", 15, 0, 20000, 30, "신규 회원 대상 15% 할인 쿠폰");
+
+			// 2. 3만원 이상 구매 시 3천원 추가 할인 쿠폰
+			createAndIssueCoupon(memberId, "신규가입 3천원 할인", "AMOUNT", 3000, 30000, null, 30, "3만원 이상 구매 시 3천원 할인");
+
+			// 3. 무료 배송 쿠폰
+			createAndIssueCoupon(memberId, "신규가입 무료배송", "SHIPPING", 0, 0, null, 30, "배송비 무료 쿠폰 (1회)");
+
+		} catch (Exception e) {
+			log.error("회원가입 쿠폰 발급 중 오류 발생: memberId={}", memberId, e);
+		}
+	}
+
+	private void createAndIssueCoupon(String memberId, String couponName, String couponType, int discountValue, int minOrderAmount, Integer maxDiscountAmount, int validityDays, String description) throws Exception {
+		// 동일한 이름의 쿠폰이 있는지 확인 (중복 생성 방지)
+		CouponDTO existingCoupon = couponService.getCouponByName(couponName);
+		Long couponId;
+
+		if (existingCoupon == null) {
+			CouponDTO newCoupon = new CouponDTO();
+			newCoupon.setCouponName(couponName);
+			newCoupon.setCouponType(couponType);
+			newCoupon.setDiscountValue(discountValue);
+			newCoupon.setMinOrderAmount(minOrderAmount);
+			newCoupon.setMaxDiscountAmount(maxDiscountAmount);
+			newCoupon.setDescription(description);
+			newCoupon.setIsActive("Y");
+			newCoupon.setIssueDate(new Date());
+
+			Calendar cal = Calendar.getInstance();
+			cal.add(Calendar.DATE, validityDays);
+			newCoupon.setExpirationDate(cal.getTime());
+
+			couponService.createCoupon(newCoupon);
+			couponId = newCoupon.getCouponId(); // MyBatis useGeneratedKeys에 의해 ID가 설정됨
+			log.info("신규 환영 쿠폰 생성: {}", couponName);
+		} else {
+			couponId = existingCoupon.getCouponId();
+			log.info("기존 환영 쿠폰 사용: {}", couponName);
+}
+
+		userCouponService.issueCouponToUser(memberId, couponId);
+		log.info("쿠폰 발급 완료: memberId={}, couponName={}", memberId, couponName);
 	}
 
 	// 아이디 중복 확인 (Ajax)

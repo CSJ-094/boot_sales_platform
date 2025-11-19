@@ -5,6 +5,7 @@ import com.boot.dao.PointHistoryDAO;
 import com.boot.dto.PointHistoryDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -17,7 +18,7 @@ public class PointServiceImpl implements PointService {
     private final LoginDAO loginDAO; // USER_DB의 MEMBER_POINT 업데이트를 위해 LoginDAO 사용
 
     @Override
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void earnPoint(String memberId, Integer amount, String description) {
         if (amount <= 0) {
             throw new IllegalArgumentException("적립 포인트는 0보다 커야 합니다.");

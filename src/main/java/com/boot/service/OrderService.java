@@ -249,6 +249,7 @@ public class OrderService {
                 log.info("Point {} used for order {}. Usage: {}", memberId, orderId, usedPoint);
             } catch (IllegalArgumentException e) {
                 log.error("Point usage failed for order {}: {}", orderId, e.getMessage());
+                throw e; // 예외를 다시 던져 트랜잭션을 롤백시킵니다.
             }
         }
 

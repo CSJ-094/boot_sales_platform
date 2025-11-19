@@ -86,7 +86,7 @@ public class RouletteController {
         if (coupon == null) {
             coupon = new CouponDTO();
             coupon.setCouponName(couponName);
-            coupon.setCouponType("percent");
+            coupon.setCouponType("PERCENT");
             coupon.setDiscountValue(discountValue);
             coupon.setMinOrderAmount(minPurchase);
             coupon.setMaxDiscountAmount(maxDiscount);

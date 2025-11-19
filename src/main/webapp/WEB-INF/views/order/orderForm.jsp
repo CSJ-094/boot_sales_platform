@@ -238,6 +238,7 @@
                                     ${uc.couponName}
                                     <c:if test="${uc.couponType == 'PERCENT'}">(${uc.discountValue}% 할인<c:if test="${uc.maxDiscountAmount != null}">, 최대 <fmt:formatNumber value="${uc.maxDiscountAmount}" pattern="#,###"/>원</c:if>)</c:if>
                                     <c:if test="${uc.couponType == 'AMOUNT'}">(<fmt:formatNumber value="${uc.discountValue}" pattern="#,###"/>원 할인)</c:if>
+                                    <c:if test="${uc.couponType == 'SHIPPING'}">(무료 배송)</c:if>
                                     (최소 <fmt:formatNumber value="${uc.minOrderAmount}" pattern="#,###"/>원)
                                 </option>
                             </c:if>
@@ -338,6 +339,8 @@
                             }
                         } else if (couponType === 'AMOUNT') {
                             tempCouponDiscount = discountValue;
+                        } else if (couponType === 'SHIPPING') { // ⭐️ 무료 배송 쿠폰 처리
+                            tempShippingFee = 0;
                         }
                         $('#couponError').text('');
                         selectedUserCouponId = selectedOption.val(); // userCouponId 저장
@@ -381,7 +384,7 @@
 
                 // 4. 화면 업데이트
                 $('#displayTotalProductAmount').text(originalTotalProductAmount.toLocaleString() + '원');
-                $('#displayShippingFee').text(originalShippingFee.toLocaleString() + '원');
+                $('#displayShippingFee').text(tempShippingFee.toLocaleString() + '원'); // ⭐️ 수정된 배송비로 업데이트
                 $('#displayCouponDiscount').text('- ' + appliedCouponDiscount.toLocaleString() + '원');
                 $('#displayPointUsage').text('- ' + appliedPointUsage.toLocaleString() + '원');
                 $('#displayFinalAmount').text(finalPaymentAmount.toLocaleString() + '원');
