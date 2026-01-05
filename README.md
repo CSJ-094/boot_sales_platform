@@ -118,3 +118,19 @@ Spring Security를 활용한 폼 기반 로그인 및 보안 설정.
   <summary>**주문관리**</summary>
 <img width="1600" height="840" alt="chrome_mOk8ryT3lL" src="https://github.com/user-attachments/assets/e498aa08-7a33-4de7-84b8-cde1ee6a43a2" />
 </details>
+
+
+## 시스템 구조도
+
+graph TD
+    User((사용자)) <--> Controller[Spring Boot Controller]
+    Controller <--> Service[Service Layer]
+    Service <--> Repository[JPA Repository]
+    Repository <--> DB[(MySQL)]
+    
+    Service <--> Toss Payment API
+    Controller <--> Security[Spring Security]
+    
+    subgraph Admin Side
+    Admin((관리자)) <--> Controller
+    end
