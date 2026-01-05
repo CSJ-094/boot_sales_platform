@@ -71,7 +71,13 @@ Spring Security를 활용한 폼 기반 로그인 및 보안 설정.
 재고 관리: 주문 및 취소 발생 시 실시간 재고 증감 로직 반영.
 
 주문 현황 모니터링: 모든 사용자의 주문 내역을 대시보드 방식으로 표시하고 관리.
+
+
 ## ERD
+
+<img width="1731" height="1448" alt="image" src="https://github.com/user-attachments/assets/326f24f6-409d-4f37-ac39-ba31cc7e6faf" />
 
 
 ## UI/UX Screenshot
+
+
