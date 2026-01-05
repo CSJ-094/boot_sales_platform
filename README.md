@@ -1,39 +1,26 @@
+# 🛒 Boot Sales Platform (Spring Boot E-Commerce)
+> **GPT-4o-mini AI 상담과 MongoDB 실시간 채팅이 통합된 스마트 커머스 플랫폼**
 
-# 의류 판매 플랫폼
+이 프로젝트는 Spring Boot 기반의 이커머스 서비스에 현대적인 AI 기술과 실시간 통신 기술을 접목했습니다. RDBMS(MySQL)와 NoSQL(MongoDB)을 혼합하여 서비스 특성에 맞는 최적의 데이터 저장 구조를 설계했습니다.
 
-의류 판매 플랫폼(가칭)은 실제 의류 판매 사이트와 동일한 기능을 재현한 프로젝트입니다.
+---
 
+## 🛠 Tech Stack
 
+### Backend
+![Java](https://img.shields.io/badge/Java-17-007396?style=flat&logo=java&logoColor=white)
+![SpringBoot](https://img.shields.io/badge/SpringBoot-3.2.x-6DB33F?style=flat&logo=springboot&logoColor=white)
+![SpringSecurity](https://img.shields.io/badge/SpringSecurity-6.x-6DB33F?style=flat&logo=springsecurity&logoColor=white)
+![JPA](https://img.shields.io/badge/JPA-Hibernate-59666C?style=flat)
 
+### Database & AI
+![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?style=flat&logo=mysql&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-6.0-47A248?style=flat&logo=mongodb&logoColor=white)
+![OpenAI](https://img.shields.io/badge/GPT--4o--mini-API-412991?style=flat&logo=openai&logoColor=white)
 
-## 기능 스택
+---
 
-**Backend**
-
-Framework: Spring Boot 3.x
-
-Language: Java 17
-
-Security: Spring Security
-
-Data: Spring Data JPA, QueryDSL
-
-Database: MySQL (운영), H2 (테스트)
-
-Build Tool: Gradle
-
-**Frontend**
-
-Engine: Thymeleaf
-
-Styling: Bootstrap 5, CSS
-
-Interaction: JavaScript, jQuery
-
-**External API**
-
-Payment : Toss Payment API
-## Features
+## ✨ Key Features
 
 **👤 회원 관리 (Member)**
 
@@ -41,6 +28,10 @@ Payment : Toss Payment API
 Spring Security를 활용한 폼 기반 로그인 및 보안 설정.
 
 권한 제어: 일반 사용자(USER)와 관리자(ADMIN) 권한 분리.
+
+GPT-4o-mini AI 상담: 사용자의 상품 문의를 실시간으로 분석하여 적절한 답변을 제공하는 지능형 챗봇을 구현했습니다.
+
+실시간 WebSocket 채팅: 상담사와 1:1 실시간 채팅이 가능하며, 대화 내용은 MongoDB에 비동기로 저장되어 대용량 메시지 데이터를 효율적으로 관리합니다.
 
 **🛍 상품 관리 (Item)**
 
@@ -71,6 +62,10 @@ Spring Security를 활용한 폼 기반 로그인 및 보안 설정.
 재고 관리: 주문 및 취소 발생 시 실시간 재고 증감 로직 반영.
 
 주문 현황 모니터링: 모든 사용자의 주문 내역을 대시보드 방식으로 표시하고 관리.
+
+통합 상담 센터: 사용자의 상담 요청 목록 확인 및 실시간 1:1 대화 응대
+
+보안: 역할 기반 접근 제어(RBAC)를 통해 관리자 전용 메뉴 접근을 보호합니다.
 
 
 ## ERD
@@ -122,12 +117,19 @@ Spring Security를 활용한 폼 기반 로그인 및 보안 설정.
 
 ## 🗺️ 시스템 구조도 (Architecture Diagram)
 
-  ```mermaid
-  graph TD
-      User((사용자)) --> Security[Spring Security]
-      Admin((관리자)) --> Security
-      Security --> Controller[Spring Boot Controller]
-      Controller --> Service[Service Layer]
-      Service --> Repository[JPA Repository]
-      Repository --> DB[(MySQL)]
-      Service <--> TossAPI{Toss Payment API}
+```mermaid
+graph TD
+    User((사용자)) --> Security[Spring Security]
+    Admin((관리자)) --> Security
+    
+    subgraph App_Server [Spring Boot Application]
+        Security --> Controller[Controller Layer]
+        Controller --> Service[Business Service]
+        Service --> AIService[AI & Chat Service]
+        Service --> PayService[Payment Service]
+    end
+    
+    Service --> MySQL[(MySQL: Order/Item)]
+    AIService <--> MongoDB[(MongoDB: Chat Log)]
+    AIService <--> OpenAI[[GPT-4o-mini API]]
+    PayService <--> Toss[[Toss Payments API]]
