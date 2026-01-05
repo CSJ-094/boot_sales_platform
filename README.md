@@ -80,4 +80,41 @@ Spring Security를 활용한 폼 기반 로그인 및 보안 설정.
 
 ## UI/UX Screenshot
 
+### 유저 전용 UI
 
+<details>
+  <summary>**메인화면**</summary>
+<img width="1601" height="942" alt="chrome_DHcEmL3QNu" src="https://github.com/user-attachments/assets/5a117255-4963-4379-8f08-13b3d7f35b97" />
+</details>
+
+<details>
+  <summary>**상품 상세페이지**</summary>
+<img width="1606" height="846" alt="chrome_V28P15tZbg" src="https://github.com/user-attachments/assets/1e493341-16e7-4395-8528-1f41d7a90608" />
+</details>
+
+<details>
+  <summary>**상품 구매(결제)페이지**</summary>
+<img width="1567" height="852" alt="chrome_umQpbhperS" src="https://github.com/user-attachments/assets/6b090870-bda5-41aa-9c30-d589c9e729b5" />
+</details>
+
+<details>
+  <summary>**마이페이지**</summary>
+<img width="1614" height="836" alt="chrome_AEjdsVdzH4" src="https://github.com/user-attachments/assets/4edc4510-136e-4220-bbf2-21f80a1f049f" />
+</details>
+
+<details>
+  <summary>**마이페이지-배송추적**</summary>
+<img width="1613" height="856" alt="chrome_4gIlYRpAho" src="https://github.com/user-attachments/assets/44623260-2999-4945-be59-71b76066aa10" />
+</details>
+
+### 관리자 전용 UI
+
+<details>
+  <summary>**대시보드**</summary>
+<img width="1587" height="840" alt="chrome_otZmBEAbIW" src="https://github.com/user-attachments/assets/6a9c7503-473a-4868-af66-0b8e2ae9d429" />
+</details>
+
+<details>
+  <summary>**주문관리**</summary>
+<img width="1600" height="840" alt="chrome_mOk8ryT3lL" src="https://github.com/user-attachments/assets/e498aa08-7a33-4de7-84b8-cde1ee6a43a2" />
+</details>
