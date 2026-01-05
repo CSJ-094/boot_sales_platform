@@ -120,17 +120,14 @@ Spring Security를 활용한 폼 기반 로그인 및 보안 설정.
 </details>
 
 
-## 시스템 구조도
+## 🗺️ 시스템 구조도 (Architecture Diagram)
 
-graph TD
-    User((사용자)) <--> Controller[Spring Boot Controller]
-    Controller <--> Service[Service Layer]
-    Service <--> Repository[JPA Repository]
-    Repository <--> DB[(MySQL)]
-    
-    Service <--> Toss Payment API
-    Controller <--> Security[Spring Security]
-    
-    subgraph Admin Side
-    Admin((관리자)) <--> Controller
-    end
+  ```mermaid
+  graph TD
+      User((사용자)) --> Security[Spring Security]
+      Admin((관리자)) --> Security
+      Security --> Controller[Spring Boot Controller]
+      Controller --> Service[Service Layer]
+      Service --> Repository[JPA Repository]
+      Repository --> DB[(MySQL)]
+      Service <--> TossAPI{Toss Payment API}
