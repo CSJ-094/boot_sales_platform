@@ -1,3 +1,6 @@
+<img width="891" height="1260" alt="image" src="https://github.com/user-attachments/assets/f8eca2d3-54a5-4444-a7a1-6adcf7e2d276" />
+
+
 # 🛒 Boot Sales Platform (Spring Boot E-Commerce)
 > **GPT-4o-mini AI 상담과 MongoDB 실시간 채팅이 통합된 스마트 커머스 플랫폼**
 
