@@ -87,6 +87,14 @@ GPT-4o-mini AI 상담: 사용자의 상품 문의를 실시간으로 분석하�
 <details>
   <summary>**메인화면**</summary>
 <img width="1601" height="942" alt="chrome_DHcEmL3QNu" src="https://github.com/user-attachments/assets/5a117255-4963-4379-8f08-13b3d7f35b97" />
+
+- 구조: ItemController → ItemService → ItemRepository(QueryDSL)
+
+- 핵심 로직:
+- 동적 쿼리: QueryDSL을 사용하여 상품명, 상품 상태, 등록자별 검색 기능을 구현했습니다.
+- 페이징(Pagination): Pageable 인터페이스를 활용해 대량의 상품 데이터를 효율적으로 끊어서 로드합니다.
+- 이미지 최적화: ItemImgRepository에서 repImgYn="Y"인 대표 이미지만 추출하여 메인 리스트에 노출합니다.
+  
 </details>
 
 <details>
