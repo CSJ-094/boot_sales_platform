@@ -103,21 +103,46 @@ GPT-4o-mini AI 상담: 사용자의 상품 문의를 실시간으로 분석하�
 <details>
   <summary>**상품 상세페이지**</summary>
 <img width="1606" height="846" alt="chrome_V28P15tZbg" src="https://github.com/user-attachments/assets/1e493341-16e7-4395-8528-1f41d7a90608" />
+
+- 구조: Item 엔티티와 ItemImg 엔티티의 1:N 매핑 구조
+
+- 핵심 로직:
+
+    상품 ID(itemId)를 경로 변수로 받아 상품 기본 정보와 등록된 모든 이미지 리스트를 함께 조회합니다.
+
+    조회수/재고 확인: 실시간 재고 수량을 파악하여 '품절' 상태일 경우 '주문하기' 버튼을 비활성화 처리합니다.
+
 </details>
 
 <details>
   <summary>**상품 구매(결제)페이지**</summary>
 <img width="1567" height="852" alt="chrome_umQpbhperS" src="https://github.com/user-attachments/assets/6b090870-bda5-41aa-9c30-d589c9e729b5" />
+
+- 구조: OrderController → OrderService → Toss Payments API
+
+- 핵심 로직:
+
+    트랜잭션 관리: 주문 생성 시 Item 엔티티의 removeStock 메서드를 호출하여 재고를 차감합니다. (재고 부족 시 OutOfStockException 발생)
+
+    결제 검증: 프론트엔드에서 전달받은 결제 금액과 서버 DB의 실제 상품 금액을 대조하여 위변조를 방지하는 검증 로직을 거친 후 Toss API 최종 승인을 호출합니다.
+  
 </details>
 
 <details>
   <summary>**마이페이지**</summary>
 <img width="1614" height="836" alt="chrome_AEjdsVdzH4" src="https://github.com/user-attachments/assets/4edc4510-136e-4220-bbf2-21f80a1f049f" />
-</details>
 
-<details>
-  <summary>**마이페이지-배송추적**</summary>
 <img width="1613" height="856" alt="chrome_4gIlYRpAho" src="https://github.com/user-attachments/assets/44623260-2999-4945-be59-71b76066aa10" />
+
+- 구조: OrderRepository에서 현재 로그인한 사용자의 email로 필터링 조회
+
+- 핵심 로직:
+
+    주문 이력: 본인이 주문한 내역을 최신순으로 페이징 조회합니다.
+
+    배송 상태: OrderStatus 상수를 정의하여 ORDER, CANCEL, SHIPPING, DELIVERED 단계를 추적합니다.
+
+    주문 취소: 배송 시작 전(ORDER 상태)에만 취소가 가능하도록 검증 로직이 포함되어 있습니다.
 </details>
 
 ### 관리자 전용 UI
