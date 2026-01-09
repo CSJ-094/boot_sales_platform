@@ -1,13 +1,31 @@
+
+
+
 # 🛒 Boot Sales Platform (Spring Boot E-Commerce)
 
-> **GPT-4o-mini AI 상담과 MongoDB 실시간 채팅이 통합된 스마트 커머스 플랫폼**
+> **상품 탐색부터 주문·결제, 상담까지 한 흐름으로 제공하는 이커머스 플랫폼**
 
-이 프로젝트는 Spring Boot 기반의 이커머스 서비스에 현대적인 AI 기술과 실시간 통신 기술을 접목했습니다. RDBMS(MySQL)와 NoSQL(MongoDB)을 혼합하여 서비스 특성에 맞는 최적의 데이터 저장 구조를 설계했습니다.
+Boot Sales Platform은 사용자가 상품을 쉽게 탐색하고, 찜하기·문의·결제 등 주요 기능을 직관적으로 이용할 수 있도록 구성된 **통합 이커머스 서비스**입니다.
+
+관리자는 대시보드와 주문 관리 기능을 통해 상품과 주문 현황을 효율적으로 운영할 수 있도록 설계되었습니다.
 
 [마이그레이션 전 프로젝트 링크](https://github.com/CSJ-094/boot_car_recall_final.git)
 
 
 <img width="891" height="1260" alt="image" src="https://github.com/user-attachments/assets/f8eca2d3-54a5-4444-a7a1-6adcf7e2d276" />
+
+---
+
+## 👥 Team & Roles (팀 구성 및 역할)
+
+| 이름 | 역할 | 담당 기능 |
+|:--:|:--:|:--|
+| **조상진** | 팀장 / Full-Stack | - 프로젝트 전반 관리 및 초기 설계·역할 분담<br>- DB 세팅 및 수정<br>- 메인페이지 구현<br>- Toss 결제 API 연동<br>- 상품 페이지 기능 구현<br>- 고객 마이페이지(구매내역) 구현<br>- 프로젝트 병합 및 오류 수정<br>- 전반 문서 및 보고서 작성 |
+| **최예성** | Full-Stack | - 관리자 공지사항 등록/수정/삭제 기능 구현<br>- 관리자 페이지 프론트엔드 구현<br>- 파일 업로드 기능 구현<br>- 택배 배송 조회 API 연동<br>- 주문 페이지 배송 기능 구현 |
+| **김가영** | Full-Stack | - 전반 UI/프론트 디자인 가이드 적용<br>- 관리자 정보 조회 기능 구현<br>- 관리자 상품 등록/수정/삭제 기능 구현<br>- 카테고리 기능 구현 및 연동<br>- 관리자 마이페이지 프론트 구현<br>- 관리자 마이페이지 최근 리스트 구현<br>- 관리자 대시보드 구현 |
+| **주석우** | Full-Stack | - 로그인 / 회원가입 기능 구현<br>- 이메일 인증 기능 구현<br>- 카테고리별 상품 조회 페이지 구현<br>- 메인 페이지 상품 리스트 프론트 구현<br>- ChatGPT 연동 챗봇 구현<br>- 챗봇 내 1:1 상담사 채팅 기능 구현 |
+| **한경훈** | Full-Stack | - 프론트엔드 UI 통일 및 디자인 구현<br>- 상품 구매 및 결제 기능 개발<br>- 고객 마이페이지 프론트 구현<br>- 파일 업로드 기능 개발<br>- 상품 검색 기능 구현<br>- 챗봇 API 연동<br>- 출석체크 API 구현<br>- 쿠폰 및 포인트 기능 구현 |
+| **최민규** | Full-Stack | - 메인페이지 상품 리스트 기능 구현<br>- 회원가입 / 로그인 기능 구현<br>- 메인페이지 프론트엔드 구현<br>- 목록 페이지 프론트 구현<br>- 카카오 API 연동<br>- 로그인/회원정보 암호화 적용<br>- 비밀번호 찾기 기능 구현<br>- 회원 탈퇴 기능 구현<br>- 마이그레이션 작업 |
 
 ---
 
@@ -115,10 +133,16 @@ Product-sales-platform-boot/
   Spring Security 기반 폼 로그인 및 보안 설정 적용
 - **권한 제어**  
   일반 사용자(USER) / 관리자(ADMIN) 권한 분리
+
+---
+
+### 💬 AI 상담 & 실시간 채팅 (Chatbot)
 - **AI 상담 챗봇**  
-  GPT-4o-mini를 활용한 상품 문의 자동 응답
-- **실시간 상담 채팅**  
-  WebSocket 기반 1:1 실시간 채팅 지원  
+  GPT-4o-mini를 활용해 상품 및 서비스 관련 기본 문의를 자동 응답
+- **상담원 연결**  
+  챗봇으로 해결되지 않는 문의는 상담원 1:1 채팅으로 전환
+- **실시간 채팅**  
+  WebSocket 기반 실시간 상담 지원  
   채팅 로그는 MongoDB에 비동기 저장
 
 ---
@@ -128,6 +152,9 @@ Product-sales-platform-boot/
   관리자 권한 사용자만 상품 이미지 및 상세 정보 관리 가능
 - **상품 조회**  
   페이징 처리 및 검색 기능을 통한 상품 목록 제공
+- **찜하기(Wishlist)**  
+  로그인 사용자가 관심 상품을 찜 목록에 추가/삭제 가능  
+  사용자별 찜 목록을 관리하여 마이페이지에서 조회 가능
 
 ---
 
@@ -158,6 +185,7 @@ Product-sales-platform-boot/
   RBAC(Role Based Access Control) 기반 관리자 기능 접근 제어
 
 
+
 ## ERD
 
 <img width="1731" height="1448" alt="image" src="https://github.com/user-attachments/assets/326f24f6-409d-4f37-ac39-ba31cc7e6faf" />
@@ -180,80 +208,187 @@ Product-sales-platform-boot/
 
 <br/>
 
-## 🚀 프로젝트 결과물 (Service Demo)
+## UI/UX Screenshot
 
-### 👤 유저 전용 UI
-
-<details>
-  <summary><b>메인 페이지 및 상품 탐색</b></summary>
-  <br />
-  <img src="https://github.com/user-attachments/assets/62866b2d-40bb-4059-a86b-e94339d83eb5" width="100%" />
-
-  - **구조**: `ItemController` → `ItemService` → `ItemRepository(QueryDSL)`
-  - **핵심 로직**:
-    - **QueryDSL 동적 쿼리**: 상품명, 상태, 등록자별 복합 검색 기능을 구현했습니다.
-    - **이미지 최적화**: `repImgYn="Y"` 조건으로 대표 이미지만 추출하여 메인 리스트 로딩 속도를 높였습니다.
-</details>
+### 유저 전용 UI
 
 <details>
-  <summary><b>상품 상세 페이지 및 찜하기</b></summary>
-  <br />
-  <img src="https://github.com/user-attachments/assets/22d8801d-c90a-4bbe-878d-2b0e0b25a5d4" width="100%" />
-  <img src="https://github.com/user-attachments/assets/20d67820-a8ab-4b84-aac1-428055b77d97" width="100%" />
+  <summary>메인 화면</summary>
+  <br>
 
-  - **구조**: `ItemService` → `WishlistService`
-  - **핵심 로직**:
-    - **상품 상세 조회**: 상품 정보와 여러 장의 이미지를 효율적으로 Fetch Join하여 노출합니다.
-    - **관심 상품(Wishlist)**: 유저별 위시리스트 엔티티를 생성하고, AJAX 통신을 통해 페이지 새로고침 없이 '찜' 기능을 수행합니다.
+  <img src="src/main/resources/static/img/main.gif" alt="메인 화면" width="700"/>
+
+  - **구조**  
+    ItemController → ItemService → ItemRepository (QueryDSL)
+
+  - **핵심 로직**
+    - **동적 검색**: QueryDSL을 활용해 상품명, 상품 상태, 등록자 조건별 검색 기능 구현
+    - **페이징 처리**: Pageable 인터페이스를 사용해 대량 데이터 분할 조회
+    - **이미지 최적화**: 대표 이미지(`repImgYn = 'Y'`)만 조회하여 메인 리스트에 노출
 </details>
+
 
 <details>
-  <summary><b>장바구니 및 주문 플로우</b></summary>
-  <br />
-  <img src="https://github.com/user-attachments/assets/08bb24f6-19dd-46da-833c-21aad1ebf6bd" width="100%" />
+  <summary>상품 상세페이지</summary>
+  <br>
 
-  - **구조**: `CartService` → `OrderService`
-  - **핵심 로직**:
-    - **주문 트랜잭션**: 재고 수량 확인 → 주문 생성 → 재고 감소 로직을 하나의 트랜잭션으로 관리하여 데이터 무결성을 보장합니다.
-    - **장바구니 제어**: 선택 상품 삭제 및 수량 변경 기능을 구현했습니다.
+  <div style="display:flex; gap:20px;">
+    <img src="src/main/resources/static/img/product_detail.gif"
+         alt="상품 상세"
+         width="48%" />
+<img src="src/main/resources/static/img/product_inquiry.gif"
+         alt="상품 문의"
+         width="48%" />
+  </div>
+  
+ - **구조**
+    - Item ↔ ItemImg : 1:N 매핑으로 상품 기본 정보 + 이미지 리스트를 함께 구성
+    - ItemDetail 화면 내 탭 구성(상세/리뷰/문의)로 기능을 분리하여 제공
+
+  - **핵심 로직**
+    - **상품 상세 조회**
+      - 상품 ID(`itemId`)를 경로 변수로 받아 상품 정보와 등록된 이미지 목록을 함께 조회합니다.
+      - **재고 상태 처리**: 재고 수량을 확인해 `품절`이면 `주문하기` 버튼을 비활성화합니다.
+    - **상품 문의**
+      - 상품 상세 페이지에서 **문의 탭**을 통해 문의를 등록/조회할 수 있습니다.
+      - **등록**: 로그인 사용자 기준으로 제목/내용을 저장하고, 상품 ID와 함께 매핑합니다.
+      - **조회**: 상품 ID 기준으로 해당 상품의 문의 목록을 조회하여 화면에 표시합니다.
 </details>
+
 
 <details>
-  <summary><b>상품 문의 및 챗봇 상담</b></summary>
-  <br />
-  <img src="https://github.com/user-attachments/assets/ff13eff3-2955-40ac-9b15-d117414b57de" width="49%" />
-  <img src="https://github.com/user-attachments/assets/1afd8847-64e8-4644-ac2d-3d779b977291" width="49%" />
+  <summary>찜하기(wishlist)</summary>
+  <br>
 
-  - **구조**: `InquiryService`, `ChatbotService(WebSocket/STOMP)`
-  - **핵심 로직**:
-    - **상품 문의**: 비밀글 설정 및 답변 상태 관리 기능을 포함합니다.
-    - **실시간 상담**: WebSocket을 활용해 유저와 관리자 간의 실시간 채팅 환경을 구축했습니다.
+  <img src="src/main/resources/static/img/wishlist.gif"
+       alt="찜하기"
+       width="700" />
+
+  - **구조**
+    - User ↔ Item : 사용자별 찜 목록을 관리하는 관계로 구성
+    - 상품 상세 화면에서 찜 상태를 토글할 수 있도록 UI와 기능을 연결
+
+  - **핵심 로직**
+    - **찜 등록/해제**
+      - 하트 버튼 클릭 시 찜 상태를 토글하며, 이미 찜한 상품이면 해제 처리합니다.
+      - 로그인 사용자 기준으로 찜 정보를 저장/삭제하여 사용자별 목록을 분리합니다.
+    - **중복 방지**
+      - 동일 사용자-상품 조합은 중복 저장되지 않도록 처리합니다.
 </details>
 
----
-
-### 👑 관리자(판매자) 전용 UI
 
 <details>
-  <summary><b>관리자 대시보드 및 주문 관리</b></summary>
-  <br />
-  <img src="https://github.com/user-attachments/assets/0d421d79-6a3b-4610-bbcb-a79ef1908e49" width="100%" />
-  <img src="https://github.com/user-attachments/assets/244ce910-321d-48f1-995e-8a0bb33cd6a4" width="100%" />
+  <summary>상품 구매(결제) 페이지</summary>
+  <br>
 
-  - **구조**: `AdminController` → `StatService` → `OrderRepository`
-  - **핵심 로직**:
-    - **데이터 시각화**: 오늘 매출, 신규 가입자, 주문 현황을 통계 쿼리로 집계하여 대시보드에 시각화했습니다.
-    - **주문 상태 관리**: 판매자가 주문 내역을 확인하고 송장 번호 입력 및 결제 상태를 업데이트할 수 있습니다.
+  <img src="src/main/resources/static/img/product_order.gif"
+       alt="상품 구매 결제 페이지"
+       width="700" />
+
+  - **구조**
+    - OrderController → OrderService → Toss Payments API
+
+  - **핵심 로직**
+    - **주문 생성**
+      - 결제 요청 시 주문 정보를 생성하고 트랜잭션 범위 내에서 재고를 차감합니다.
+      - `Item.removeStock()` 호출 시 재고 부족하면 `OutOfStockException`을 발생시켜 전체 주문을 롤백합니다.
+    - **결제 검증**
+      - 프론트엔드에서 전달된 결제 금액과 서버 DB에 저장된 실제 상품 금액을 비교 검증합니다.
+      - 검증이 완료된 경우에만 Toss Payments API를 호출하여 최종 결제 승인을 처리합니다.
 </details>
+
+
 
 <details>
-  <summary><b>실시간 상담원 연결</b></summary>
-  <br />
-  <img src="https://github.com/user-attachments/assets/7fbdf1db-2a4b-4759-85d1-cca1f183bd77" width="100%" />
+  <summary>마이페이지</summary>
+<img width="1614" height="836" alt="chrome_AEjdsVdzH4" src="https://github.com/user-attachments/assets/4edc4510-136e-4220-bbf2-21f80a1f049f" />
 
-  - **핵심 로직**:
-    - **관리자 전용 채팅창**: 여러 명의 유저 문의를 리스트로 관리하고, 선택한 유저와 즉시 매칭되어 상담을 진행하는 로직을 구현했습니다.
+<img width="1613" height="856" alt="chrome_4gIlYRpAho" src="https://github.com/user-attachments/assets/44623260-2999-4945-be59-71b76066aa10" />
+
+- 구조: OrderRepository에서 현재 로그인한 사용자의 email로 필터링 조회
+
+- 핵심 로직:
+
+    주문 이력: 본인이 주문한 내역을 최신순으로 페이징 조회합니다.
+
+    배송 상태: OrderStatus 상수를 정의하여 ORDER, CANCEL, SHIPPING, DELIVERED 단계를 추적합니다.
+
+    주문 취소: 배송 시작 전(ORDER 상태)에만 취소가 가능하도록 검증 로직이 포함되어 있습니다.
 </details>
+
+
+### 관리자 전용 UI
+
+<details>
+  <summary>관리자 대시보드</summary>
+  <br>
+
+  <img src="src/main/resources/static/img/admin_dashboard.gif"
+       alt="관리자 대시보드"
+       width="700" />
+
+  - **구조**
+    - AdminDashboardController → AdminDashboardService → Repository(통계/집계 쿼리)
+    - 주문/회원/상품 등 주요 데이터를 집계하여 카드형 지표 + 차트 형태로 시각화
+
+  - **핵심 로직**
+    - **핵심 지표 집계**
+      - 전체 주문 수, 매출, 신규 회원 수 등 관리자 핵심 지표를 집계하여 대시보드 상단에 표시합니다.
+    - **기간/조건 기반 조회**
+      - 일/주/월 단위(또는 기간 조건)로 통계 데이터를 조회하여 차트에 반영합니다.
+    - **운영 편의 기능**
+      - 대시보드에서 주요 관리 화면(주문 관리, 상품 관리 등)으로 빠르게 이동할 수 있도록 구성합니다.
+</details>
+
+
+<details>
+  <summary>관리자 주문관리</summary>
+  <br>
+
+  <img src="src/main/resources/static/img/admin_order.gif"
+       alt="관리자 주문관리"
+       width="700" />
+
+  - **구조**
+    - AdminOrderController → AdminOrderService → Repository(주문/배송 조회 및 상태 변경)
+    - 주문 목록 조회 + 상태/배송 정보 등록 기능을 한 화면에서 관리
+
+  - **핵심 로직**
+    - **주문 목록 조회**
+      - 주문번호, 구매자, 상품 수량, 결제 금액, 주문 일시, 주문 상태 등의 정보를 목록으로 조회합니다.
+    - **배송 정보 등록**
+      - 택배사 선택 및 송장번호 입력 후 저장하여 배송 정보를 등록합니다.
+    - **상태 관리**
+      - 주문 상태(예: 결제 완료/배송 중/배송 완료 등)를 변경하여 주문 처리 흐름을 관리합니다.
+</details>
+
+### 챗봇 & 상담원 연결 UI
+<details>
+  <summary>챗봇 & 상담원 연결</summary>
+  <br>
+
+  <div style="display:flex; gap:20px;">
+    <img src="src/main/resources/static/img/chatbot_main.gif"
+         alt="챗봇 메인"
+         width="48%" />
+    <img src="src/main/resources/static/img/chatbot_agent_connect.gif"
+         alt="상담원 연결"
+         width="48%" />
+  </div>
+
+  - **구조**
+    - Chatbot UI(프론트) → ChatController → ChatService(응답 처리)
+    - 자동 응답으로 해결이 어려운 경우 상담원 연결(실시간 문의)로 전환
+
+  - **핵심 로직**
+    - **챗봇 상담**
+      - 사용자의 질문을 입력받아 키워드/시나리오 기반으로 즉시 응답을 제공합니다.
+      - FAQ/공지 등 기본 문의를 빠르게 처리하여 사용자의 탐색 시간을 줄입니다.
+    - **상담원 연결**
+      - 챗봇으로 해결되지 않는 문의는 상담원 연결 버튼을 통해 실시간 문의로 전환합니다.
+      - 문의 접수 상태를 사용자/관리자 화면에서 확인할 수 있도록 구성합니다.
+</details>
+
 
 
 ## 🗺️ 시스템 구조도 (Architecture Diagram)
