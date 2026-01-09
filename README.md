@@ -1,6 +1,3 @@
-![product_inquiry](https://github.com/user-attachments/assets/bab4d1a0-5a45-4fe0-81b9-0ff597ada84b)![product_detail](https://github.com/user-attachments/assets/bd765ac2-73b0-4119-ad0a-cf9e0236583a)
-
-
 # 🛒 Boot Sales Platform (Spring Boot E-Commerce)
 
 > **GPT-4o-mini AI 상담과 MongoDB 실시간 채팅이 통합된 스마트 커머스 플랫폼**
