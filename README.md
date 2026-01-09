@@ -215,7 +215,7 @@ graph TD
   <summary><b>메인페이지 (클릭하여 펼치기)</b></summary>
   <br />
 
-  <img src="https://github.com/user-attachments/assets/f5a14f1b-00ea-4073-9a60-f14e419751d1" width="100%" />
+  <img src="https://github.com/user-attachments/assets/4584bff6-534d-47ba-8cc3-269a61d1b35b" width="100%" />
 
   #### 💡 핵심 로직
   * **구조**: ItemController → ItemService → ItemRepository(QueryDSL)
