@@ -191,7 +191,7 @@ Product-sales-platform-boot/
   <summary>메인 화면</summary>
   <br>
 
-  <img src="https://github.com/user-attachments/assets/dc92bad6-a065-4f26-8f23-690a21368769" alt="메인 화면" width="700"/>
+  <img src="src/main/resources/static/img/main.gif" alt="메인 화면" width="700"/>
 
   - **구조**  
     ItemController → ItemService → ItemRepository (QueryDSL)
@@ -317,9 +317,53 @@ Product-sales-platform-boot/
 
 
 <details>
-  <summary>주문관리</summary>
-<img width="1600" height="840" alt="chrome_mOk8ryT3lL" src="https://github.com/user-attachments/assets/e498aa08-7a33-4de7-84b8-cde1ee6a43a2" />
+  <summary>관리자 주문관리</summary>
+  <br>
+
+  <img src="src/main/resources/static/img/admin_order.gif"
+       alt="관리자 주문관리"
+       width="700" />
+
+  - **구조**
+    - AdminOrderController → AdminOrderService → Repository(주문/배송 조회 및 상태 변경)
+    - 주문 목록 조회 + 상태/배송 정보 등록 기능을 한 화면에서 관리
+
+  - **핵심 로직**
+    - **주문 목록 조회**
+      - 주문번호, 구매자, 상품 수량, 결제 금액, 주문 일시, 주문 상태 등의 정보를 목록으로 조회합니다.
+    - **배송 정보 등록**
+      - 택배사 선택 및 송장번호 입력 후 저장하여 배송 정보를 등록합니다.
+    - **상태 관리**
+      - 주문 상태(예: 결제 완료/배송 중/배송 완료 등)를 변경하여 주문 처리 흐름을 관리합니다.
 </details>
+
+### 챗봇 & 상담원 연결 UI
+<details>
+  <summary>챗봇 & 상담원 연결</summary>
+  <br>
+
+  <div style="display:flex; gap:20px;">
+    <img src="src/main/resources/static/img/chatbot_main.gif"
+         alt="챗봇 메인"
+         width="48%" />
+    <img src="src/main/resources/static/img/chatbot_agent_connect.gif"
+         alt="상담원 연결"
+         width="48%" />
+  </div>
+
+  - **구조**
+    - Chatbot UI(프론트) → ChatController → ChatService(응답 처리)
+    - 자동 응답으로 해결이 어려운 경우 상담원 연결(실시간 문의)로 전환
+
+  - **핵심 로직**
+    - **챗봇 상담**
+      - 사용자의 질문을 입력받아 키워드/시나리오 기반으로 즉시 응답을 제공합니다.
+      - FAQ/공지 등 기본 문의를 빠르게 처리하여 사용자의 탐색 시간을 줄입니다.
+    - **상담원 연결**
+      - 챗봇으로 해결되지 않는 문의는 상담원 연결 버튼을 통해 실시간 문의로 전환합니다.
+      - 문의 접수 상태를 사용자/관리자 화면에서 확인할 수 있도록 구성합니다.
+</details>
+
 
 
 ## 🗺️ 시스템 구조도 (Architecture Diagram)
