@@ -3,11 +3,11 @@
 
 # 🛒 Boot Sales Platform (Spring Boot E-Commerce)
 
-> **GPT-4o-mini AI 상담과 MongoDB 실시간 채팅이 통합된 스마트 커머스 플랫폼**
+> **상품 탐색부터 주문·결제, 상담까지 한 흐름으로 제공하는 이커머스 플랫폼**
 
-이 프로젝트는 Spring Boot 기반의 이커머스 서비스에 현대적인 AI 기술과 실시간 통신 기술을 접목했습니다. RDBMS(MySQL)와 NoSQL(MongoDB)을 혼합하여 서비스 특성에 맞는 최적의 데이터 저장 구조를 설계했습니다.
+Boot Sales Platform은 사용자가 상품을 쉽게 탐색하고, 찜하기·문의·결제 등 주요 기능을 직관적으로 이용할 수 있도록 구성된 **통합 이커머스 서비스**입니다.
 
-[마이그레이션 전 프로젝트 링크](https://github.com/CSJ-094/boot_car_recall_final.git)
+관리자는 대시보드와 주문 관리 기능을 통해 상품과 주문 현황을 효율적으로 운영할 수 있도록 설계되었습니다.
 
 
 <img width="891" height="1260" alt="image" src="https://github.com/user-attachments/assets/f8eca2d3-54a5-4444-a7a1-6adcf7e2d276" />
