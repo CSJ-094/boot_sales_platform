@@ -191,7 +191,7 @@ Product-sales-platform-boot/
   <summary>메인 화면</summary>
   <br>
 
-  <img src="src/main/resources/static/img/main.gif" alt="메인 화면" width="700"/>
+  <img src="https://github.com/user-attachments/assets/dc92bad6-a065-4f26-8f23-690a21368769" alt="메인 화면" width="700"/>
 
   - **구조**  
     ItemController → ItemService → ItemRepository (QueryDSL)
