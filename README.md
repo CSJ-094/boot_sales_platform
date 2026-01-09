@@ -55,7 +55,6 @@
 | ![Notion](https://img.shields.io/badge/Notion-000000?style=flat&logo=notion&logoColor=white) | 문서화 및 일정 관리 |
 | ![Jira](https://img.shields.io/badge/Jira-0052CC?style=flat&logo=jira&logoColor=white) | 이슈 및 작업 관리 |
 | ![Slack](https://img.shields.io/badge/Slack-4A154B?style=flat&logo=slack&logoColor=white) | 팀 커뮤니케이션 |
-| ![KakaoTalk](https://img.shields.io/badge/KakaoTalk-FFCD00?style=flat&logo=kakaotalk&logoColor=black) | 실시간 소통 |
 
 ---
 ## 📁 Project Structure (프로젝트 폴더 구조)
@@ -173,27 +172,6 @@ Product-sales-platform-boot/
 
 </details>
 
-
-## 🗺️ 시스템 구조도 (Architecture Diagram)
-
-```mermaid
-graph TD
-    User((사용자)) --> Security[Spring Security]
-    Admin((관리자)) --> Security
-    
-    subgraph App_Server[Spring Boot Application]
-        Security --> Controller[Controller Layer]
-        Controller --> Service[Business Service]
-        Service --> AIService[AI & Chat Service]
-        Service --> PayService[Payment Service]
-    end
-    
-    Service --> MySQL[(MySQL: Order/Item)]
-    AIService <--> MongoDB[(MongoDB: Chat Log)]
-    AIService <--> OpenAI[[GPT-4o-mini API]]
-    PayService <--> Toss[[Toss Payments API]]
-```
-
 ## 📂 Project Documents (기타 문서)
 
 프로젝트 진행 시 작성된 설계 문서입니다. 클릭 시 상세 내용을 확인할 수 있습니다.
@@ -201,57 +179,100 @@ graph TD
 | 문서 종류 | 파일명 | 형식 | 바로가기 |
 | :--- | :--- | :---: | :---: |
 | **화면 설계서** | 화면설계서.pdf | ![PDF](https://img.shields.io/badge/PDF-F40F02?style=flat-square&logo=adobe-acrobat-reader&logoColor=white) | [📄 문서 보기](https://github.com/user-attachments/files/24488584/default.pdf) |
-| **서비스구조** | 서비스 구조도.pdf | ![PDF](https://img.shields.io/badge/PDF-F40F02?style=flat-square&logo=adobe-acrobat-reader&logoColor=white)  | [📄 문서 보기](https://github.com/user-attachments/files/24488707/-3.pdf) |
+| **서비스구조** | 테이블명세서.xls | ![PDF](https://img.shields.io/badge/PDF-F40F02?style=flat-square&logo=adobe-acrobat-reader&logoColor=white)  | [📄 문서 보기](https://github.com/user-attachments/files/24488677/default.pdf) |
 
 <br/>
 
----
-
-## 🚀 결과
+## UI/UX Screenshot
 
 ### 유저 전용 UI
 
 <details>
-  <summary><b>메인페이지 (클릭하여 펼치기)</b></summary>
-  <br />
+  <summary>메인 화면</summary>
+  <br>
 
-  <img src="https://github.com/user-attachments/assets/4584bff6-534d-47ba-8cc3-269a61d1b35b" width="100%" />
+  <img src="src/main/resources/static/img/main.gif" alt="메인 화면" width="700"/>
 
-  #### 💡 핵심 로직
-  * **구조**: ItemController → ItemService → ItemRepository(QueryDSL)
-  * **동적 쿼리**: QueryDSL을 사용하여 상품명, 상품 상태, 등록자별 검색 기능을 구현했습니다.
-  * **페이징(Pagination)**: Pageable 인터페이스를 활용해 대량의 상품 데이터를 효율적으로 끊어서 로드합니다.
-  * **이미지 최적화**: ItemImgRepository에서 `repImgYn="Y"`인 대표 이미지만 추출하여 메인 리스트에 노출합니다.
+  - **구조**  
+    ItemController → ItemService → ItemRepository (QueryDSL)
 
+  - **핵심 로직**
+    - **동적 검색**: QueryDSL을 활용해 상품명, 상품 상태, 등록자 조건별 검색 기능 구현
+    - **페이징 처리**: Pageable 인터페이스를 사용해 대량 데이터 분할 조회
+    - **이미지 최적화**: 대표 이미지(`repImgYn = 'Y'`)만 조회하여 메인 리스트에 노출
 </details>
+
 
 <details>
   <summary>상품 상세페이지</summary>
-<img width="1606" height="846" alt="chrome_V28P15tZbg" src="https://github.com/user-attachments/assets/1e493341-16e7-4395-8528-1f41d7a90608" />
+  <br>
 
-- 구조: Item 엔티티와 ItemImg 엔티티의 1:N 매핑 구조
+  <div style="display:flex; gap:20px;">
+    <img src="src/main/resources/static/img/product_detail.gif"
+         alt="상품 상세"
+         width="48%" />
+<img src="src/main/resources/static/img/product_inquiry.gif"
+         alt="상품 문의"
+         width="48%" />
+  </div>
+  
+ - **구조**
+    - Item ↔ ItemImg : 1:N 매핑으로 상품 기본 정보 + 이미지 리스트를 함께 구성
+    - ItemDetail 화면 내 탭 구성(상세/리뷰/문의)로 기능을 분리하여 제공
 
-- 핵심 로직:
-
-    상품 ID(itemId)를 경로 변수로 받아 상품 기본 정보와 등록된 모든 이미지 리스트를 함께 조회합니다.
-
-    조회수/재고 확인: 실시간 재고 수량을 파악하여 '품절' 상태일 경우 '주문하기' 버튼을 비활성화 처리합니다.
-
+  - **핵심 로직**
+    - **상품 상세 조회**
+      - 상품 ID(`itemId`)를 경로 변수로 받아 상품 정보와 등록된 이미지 목록을 함께 조회합니다.
+      - **재고 상태 처리**: 재고 수량을 확인해 `품절`이면 `주문하기` 버튼을 비활성화합니다.
+    - **상품 문의**
+      - 상품 상세 페이지에서 **문의 탭**을 통해 문의를 등록/조회할 수 있습니다.
+      - **등록**: 로그인 사용자 기준으로 제목/내용을 저장하고, 상품 ID와 함께 매핑합니다.
+      - **조회**: 상품 ID 기준으로 해당 상품의 문의 목록을 조회하여 화면에 표시합니다.
 </details>
+
 
 <details>
-  <summary>상품 구매(결제)페이지</summary>
-<img width="1567" height="852" alt="chrome_umQpbhperS" src="https://github.com/user-attachments/assets/6b090870-bda5-41aa-9c30-d589c9e729b5" />
+  <summary>찜하기(wishlist)</summary>
+  <br>
 
-- 구조: OrderController → OrderService → Toss Payments API
+  <img src="src/main/resources/static/img/wishlist.gif"
+       alt="찜하기"
+       width="700" />
 
-- 핵심 로직:
+  - **구조**
+    - User ↔ Item : 사용자별 찜 목록을 관리하는 관계로 구성
+    - 상품 상세 화면에서 찜 상태를 토글할 수 있도록 UI와 기능을 연결
 
-    트랜잭션 관리: 주문 생성 시 Item 엔티티의 removeStock 메서드를 호출하여 재고를 차감합니다. (재고 부족 시 OutOfStockException 발생)
-
-    결제 검증: 프론트엔드에서 전달받은 결제 금액과 서버 DB의 실제 상품 금액을 대조하여 위변조를 방지하는 검증 로직을 거친 후 Toss API 최종 승인을 호출합니다.
-  
+  - **핵심 로직**
+    - **찜 등록/해제**
+      - 하트 버튼 클릭 시 찜 상태를 토글하며, 이미 찜한 상품이면 해제 처리합니다.
+      - 로그인 사용자 기준으로 찜 정보를 저장/삭제하여 사용자별 목록을 분리합니다.
+    - **중복 방지**
+      - 동일 사용자-상품 조합은 중복 저장되지 않도록 처리합니다.
 </details>
+
+
+<details>
+  <summary>상품 구매(결제) 페이지</summary>
+  <br>
+
+  <img src="src/main/resources/static/img/product_order.gif"
+       alt="상품 구매 결제 페이지"
+       width="700" />
+
+  - **구조**
+    - OrderController → OrderService → Toss Payments API
+
+  - **핵심 로직**
+    - **주문 생성**
+      - 결제 요청 시 주문 정보를 생성하고 트랜잭션 범위 내에서 재고를 차감합니다.
+      - `Item.removeStock()` 호출 시 재고 부족하면 `OutOfStockException`을 발생시켜 전체 주문을 롤백합니다.
+    - **결제 검증**
+      - 프론트엔드에서 전달된 결제 금액과 서버 DB에 저장된 실제 상품 금액을 비교 검증합니다.
+      - 검증이 완료된 경우에만 Toss Payments API를 호출하여 최종 결제 승인을 처리합니다.
+</details>
+
+
 
 <details>
   <summary>마이페이지</summary>
@@ -270,27 +291,52 @@ graph TD
     주문 취소: 배송 시작 전(ORDER 상태)에만 취소가 가능하도록 검증 로직이 포함되어 있습니다.
 </details>
 
+
 ### 관리자 전용 UI
 
 <details>
-  <summary>대시보드</summary>
-<img width="1587" height="840" alt="chrome_otZmBEAbIW" src="https://github.com/user-attachments/assets/6a9c7503-473a-4868-af66-0b8e2ae9d429" />
+  <summary>관리자 대시보드</summary>
+  <br>
+
+  <img src="src/main/resources/static/img/admin_dashboard.gif"
+       alt="관리자 대시보드"
+       width="700" />
+
+  - **구조**
+    - AdminDashboardController → AdminDashboardService → Repository(통계/집계 쿼리)
+    - 주문/회원/상품 등 주요 데이터를 집계하여 카드형 지표 + 차트 형태로 시각화
+
+  - **핵심 로직**
+    - **핵심 지표 집계**
+      - 전체 주문 수, 매출, 신규 회원 수 등 관리자 핵심 지표를 집계하여 대시보드 상단에 표시합니다.
+    - **기간/조건 기반 조회**
+      - 일/주/월 단위(또는 기간 조건)로 통계 데이터를 조회하여 차트에 반영합니다.
+    - **운영 편의 기능**
+      - 대시보드에서 주요 관리 화면(주문 관리, 상품 관리 등)으로 빠르게 이동할 수 있도록 구성합니다.
 </details>
+
 
 <details>
   <summary>주문관리</summary>
 <img width="1600" height="840" alt="chrome_mOk8ryT3lL" src="https://github.com/user-attachments/assets/e498aa08-7a33-4de7-84b8-cde1ee6a43a2" />
 </details>
 
----
 
-## 👥 Team & Roles (팀 구성 및 역할)
+## 🗺️ 시스템 구조도 (Architecture Diagram)
 
-| 이름 | 역할 | 담당 기능 |
-|:--:|:--:|:--|
-| **조상진** | 팀장 / Full-Stack | - 프로젝트 전반 관리 및 초기 설계·역할 분담<br>- DB 세팅 및 수정<br>- 메인페이지 구현<br>- 토스 결제 API 연동<br>- 상품 페이지 기능 구현<br>- 고객 마이페이지(구매내역) 구현<br>- 프로젝트 병합 및 오류 수정<br>- 전반 문서/보고서 작성 |
-| **최예성** | Full-Stack | - 관리자 공지사항 등록/수정/삭제 기능 구현<br>- 관리자 페이지 프론트 구현<br>- 파일 업로드 및 주요 오류 대응 참여<br>- 택배 배송 조회 API 연동<br>- 주문 페이지 택배 기능 구현<br>- 문서 작업 |
-| **김가영** | Full-Stack | - 전반 UI/프론트 디자인 가이드 적용<br>- 판매자 정보 조회 기능 구현<br>- 판매자 상품 등록/수정/삭제 기능 구현<br>- 카테고리 기능 구현 및 연동<br>- 판매자 마이페이지 프론트 구현<br>- 판매자 마이페이지 최근 리스트 구현<br>- 판매자 대시보드 구현<br>- PPT 제작 |
-| **주석우** | Full-Stack | - 로그인 / 회원가입 기능 구현<br>- 이메일 인증 기능 구현<br>- 카테고리별 상품 조회 페이지 구현<br>- 메인 페이지 상품 리스트 프론트 구현<br>- ChatGPT 연동 챗봇 구현<br>- 챗봇 내 1:1 상담사 채팅 기능 구현 |
-| **한경훈** | Full-Stack | - 프론트 디자인 통일 및 UI 구현<br>- 상품 구매 및 결제 기능 개발<br>- 고객 마이페이지 프론트 구현<br>- 파일 업로드 기능 개발<br>- 상품 검색 기능 구현<br>- 챗봇 API 연동<br>- 출석체크 API 구현<br>- 쿠폰/포인트 기능 구현 |
-| **최민규** | Full-Stack | - 메인페이지 상품 리스트 기능 구현<br>- 회원가입 / 로그인 기능 구현<br>- 메인페이지 프론트 구현<br>- 목록 페이지 프론트 구현<br>- 카카오 API 연동<br>- 로그인/회원정보 암호화 적용<br>- 비밀번호 찾기 기능 구현<br>- 회원 탈퇴 기능 구현<br>- 마이그레이션 작업 |
+```mermaid
+graph TD
+    User((사용자)) --> Security[Spring Security]
+    Admin((관리자)) --> Security
+    
+    subgraph App_Server [Spring Boot Application]
+        Security --> Controller[Controller Layer]
+        Controller --> Service[Business Service]
+        Service --> AIService[AI & Chat Service]
+        Service --> PayService[Payment Service]
+    end
+    
+    Service --> MySQL[(MySQL: Order/Item)]
+    AIService <--> MongoDB[(MongoDB: Chat Log)]
+    AIService <--> OpenAI[[GPT-4o-mini API]]
+    PayService <--> Toss[[Toss Payments API]]
