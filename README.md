@@ -188,7 +188,7 @@ Product-sales-platform-boot/
 <details>
   <summary><b>메인 페이지 및 상품 탐색</b></summary>
   <br />
-  <img src="https://github.com/user-attachments/assets/62866b2d-40bb-4059-a86b-e94339d83eb5" width="100%" />
+  <img src="https://github.com/user-attachments/assets/62866b2d-40bb-4059-a86b-e94339d83eb5" width="80%" />
 
   - **구조**: `ItemController` → `ItemService` → `ItemRepository(QueryDSL)`
   - **핵심 로직**:
@@ -199,8 +199,8 @@ Product-sales-platform-boot/
 <details>
   <summary><b>상품 상세 페이지 및 찜하기</b></summary>
   <br />
-  <img src="https://github.com/user-attachments/assets/22d8801d-c90a-4bbe-878d-2b0e0b25a5d4" width="100%" />
-  <img src="https://github.com/user-attachments/assets/20d67820-a8ab-4b84-aac1-428055b77d97" width="100%" />
+  <img src="https://github.com/user-attachments/assets/22d8801d-c90a-4bbe-878d-2b0e0b25a5d4" width="49%" />
+  <img src="https://github.com/user-attachments/assets/20d67820-a8ab-4b84-aac1-428055b77d97" width="49%" />
 
   - **구조**: `ItemService` → `WishlistService`
   - **핵심 로직**:
@@ -238,8 +238,8 @@ Product-sales-platform-boot/
 <details>
   <summary><b>관리자 대시보드 및 주문 관리</b></summary>
   <br />
-  <img src="https://github.com/user-attachments/assets/0d421d79-6a3b-4610-bbcb-a79ef1908e49" width="100%" />
-  <img src="https://github.com/user-attachments/assets/244ce910-321d-48f1-995e-8a0bb33cd6a4" width="100%" />
+  <img src="https://github.com/user-attachments/assets/0d421d79-6a3b-4610-bbcb-a79ef1908e49" width="49%" />
+  <img src="https://github.com/user-attachments/assets/244ce910-321d-48f1-995e-8a0bb33cd6a4" width="49%" />
 
   - **구조**: `AdminController` → `StatService` → `OrderRepository`
   - **핵심 로직**:
@@ -250,7 +250,7 @@ Product-sales-platform-boot/
 <details>
   <summary><b>실시간 상담원 연결</b></summary>
   <br />
-  <img src="https://github.com/user-attachments/assets/7fbdf1db-2a4b-4759-85d1-cca1f183bd77" width="100%" />
+  <img src="https://github.com/user-attachments/assets/7fbdf1db-2a4b-4759-85d1-cca1f183bd77" width="80%" />
 
   - **핵심 로직**:
     - **관리자 전용 채팅창**: 여러 명의 유저 문의를 리스트로 관리하고, 선택한 유저와 즉시 매칭되어 상담을 진행하는 로직을 구현했습니다.
