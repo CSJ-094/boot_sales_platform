@@ -211,7 +211,7 @@ Product-sales-platform-boot/
 <details>
   <summary><b>장바구니 및 주문 플로우</b></summary>
   <br />
-  <img src="https://github.com/user-attachments/assets/08bb24f6-19dd-46da-833c-21aad1ebf6bd" width="100%" />
+  <img src="https://github.com/user-attachments/assets/08bb24f6-19dd-46da-833c-21aad1ebf6bd" width="80%" />
 
   - **구조**: `CartService` → `OrderService`
   - **핵심 로직**:
