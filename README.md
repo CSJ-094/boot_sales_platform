@@ -255,7 +255,7 @@ Product-sales-platform-boot/
   - **핵심 로직**:
     - **관리자 전용 채팅창**: 여러 명의 유저 문의를 리스트로 관리하고, 선택한 유저와 즉시 매칭되어 상담을 진행하는 로직을 구현했습니다.
 </details>
-
+<br/>
 
 ## 🧠 주요 해결 과제 (Engineering Review)
 
@@ -276,7 +276,7 @@ Product-sales-platform-boot/
 ### 4. 데이터 일관성 및 재고 관리
 * **Problem**: 주문 프로세스 중 재고 감소와 결제 준비 과정에서 어느 한 곳이라도 실패할 경우 데이터 불일치가 발생할 위험이 있었습니다.
 * **Solution**: 비즈니스 로직에 `@Transactional`을 적용하여 원자성(Atomicity)을 보장했습니다. 재고 부족 시 커스텀 예외(`OutOfStockException`)를 발생시켜 안전하게 롤백되도록 설계했습니다.
-
+<br/>
 
 ## 🗺️ 시스템 구조도 (Architecture Diagram)
 
