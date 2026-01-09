@@ -207,13 +207,14 @@ graph TD
 
 ---
 
-## UI/UX Screenshot
+## 🚀 결과
 
 ### 유저 전용 UI
 
 <details>
-  <summary>메인화면</summary>
-<img width="1601" height="942" alt="chrome_DHcEmL3QNu" src="https://github.com/user-attachments/assets/5a117255-4963-4379-8f08-13b3d7f35b97" />
+  <summary><b>메인페이지</b></summary>
+  ![메인화면](https://github.com/user-attachments/assets/01803f6d-cd54-4dfd-9869-8736a712833c)
+
 
 - 구조: ItemController → ItemService → ItemRepository(QueryDSL)
 
