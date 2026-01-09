@@ -213,8 +213,7 @@ graph TD
 
 <details>
   <summary><b>메인페이지</b></summary>
-  ![메인화면](https://github.com/user-attachments/assets/01803f6d-cd54-4dfd-9869-8736a712833c)
-
+  ![main](https://github.com/user-attachments/assets/f5a14f1b-00ea-4073-9a60-f14e419751d1)
 
 - 구조: ItemController → ItemService → ItemRepository(QueryDSL)
 
